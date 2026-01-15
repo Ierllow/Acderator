@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1045 &1
+EditorBuildSettings:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Acderator/Scenes/Boot.unity
+    guid: 1f7520dad3831bc4b985eeae7ddb313c
+  - enabled: 1
+    path: Assets/Acderator/Scenes/Title.unity
+    guid: 6b923a9643628d74c8b795c9382cb536
+  - enabled: 1
+    path: Assets/Acderator/Scenes/SongSelect.unity
+    guid: 55abdb884b0818d4db715402544223ac
+  - enabled: 1
+    path: Assets/Acderator/Scenes/Song.unity
+    guid: 9fc0d4010bbf28b4594072e72b8655ab
+  - enabled: 1
+    path: Assets/Acderator/Scenes/Result.unity
+    guid: 6b7fe349a9f3c0f4385f152293348acd
+  m_configObjects: {}

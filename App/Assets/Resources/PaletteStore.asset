@@ -1,0 +1,220 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0edd4d6dec9974f11ba4b078ca3a0e1e, type: 3}
+  m_Name: PaletteStore
+  m_EditorClassIdentifier: 
+  _colorPalette:
+    _entries:
+      _keys:
+      - 961a5454-79e6-4eac-9b64-403cc4fa557b
+      - 7774e83a-9894-4521-b48c-378821c933ff
+      _values:
+      - _id: 961a5454-79e6-4eac-9b64-403cc4fa557b
+        _name:
+          _value: LightWhite
+        _values:
+          _keys:
+          - 4a669972-2591-4c38-a9d2-e39bbd662904
+          _values:
+          - _value: {r: 1, g: 1, b: 1, a: 0.4627451}
+      - _id: 7774e83a-9894-4521-b48c-378821c933ff
+        _name:
+          _value: White
+        _values:
+          _keys:
+          - 4a669972-2591-4c38-a9d2-e39bbd662904
+          _values:
+          - _value: {r: 1, g: 1, b: 1, a: 1}
+    _themes:
+      _keys:
+      - 4a669972-2591-4c38-a9d2-e39bbd662904
+      _values:
+      - _id: 4a669972-2591-4c38-a9d2-e39bbd662904
+        _name:
+          _value: Default
+    _entryOrders:
+      _ids:
+      - 961a5454-79e6-4eac-9b64-403cc4fa557b
+      - 7774e83a-9894-4521-b48c-378821c933ff
+    _themeOrders:
+      _ids:
+      - 4a669972-2591-4c38-a9d2-e39bbd662904
+    _activeThemeId: 4a669972-2591-4c38-a9d2-e39bbd662904
+  _gradientPalette:
+    _entries:
+      _keys:
+      - 8ca02421-58ec-47b3-8cf7-89e70d3bc65d
+      - fc650475-e8f8-4ec7-91fb-d81e7e97934f
+      - ed740ee4-c50c-4a12-b62c-9bca9b158a16
+      _values:
+      - _id: 8ca02421-58ec-47b3-8cf7-89e70d3bc65d
+        _name:
+          _value: Exc
+        _values:
+          _keys:
+          - 69c39b37-a72c-4ea3-b33d-46a623c2fa6c
+          _values:
+          - _value:
+              serializedVersion: 2
+              key0: {r: 0.3254902, g: 0.35686275, b: 0.5372549, a: 1}
+              key1: {r: 0.40392157, g: 0.7254902, b: 0.94509804, a: 1}
+              key2: {r: 0.8666667, g: 0.8666667, b: 0.9607843, a: 0}
+              key3: {r: 0.64705884, g: 0.6784314, b: 1, a: 0}
+              key4: {r: 1, g: 1, b: 1, a: 0}
+              key5: {r: 1, g: 1, b: 1, a: 0}
+              key6: {r: 1, g: 1, b: 1, a: 0}
+              key7: {r: 0, g: 0, b: 0, a: 0}
+              ctime0: 0
+              ctime1: 21627
+              ctime2: 43253
+              ctime3: 65535
+              ctime4: 65535
+              ctime5: 65535
+              ctime6: 65535
+              ctime7: 0
+              atime0: 0
+              atime1: 65535
+              atime2: 0
+              atime3: 0
+              atime4: 0
+              atime5: 0
+              atime6: 0
+              atime7: 0
+              m_Mode: 0
+              m_ColorSpace: 0
+              m_NumColorKeys: 4
+              m_NumAlphaKeys: 2
+      - _id: fc650475-e8f8-4ec7-91fb-d81e7e97934f
+        _name:
+          _value: Clear
+        _values:
+          _keys:
+          - 69c39b37-a72c-4ea3-b33d-46a623c2fa6c
+          _values:
+          - _value:
+              serializedVersion: 2
+              key0: {r: 0.76117647, g: 0.6788236, b: 0.37137255, a: 1}
+              key1: {r: 0.7921569, g: 0.58431375, b: 0.2, a: 1}
+              key2: {r: 0.63529414, g: 0.8980392, b: 0.16470589, a: 0}
+              key3: {r: 0.4117647, g: 0.9254902, b: 0.34509805, a: 0}
+              key4: {r: 0, g: 0, b: 0, a: 0}
+              key5: {r: 0, g: 0, b: 0, a: 0}
+              key6: {r: 0, g: 0, b: 0, a: 0}
+              key7: {r: 0, g: 0, b: 0, a: 0}
+              ctime0: 0
+              ctime1: 21627
+              ctime2: 43253
+              ctime3: 65535
+              ctime4: 0
+              ctime5: 0
+              ctime6: 0
+              ctime7: 0
+              atime0: 0
+              atime1: 65535
+              atime2: 0
+              atime3: 0
+              atime4: 0
+              atime5: 0
+              atime6: 0
+              atime7: 0
+              m_Mode: 0
+              m_ColorSpace: 0
+              m_NumColorKeys: 4
+              m_NumAlphaKeys: 2
+      - _id: ed740ee4-c50c-4a12-b62c-9bca9b158a16
+        _name:
+          _value: Failed
+        _values:
+          _keys:
+          - 69c39b37-a72c-4ea3-b33d-46a623c2fa6c
+          _values:
+          - _value:
+              serializedVersion: 2
+              key0: {r: 0.2, g: 0.105882354, b: 0.8862745, a: 1}
+              key1: {r: 0.06666667, g: 0.13333334, b: 0.13333334, a: 1}
+              key2: {r: 0, g: 0.011764706, b: 0.62352943, a: 0}
+              key3: {r: 0.5372549, g: 0.60784316, b: 0.94509804, a: 0}
+              key4: {r: 0, g: 0, b: 0, a: 0}
+              key5: {r: 0, g: 0, b: 0, a: 0}
+              key6: {r: 0, g: 0, b: 0, a: 0}
+              key7: {r: 0, g: 0, b: 0, a: 0}
+              ctime0: 0
+              ctime1: 21627
+              ctime2: 43253
+              ctime3: 65535
+              ctime4: 0
+              ctime5: 0
+              ctime6: 0
+              ctime7: 0
+              atime0: 0
+              atime1: 65535
+              atime2: 0
+              atime3: 0
+              atime4: 0
+              atime5: 0
+              atime6: 0
+              atime7: 0
+              m_Mode: 0
+              m_ColorSpace: 0
+              m_NumColorKeys: 4
+              m_NumAlphaKeys: 2
+    _themes:
+      _keys:
+      - 69c39b37-a72c-4ea3-b33d-46a623c2fa6c
+      _values:
+      - _id: 69c39b37-a72c-4ea3-b33d-46a623c2fa6c
+        _name:
+          _value: Default
+    _entryOrders:
+      _ids:
+      - 8ca02421-58ec-47b3-8cf7-89e70d3bc65d
+      - fc650475-e8f8-4ec7-91fb-d81e7e97934f
+      - ed740ee4-c50c-4a12-b62c-9bca9b158a16
+    _themeOrders:
+      _ids:
+      - 69c39b37-a72c-4ea3-b33d-46a623c2fa6c
+    _activeThemeId: 69c39b37-a72c-4ea3-b33d-46a623c2fa6c
+  _characterStylePalette:
+    _entries:
+      _keys: []
+      _values: []
+    _themes:
+      _keys:
+      - 37dfcba0-1f0d-43e6-9bc8-290c48fd17b5
+      _values:
+      - _id: 37dfcba0-1f0d-43e6-9bc8-290c48fd17b5
+        _name:
+          _value: Default
+    _entryOrders:
+      _ids: []
+    _themeOrders:
+      _ids:
+      - 37dfcba0-1f0d-43e6-9bc8-290c48fd17b5
+    _activeThemeId: 37dfcba0-1f0d-43e6-9bc8-290c48fd17b5
+  _characterStyleTMPPalette:
+    _entries:
+      _keys: []
+      _values: []
+    _themes:
+      _keys:
+      - a357cca1-a77e-4e3d-b592-06ebcf0da609
+      _values:
+      - _id: a357cca1-a77e-4e3d-b592-06ebcf0da609
+        _name:
+          _value: Default
+    _entryOrders:
+      _ids: []
+    _themeOrders:
+      _ids:
+      - a357cca1-a77e-4e3d-b592-06ebcf0da609
+    _activeThemeId: a357cca1-a77e-4e3d-b592-06ebcf0da609
+  _missingEntryErrorLevel: 2

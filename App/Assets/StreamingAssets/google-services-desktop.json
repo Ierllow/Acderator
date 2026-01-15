@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "501048480795",
+    "project_id": "musicgame-355817",
+    "storage_bucket": "musicgame-355817.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:501048480795:android:acf0b8585a70ecf00214be",
+        "android_client_info": {
+          "package_name": "com.DefaultCompany.musicGamemaster"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "501048480795-df7ku2ps5t2e2b50mo06n3jmma51cbvq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDHkatj8fHdLW1vp-KFK9T-TyXDj3taZI4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "501048480795-df7ku2ps5t2e2b50mo06n3jmma51cbvq.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "501048480795-4vgkgspsrfgcsv2fkcd7mppusici4fmg.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.DefaultCompany.musicGame-master"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
