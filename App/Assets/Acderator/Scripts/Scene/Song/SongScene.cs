@@ -91,6 +91,7 @@ namespace Song
                 if (loadedChartInfo.LoadResult.EnumEquals(ELoadResult.None))
                 {
                     notesManager.Init(loadedChartInfo);
+                    noteFactory.Init();
                     var offset = notesManager.GetSpawnOffset(notesLineController.LaneLength);
                     songControllerResolver.Loop.SetOffset(offset);
                     songControllerResolver.Spawner.Init(loadedChartInfo.NoteDataList, offset);

@@ -771,11 +771,6 @@ MonoBehaviour:
   ConformX: 1
   ConformY: 1
   Logging: 0
---- !u!1 &160650891 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 299359212368171834, guid: 84c3b95df199e4a11b374ff991d77f14, type: 3}
-  m_PrefabInstance: {fileID: 1816287539}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &186124688
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -854,6 +849,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4742101743095847061, guid: cd9e1b0593c7f4470b0d6e377f33b88f, type: 3}
   m_PrefabInstance: {fileID: 186124688}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &186124690 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2061089197911309461, guid: cd9e1b0593c7f4470b0d6e377f33b88f, type: 3}
+  m_PrefabInstance: {fileID: 186124688}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4eb57a46dfde648348158abf264d9eb9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &210054720
 GameObject:
   m_ObjectHideFlags: 0
@@ -1563,7 +1569,7 @@ GameObject:
   m_Component:
   - component: {fileID: 375787888}
   m_Layer: 0
-  m_Name: LInes
+  m_Name: Lines
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2209,6 +2215,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 723489221}
+  - component: {fileID: 723489222}
   m_Layer: 0
   m_Name: Particles
   m_TagString: Untagged
@@ -2231,6 +2238,22 @@ Transform:
   m_Children: []
   m_Father: {fileID: 2104897572}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &723489222
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 723489220}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da17eeeeda8f22e47af03db236aac7b9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Song.SongParticleController
+  tapParticleObject: {fileID: 418352186}
+  holdParticleObject: {fileID: 1797037050}
+  judgeParticleObject: {fileID: 903195510}
+  particlePoolTransform: {fileID: 723489221}
 --- !u!1 &728739108
 GameObject:
   m_ObjectHideFlags: 0
@@ -3768,6 +3791,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4460316642199643599, guid: 401eda2e74877894683b243607d91561, type: 3}
   m_PrefabInstance: {fileID: 999429746}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &999429748 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 238052682759515483, guid: 401eda2e74877894683b243607d91561, type: 3}
+  m_PrefabInstance: {fileID: 999429746}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb9a0b80da1937a499459e04c46e6c92, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &999688511
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3846,6 +3880,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 8772820350342947061, guid: 140051c5b862643eab7d9bc070b1f8b2, type: 3}
   m_PrefabInstance: {fileID: 999688511}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &999688513 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: -5625268790149222853, guid: 140051c5b862643eab7d9bc070b1f8b2, type: 3}
+  m_PrefabInstance: {fileID: 999688511}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 77e690ba27d2a42ddb02c04a6b6db5e6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1054320623
 GameObject:
   m_ObjectHideFlags: 0
@@ -4043,11 +4088,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1524234341}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1143397926 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 4524999784785855319, guid: 140051c5b862643eab7d9bc070b1f8b2, type: 3}
-  m_PrefabInstance: {fileID: 999688511}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1179438452
 GameObject:
   m_ObjectHideFlags: 0
@@ -4421,11 +4461,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1524234341}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1389794136 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 7449628401480591517, guid: cd9e1b0593c7f4470b0d6e377f33b88f, type: 3}
-  m_PrefabInstance: {fileID: 186124688}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1394493676
 GameObject:
   m_ObjectHideFlags: 0
@@ -4566,7 +4601,7 @@ MonoBehaviour:
   backTelopLayerController: {fileID: 936951398}
   songPopupLayerController: {fileID: 728739110}
   notesLineController: {fileID: 2104897571}
-  songFailFastExceptionWatcher: {fileID: 1413050360}
+  failFastExceptionWatcher: {fileID: 1413050360}
 --- !u!114 &1413050358
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4579,23 +4614,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1b2c3d4e5f6789012345678901234ab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  notePrefabs:
-  - key: 0
-    value: {fileID: 160650891}
-  - key: 1
-    value: {fileID: 1389794136}
-  - key: 2
-    value: {fileID: 1143397926}
-  - key: 3
-    value: {fileID: 1836745090}
-  notePoolTransform: {fileID: 1924241690}
-  hitParticlePrefab:
-  - key: 0
-    value: {fileID: 418352186}
-  - key: 1
-    value: {fileID: 1797037050}
-  judgeParticlePrefab: {fileID: 903195510}
-  particlePoolTransform: {fileID: 89953999}
 --- !u!114 &1413050359
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5698,6 +5716,11 @@ MonoBehaviour:
   - {fileID: 1087920362}
   - {fileID: 1282521082}
   - {fileID: 1628321500}
+  notePrefabs:
+    singleNote: {fileID: 1816287541}
+    longNote: {fileID: 186124690}
+    flickNote: {fileID: 999688513}
+    curveNote: {fileID: 999429748}
 --- !u!114 &1656341584
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6372,11 +6395,17 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 9184044766039723663, guid: 84c3b95df199e4a11b374ff991d77f14, type: 3}
   m_PrefabInstance: {fileID: 1816287539}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &1836745090 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1778185036528587733, guid: 401eda2e74877894683b243607d91561, type: 3}
-  m_PrefabInstance: {fileID: 999429746}
+--- !u!114 &1816287541 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1929046337053051806, guid: 84c3b95df199e4a11b374ff991d77f14, type: 3}
+  m_PrefabInstance: {fileID: 1816287539}
   m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad88ba1358d79415eb38a6c8eb3048ab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1845836065
 GameObject:
   m_ObjectHideFlags: 0
@@ -6954,7 +6983,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &2104897571
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6973,8 +7002,6 @@ MonoBehaviour:
   - {fileID: 849423310}
   - {fileID: 834528805}
   noteLineRoot: {fileID: 2104897570}
-  spawnStartLane: {fileID: 932567021}
-  judgeLane: {fileID: 67871189}
 --- !u!224 &2104897572
 RectTransform:
   m_ObjectHideFlags: 0

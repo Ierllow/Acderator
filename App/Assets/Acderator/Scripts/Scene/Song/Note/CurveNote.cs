@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using Zenject;
 using ZLinq;
 
 namespace Song
@@ -19,9 +18,9 @@ namespace Song
         private List<Vector2> curvePointList;
         private float curveDuration;
 
-        public new void OnSpawned(NoteData data, IMemoryPool pool)
+        public new void Init(NoteData data, NotePool<NoteBase> pool)
         {
-            base.OnSpawned(data, pool);
+            base.Init(data, pool);
 
             NoteData = data;
             this.pool = pool;

@@ -3,18 +3,54 @@ using Intense;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using Zenject;
 using ZLinq;
 
 namespace Song
 {
-    public class SongParticleController : IController
+    public class SongParticleController : MonoBehaviour, IController
     {
-        [Inject] private TapParticlePool tapPool;
-        [Inject] private HoldParticlePool holdPool;
-        [Inject] private JudgeParticlePool judgePool;
+        [SerializeField] private ParticleObject tapParticleObject;
+        [SerializeField] private HoldParticleObject holdParticleObject;
+        [SerializeField] private JudgeParticleObject judgeParticleObject;
+
+        private TapParticlePool tapParticlePool;
+        private HoldParticlePool holdParticlePool;
+        private JudgeParticlePool judgeParticlePool;
+
+        [SerializeField] private Transform particlePoolTransform;
 
         private readonly Dictionary<int, HoldParticleObject> playingHoldParticleDict = new();
+
+        private void Awake()
+        {
+            tapParticlePool = new TapParticlePool(
+                createFunc: () => Instantiate(tapParticleObject, particlePoolTransform),
+                actionOnGet: note => note.gameObject.SetActive(true),
+                actionOnRelease: note => note.gameObject.SetActive(false),
+                actionOnDestroy: note => Destroy(note.gameObject),
+                collectionCheck: false,
+                defaultCapacity: 5,
+                maxSize: 10
+            );
+            holdParticlePool = new HoldParticlePool(
+                createFunc: () => Instantiate(holdParticleObject, particlePoolTransform),
+                actionOnGet: note => note.gameObject.SetActive(true),
+                actionOnRelease: note => note.gameObject.SetActive(false),
+                actionOnDestroy: note => Destroy(note.gameObject),
+                collectionCheck: false,
+                defaultCapacity: 5,
+                maxSize: 10
+            );
+            judgeParticlePool = new JudgeParticlePool(
+                createFunc: () => Instantiate(judgeParticleObject, particlePoolTransform),
+                actionOnGet: note => note.gameObject.SetActive(true),
+                actionOnRelease: note => note.gameObject.SetActive(false),
+                actionOnDestroy: note => Destroy(note.gameObject),
+                collectionCheck: false,
+                defaultCapacity: 5,
+                maxSize: 10
+            );
+        }
 
         public void UpdateParticles(FingerInfo fingerInfo)
         {
@@ -42,11 +78,15 @@ namespace Song
                 3 => -0.25f,
                 _ => default,
             };
+
             SpawnJudgeEffect(particlePosition, judgeParticlePosition, particleInfo.Item3).Forget();
             if (particleInfo.Item2.EnumEquals(ENoteType.Long)
                 || particleInfo.Item2.EnumEquals(ENoteType.Curve))
             {
-                PlayHoldEffect(particleInfo, particlePosition, judgeParticlePosition).Forget();
+                if (!particleInfo.Item1.EnumEquals(EFingerType.Up))
+                    PlayHoldEffect(particleInfo, particlePosition, judgeParticlePosition).Forget();
+                else
+                    StopHoldEffect(particleInfo.Item4);
                 return;
             }
             SpawnTapEffect(particlePosition).Forget();
@@ -54,16 +94,18 @@ namespace Song
 
         private async UniTask SpawnJudgeEffect(float parentX, float childX, EJudgementType judgementType)
         {
-            var pool = judgePool.Spawn(parentX, childX, judgementType);
-            await UniTask.WaitWhile(() => pool.IsPlaying);
-            judgePool.Despawn(pool);
+            var judgeParticle = judgeParticlePool.Get();
+            judgeParticle.Emit(parentX, childX, judgementType);
+            await UniTask.WaitWhile(() => judgeParticle.IsPlaying);
+            judgeParticlePool.Release(judgeParticle);
         }
 
-        private async UniTask SpawnTapEffect(float x)
+        private async UniTask SpawnTapEffect(float position)
         {
-            var pool = tapPool.Spawn(x);
-            await UniTask.WaitWhile(() => pool.IsPlaying);
-            tapPool.Despawn(pool);
+            var tapParticle = tapParticlePool.Get();
+            tapParticle.Emit(position);
+            await UniTask.WaitWhile(() => tapParticle.IsPlaying);
+            tapParticlePool.Release(tapParticle);
         }
 
         private async UniTask PlayHoldEffect((EFingerType fingerType, ENoteType noteType, EJudgementType judgeType, int lane, List<NoteBase> tappingNotes) particleInfo, float parentX, float childX)
@@ -72,13 +114,14 @@ namespace Song
                 && particleInfo.fingerType.EnumEquals(EFingerType.Down)
                 && !particleInfo.judgeType.EnumEquals(EJudgementType.Miss))
             {
-                var holdParticle = holdPool.Spawn(parentX);
+                var holdParticle = holdParticlePool.Get();
+                holdParticle.Play(parentX);
                 playingHoldParticleDict.Add(particleInfo.lane, holdParticle);
             }
             if (playingHoldParticleDict.TryGetValue(particleInfo.lane, out var playing)
                 && !particleInfo.tappingNotes.AsValueEnumerable().Any(x => x.NoteData.Lane == particleInfo.lane))
             {
-                holdPool.Despawn(playing);
+                holdParticlePool.Release(playing);
                 playingHoldParticleDict.Remove(particleInfo.lane);
                 await SpawnJudgeEffect(parentX, childX, particleInfo.judgeType);
             }
@@ -89,7 +132,7 @@ namespace Song
             if (playingHoldParticleDict.TryGetValue(lane, out var holdParticle))
             {
                 holdParticle.Stop();
-                holdPool.Despawn(holdParticle);
+                holdParticlePool.Release(holdParticle);
                 playingHoldParticleDict.Remove(lane);
             }
         }

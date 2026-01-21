@@ -1,20 +1,23 @@
-﻿using Intense;
-using Zenject;
+﻿using System;
+using UnityEngine.Pool;
 
 namespace Song
 {
-    public class TapParticlePool : MonoMemoryPool<float, ParticleObject>
+    public class TapParticlePool : ObjectPool<ParticleObject>
     {
-        protected override void Reinitialize(float xPosition, ParticleObject item) => item.Emit(xPosition);
+        public TapParticlePool(Func<ParticleObject> createFunc, Action<ParticleObject> actionOnGet = null, Action<ParticleObject> actionOnRelease = null, Action<ParticleObject> actionOnDestroy = null, bool collectionCheck = false, int defaultCapacity = 4, int maxSize = 10)
+            : base(createFunc, actionOnGet, actionOnRelease, actionOnDestroy, collectionCheck, defaultCapacity, maxSize) { }
     }
 
-    public class HoldParticlePool : MonoMemoryPool<float, HoldParticleObject>
+    public class HoldParticlePool : ObjectPool<HoldParticleObject>
     {
-        protected override void Reinitialize(float xPosition, HoldParticleObject item) => item.Play(xPosition);
+        public HoldParticlePool(Func<HoldParticleObject> createFunc, Action<HoldParticleObject> actionOnGet = null, Action<HoldParticleObject> actionOnRelease = null, Action<HoldParticleObject> actionOnDestroy = null, bool collectionCheck = false, int defaultCapacity = 4, int maxSize = 10)
+            : base(createFunc, actionOnGet, actionOnRelease, actionOnDestroy, collectionCheck, defaultCapacity, maxSize) { }
     }
 
-    public class JudgeParticlePool : MonoMemoryPool<float, float, EJudgementType, JudgeParticleObject>
+    public class JudgeParticlePool : ObjectPool<JudgeParticleObject>
     {
-        protected override void Reinitialize(float xParentPos, float xChildPos, EJudgementType type, JudgeParticleObject item) => item.Emit(xParentPos, xChildPos, type);
+        public JudgeParticlePool(Func<JudgeParticleObject> createFunc, Action<JudgeParticleObject> actionOnGet = null, Action<JudgeParticleObject> actionOnRelease = null, Action<JudgeParticleObject> actionOnDestroy = null, bool collectionCheck = false, int defaultCapacity = 4, int maxSize = 10)
+            : base(createFunc, actionOnGet, actionOnRelease, actionOnDestroy, collectionCheck, defaultCapacity, maxSize) { }
     }
 }
