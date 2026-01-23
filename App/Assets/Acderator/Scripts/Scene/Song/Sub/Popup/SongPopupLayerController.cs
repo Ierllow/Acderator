@@ -2,7 +2,6 @@
 using Cysharp.Threading.Tasks.Linq;
 using Element.UI;
 using Intense;
-using Intense.Asset;
 using Intense.UI;
 using R3;
 using System;
@@ -68,7 +67,7 @@ namespace Song
 
             currentOpenPopupType = EType.Error;
             if (!SceneManager.Instance.IsFadeIn) await SceneManager.Instance.FadeInAsync();
-            await AutoResetUniTaskCompletionSource.Create().OpenErrorPopup();
+            await PopupUtils.OpenErrorPopup();
         }
 
         private void OnOpenSaveScoreDataErrorPopup()

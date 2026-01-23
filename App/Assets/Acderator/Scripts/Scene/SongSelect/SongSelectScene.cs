@@ -2,7 +2,6 @@
 using Cysharp.Threading.Tasks.Linq;
 using Intense;
 using Intense.Asset;
-using Intense.Internal;
 using Intense.Master;
 using Intense.UI;
 using R3;
@@ -43,7 +42,7 @@ namespace SongSelect
             songSelectDetail.SetData(songListView.SelectedGroup, songListView.SelectedDifficulty);
             backgroundImage.SetAtlasFormat("{0}", MasterDataManager.Instance.MemoryDatabase.SongMasterTable.FindByGroup(songListView.SelectedGroup).Bg, "songselect/bg");
             orderButton.SetButtonText(songListView.CurrentOrderText);
-            SoundManager.Instance.PlaySongPreview(songListView.SelectedGroup);
+            SoundManager.Instance.PlaySongPreview(songListView.SelectedGroup, destroyCancellationToken);
             await UniTask.WhenAll(
                 UniTask.Delay(500, cancellationToken: destroyCancellationToken),
                 SceneManager.Instance.FadeInAsync());
@@ -51,7 +50,7 @@ namespace SongSelect
 
         public override void OnDeleteScene()
         {
-            if (!AlertManager.Instance.IsAlert) songListView.Save();
+            songListView.Save();
             base.OnDeleteScene();
         }
 
@@ -73,7 +72,7 @@ namespace SongSelect
         {
             songSelectDetail.SetData(cell.MSong.Group, songListView.SelectedDifficulty);
             backgroundImage.SetAtlasFormat("{0}", MasterDataManager.Instance.MemoryDatabase.SongMasterTable.FindByGroup(cell.MSong.Group).Bg);
-            SoundManager.Instance.PlaySongPreview(cell.MSong.Group);
+            SoundManager.Instance.PlaySongPreview(cell.MSong.Group, destroyCancellationToken);
         }
 
         private void SelectedDifficultChanged(Toggle toggle)

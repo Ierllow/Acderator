@@ -12,6 +12,15 @@ namespace Intense.Internal
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        static void ThrowArgumentNullExceptionCore(string paramName) => throw new ArgumentNullException(paramName);
+        private static void ThrowArgumentNullExceptionCore(string paramName) => throw new ArgumentNullException(paramName);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void ThrowIfInvalid(bool isValid, string message)
+        {
+            if (!isValid) ThrowInvalidOperationExceptionCore(message);
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private static void ThrowInvalidOperationExceptionCore(string message) => throw new InvalidOperationException(message);
     }
 }

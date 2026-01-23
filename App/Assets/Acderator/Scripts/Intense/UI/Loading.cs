@@ -3,6 +3,7 @@ using DG.Tweening;
 using System;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace Intense.UI
@@ -14,6 +15,7 @@ namespace Intense.UI
         [SerializeField] private GameObject progressBar;
         [SerializeField] private Slider slider;
         [SerializeField] private TextMeshProUGUI percent;
+        [SerializeField] private EventSystem eventSystem;
 
         private Sequence sequence;
         private DOTweenTMPAnimator doTweenTMPAnimator;
@@ -46,7 +48,7 @@ namespace Intense.UI
                 sequence.Play();
                 isInit = true;
             }
-            TouchControlManager.Instance.SetEventSystemEnabled(true);
+            eventSystem.enabled = false;
         }
 
         public void SetDownloadFileSize(long downloadedFileSize, long allFileSize)
@@ -70,7 +72,7 @@ namespace Intense.UI
         {
             sequence.Pause();
             loadingRoot.SetActive(false);
-            TouchControlManager.Instance.SetEventSystemEnabled(false);
+            eventSystem.enabled = true;
         }
     }
 }

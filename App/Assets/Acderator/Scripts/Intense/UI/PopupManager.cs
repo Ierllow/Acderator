@@ -1,5 +1,4 @@
 ﻿using Cysharp.Text;
-using Cysharp.Threading.Tasks;
 using Cysharp.Threading.Tasks.Linq;
 using Element.UI;
 using R3;
@@ -54,16 +53,6 @@ namespace Intense.UI
             openedPopupList.Add(popupBase);
 
             Debug.Log(ZString.Format("{0} is open", CurrentOpenPopup));
-        }
-    }
-
-    static class Ex
-    {
-        public static async UniTask OpenErrorPopup(this AutoResetUniTaskCompletionSource completionSource)
-        {
-            TouchControlManager.Instance.SetEventSystemEnabled(false);
-            PopupManager.Instance.OpenPopup(PopupContextFactory.CreateErrorPopupContext(completionSource));
-            await completionSource.Task;
         }
     }
 }

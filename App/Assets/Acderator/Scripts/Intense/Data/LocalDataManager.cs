@@ -1,4 +1,5 @@
 ﻿using System;
+using UnityEngine;
 
 namespace Intense.Data
 {
@@ -46,18 +47,18 @@ namespace Intense.Data
             {
                 if (IsInit) return;
 
-                UserName = SaveDataManager.Instance.GetString("UserName", "");
-                UserId = SaveDataManager.Instance.GetString("UserId", "");
-                PassWard = SaveDataManager.Instance.GetString("PassWard", "");
+                UserName = PlayerPrefs.GetString("UserName", "");
+                UserId = PlayerPrefs.GetString("UserId", "");
+                PassWard = PlayerPrefs.GetString("PassWard", "");
 
                 IsInit = true;
             }
 
             public override void Save()
             {
-                SaveDataManager.Instance.SetString("UserName", UserName);
-                SaveDataManager.Instance.SetString("UserId", UserId);
-                SaveDataManager.Instance.SetString("PassWard", PassWard);
+                PlayerPrefs.SetString("UserName", UserName);
+                PlayerPrefs.SetString("UserId", UserId);
+                PlayerPrefs.SetString("PassWard", PassWard);
             }
         }
 
@@ -76,28 +77,28 @@ namespace Intense.Data
             {
                 if (IsInit) return;
 
-                BgmVolume = SaveDataManager.Instance.GetFloat("bgmVolume", 1f);
-                SeVolume = SaveDataManager.Instance.GetFloat("seVolume", 1f);
-                SongVolume = SaveDataManager.Instance.GetFloat("songVolume", 1f);
-                IsMuteBgm = SaveDataManager.Instance.GetBool("bgmMute");
-                IsMuteSe = SaveDataManager.Instance.GetBool("seMute");
-                IsMuteSong = SaveDataManager.Instance.GetBool("songMute");
-                NoteSpeed = SaveDataManager.Instance.GetFloat("noteSpeedConfig", 1f);
-                TapTimingNum = SaveDataManager.Instance.GetFloat("tapTimingNum", 0f);
+                BgmVolume = PlayerPrefs.GetFloat("bgmVolume", 1f);
+                SeVolume = PlayerPrefs.GetFloat("seVolume", 1f);
+                SongVolume = PlayerPrefs.GetFloat("songVolume", 1f);
+                IsMuteBgm = PlayerPrefs.HasKey("bgmMute") ? PlayerPrefs.GetInt("bgmMute") == 1 : false;
+                IsMuteSe = PlayerPrefs.HasKey("seMute") ? PlayerPrefs.GetInt("seMute") == 1 : false;
+                IsMuteSong = PlayerPrefs.HasKey("songMute") ? PlayerPrefs.GetInt("songMute") == 1 : false;
+                NoteSpeed = PlayerPrefs.GetFloat("noteSpeedConfig", 1f);
+                TapTimingNum = PlayerPrefs.GetFloat("tapTimingNum", 0f);
 
                 IsInit = true;
             }
 
             public override void Save()
             {
-                SaveDataManager.Instance.SetFloat("bgmVolume", BgmVolume);
-                SaveDataManager.Instance.SetFloat("seVolume", SeVolume);
-                SaveDataManager.Instance.SetFloat("songVolume", SongVolume);
-                SaveDataManager.Instance.SetBool("bgmMute", IsMuteBgm);
-                SaveDataManager.Instance.SetBool("seMute", IsMuteSe);
-                SaveDataManager.Instance.SetBool("songMute", IsMuteSong);
-                SaveDataManager.Instance.SetFloat("noteSpeedConfig", NoteSpeed);
-                SaveDataManager.Instance.SetFloat("tapTimingNum", TapTimingNum);
+                PlayerPrefs.SetFloat("bgmVolume", BgmVolume);
+                PlayerPrefs.SetFloat("seVolume", SeVolume);
+                PlayerPrefs.SetFloat("songVolume", SongVolume);
+                PlayerPrefs.SetInt("bgmMute", IsMuteBgm ? 1 : 0);
+                PlayerPrefs.SetInt("seMute", IsMuteSe ? 1 : 0);
+                PlayerPrefs.SetInt("songMute", IsMuteSong ? 1 : 0);
+                PlayerPrefs.SetFloat("noteSpeedConfig", NoteSpeed);
+                PlayerPrefs.SetFloat("tapTimingNum", TapTimingNum);
             }
         }
 
@@ -110,16 +111,16 @@ namespace Intense.Data
             {
                 if (IsInit) return;
 
-                SelectedGroup = SaveDataManager.Instance.GetInt("SelectedGroup", 1);
-                SelectedDifficulty = SaveDataManager.Instance.GetInt("SelectedDifficulty", 1);
+                SelectedGroup = PlayerPrefs.GetInt("SelectedGroup", 1);
+                SelectedDifficulty = PlayerPrefs.GetInt("SelectedDifficulty", 1);
 
                 IsInit = true;
             }
 
             public override void Save()
             {
-                SaveDataManager.Instance.SetInt("SelectedGroup", SelectedGroup);
-                SaveDataManager.Instance.SetInt("SelectedDifficulty", SelectedDifficulty);
+                PlayerPrefs.SetInt("SelectedGroup", SelectedGroup);
+                PlayerPrefs.SetInt("SelectedDifficulty", SelectedDifficulty);
             }
         }
 
@@ -131,7 +132,7 @@ namespace Intense.Data
             {
                 if (IsInit) return;
 
-                OrderType = SaveDataManager.Instance.GetInt("OrderType", 0);
+                OrderType = PlayerPrefs.GetInt("OrderType", 0);
                 IsInit = true;
             }
 
@@ -141,7 +142,7 @@ namespace Intense.Data
                 Save();
             }
 
-            public override void Save() => SaveDataManager.Instance.SetInt("OrderType", OrderType);
+            public override void Save() => PlayerPrefs.SetInt("OrderType", OrderType);
         }
     }
 }

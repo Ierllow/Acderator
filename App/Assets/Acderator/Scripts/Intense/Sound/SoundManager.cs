@@ -1,12 +1,11 @@
 ﻿using CriWare;
 using Cysharp.Text;
 using Cysharp.Threading.Tasks;
-using Cysharp.Threading.Tasks.Linq;
 using Intense.Asset;
 using Intense.Data;
 using Intense.Master;
-using R3;
 using System;
+using System.Threading;
 using UnityEngine;
 
 namespace Intense
@@ -23,8 +22,6 @@ namespace Intense
         public CriAtomExPlayer SeExPlayer { get; private set; }
 
         public bool IsInit { get; private set; } = false;
-
-        private IDisposable subscribeDisposable = default;
 
         protected override void OnDestroy()
         {
@@ -168,7 +165,7 @@ namespace Intense
             });
         }
 
-        public void PlaySongPreview(int id)
+        public void PlaySongPreview(int id, CancellationToken token = default)
         {
             if (!IsInit) return;
 
@@ -185,15 +182,20 @@ namespace Intense
                 SongPreviewExPlayer.SetStartTime(MasterDataManager.Instance.MemoryDatabase.SongSelectMasterTable.FindByGroup(id).StartSongTime);
                 SongPreviewExPlayer.Start();
                 var songSelectMaster = MasterDataManager.Instance.MemoryDatabase.SongSelectMasterTable.FindByGroup(id);
-                subscribeDisposable = UniTaskAsyncEnumerable.EveryUpdate().Where(_ => SongPreviewExPlayer.IsPlaying()).SubscribeAwait(async _ =>
+                try
                 {
-                    if (SongPreviewExPlayer.GetTime() > songSelectMaster.StartSongTime + songSelectMaster.SongTime)
+                    while (!token.IsCancellationRequested)
                     {
-                        await UniTask.WaitWhile(() => SongPreviewExPlayer.IsFading());
+                        await UniTask.WaitUntil(() => SongPreviewExPlayer.GetTime() > songSelectMaster.StartSongTime + songSelectMaster.SongTime, cancellationToken: token);
+                        await UniTask.WaitWhile(() => SongPreviewExPlayer.IsFading(), cancellationToken: token);
                         SongPreviewExPlayer.SetFadeInStartOffset(6000);
                         SongPreviewExPlayer.Start();
                     }
-                });
+                }
+                catch (OperationCanceledException)
+                {
+                    SongPreviewExPlayer.Stop(true);
+                }
             });
         }
 
@@ -205,12 +207,7 @@ namespace Intense
 
         public void StopSong() => SongExPlayer?.Stop(true);
 
-        public void StopSongPreview()
-        {
-            SongPreviewExPlayer?.Stop(true);
-            subscribeDisposable?.Dispose();
-            subscribeDisposable = null;
-        }
+        public void StopSongPreview() => SongPreviewExPlayer?.Stop(true);
 
         public void StopSoundAll()
         {

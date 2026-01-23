@@ -2,11 +2,11 @@
 using Cysharp.Threading.Tasks;
 using Cysharp.Threading.Tasks.Linq;
 using DG.Tweening;
-using Intense;
 using Intense.UI;
 using System;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 using uPalette.Generated;
 using uPalette.Runtime.Core;
 
@@ -19,6 +19,7 @@ namespace Song
         [SerializeField] private AtlasImage sliderRing;
         [SerializeField] private TextMeshProUGUI restTimeText;
         [SerializeField] private TextMeshProUGUI resultText;
+        [SerializeField] private Image inputBlocker;
 
         public void ShowMissMask() => UniTask.Void(async () =>
         {
@@ -31,13 +32,13 @@ namespace Song
         {
             restTimeText.SetTextFormat("{0}", 3);
             countDownRoot.SetActive(true);
-            TouchControlManager.Instance.SetEventSystemEnabled(true);
+            inputBlocker.raycastTarget = false;
             await UniTask.WhenAll(
                 sliderRing.DOFillAmount(1, 1).SetLoops(3, LoopType.Restart).WithCancellation(destroyCancellationToken),
                 restTimeText.DOCounter(3, 0, 3).SetEase(Ease.Linear).SetDelay(0.5f).WithCancellation(destroyCancellationToken));
             sliderRing.fillAmount = 0;
             countDownRoot.SetActive(false);
-            TouchControlManager.Instance.SetEventSystemEnabled(false);
+            inputBlocker.raycastTarget = true;
         }
 
         public async UniTask ShowResult(ESongResultType resultType)

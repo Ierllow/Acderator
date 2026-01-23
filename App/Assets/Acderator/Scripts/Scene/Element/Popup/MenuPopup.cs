@@ -1,6 +1,5 @@
 ﻿using Intense;
 using Intense.Api;
-using Intense.Data;
 using Intense.UI;
 using R3;
 using System;
@@ -52,7 +51,7 @@ namespace Element.UI
                 NegativeText = "キャンセル",
                 PositiveCallback = () =>
                 {
-                    SaveDataManager.Instance.DeleteAll();
+                    PlayerPrefs.DeleteAll();
                     base.Close();
                     closeCallback.Invoke(ESceneType.Title);
                 },

@@ -4,6 +4,7 @@ using Cysharp.Threading.Tasks.Linq;
 using DG.Tweening;
 using Element;
 using Intense.Asset;
+using Intense.Master;
 using Intense.UI;
 using System;
 using System.Collections.Generic;
@@ -60,21 +61,6 @@ namespace Intense
                     Loading.Instance.ShowLoading();
                 }
             });
-#if UNITY_EDITOR
-            UniTaskAsyncEnumerable.EveryValueChanged(SceneBaseDict, x => x).FirstOrDefaultAwaitAsync(async sceneDict =>
-            {
-                static bool IsFirst(ESceneType sceneType) => !sceneType.EnumEquals(ESceneType.None) || !sceneType.EnumEquals(ESceneType.Boot) || !sceneType.EnumEquals(ESceneType.Title);
-
-                if (ResourceManager.Instance.IsInit) return false;
-                if (!IsFirst(sceneDict.AsValueEnumerable().First().Key)) return false;
-
-                await ResourceManager.Instance.ReadyToFirstScene();
-                header.SetHeaderActive(sceneDict.AsValueEnumerable().First().Key.EnumEquals(ESceneType.SongSelect));
-                sceneDict.AsValueEnumerable().First().Value.OnCreateScene();
-                await UniTask.Yield();
-                return true;
-            });
-#endif
         }
 
         public async UniTask FadeInAsync() => await fadeMask.DOFade(0.0f, 0.2f);

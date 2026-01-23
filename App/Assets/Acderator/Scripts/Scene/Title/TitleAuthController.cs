@@ -2,7 +2,9 @@ using Cysharp.Threading.Tasks;
 using Element.UI;
 using Intense;
 using Intense.Api;
+using Intense.Asset;
 using Intense.Data;
+using Intense.Master;
 using Intense.UI;
 using PlayFab;
 using System;
@@ -17,22 +19,23 @@ namespace Title
             var response = await NetworkManager.Instance.LogInAnonymouslyAsync().AddWatcherTo(failFastExceptionWatcher);
             if (response?.Error != default && !response.Error.Error.EnumEquals(PlayFabErrorCode.Success))
             {
-                var completionSource = AutoResetUniTaskCompletionSource<ECommonPopupTapKind>.Create();
-                PopupManager.Instance.OpenPopup(PopupContextFactory.CreateNetworkErrorPopupContext(completionSource, response.Error));
-                var result = await completionSource.Task;
+                var result = await PopupUtils.OpenNetworkErrorPopup(response.Error);
                 return result.EnumEquals(ECommonPopupTapKind.Negative);
             }
 
+            await LoadAssets(token).AddWatcherTo(failFastExceptionWatcher);
             ScoreManager.Instance.SetScoreData(response?.Result.InfoResultPayload?.UserData);
-
-            if (!ResourceManager.Instance.IsInit)
-            {
-                DownloadSizeConfManager.Instance.SetProgressInActive();
-                DownloadSizeConfManager.Instance.SetDownloadSizePopupNotRun();
-                await ResourceManager.Instance.OnLoadGameAssetAsync().AddWatcherTo(failFastExceptionWatcher);
-            }
+            await SoundManager.Instance.InitializeAsync();
             await SceneManager.Instance.ChangeSceneAsync(ESceneType.SongSelect, new SongSelect.SongSelectSceneContext());
             return true;
+        }
+
+        private async UniTask LoadAssets(CancellationToken token)
+        {
+            AssetBundleManager.Instance.NotExistAssetBundleName.ForEach(AssetBundleManager.Instance.AddLoadAssets);
+            AssetBundleManager.Instance.AddLoadAssets("master/master");
+            await AssetBundleManager.Instance.LoadAssetsAsync(token);
+            await MasterDataManager.Instance.LoadMasterAsync();
         }
     }
 }

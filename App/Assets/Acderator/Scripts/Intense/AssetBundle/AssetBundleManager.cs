@@ -1,5 +1,6 @@
 ﻿using Cysharp.Text;
 using Cysharp.Threading.Tasks;
+using Element.UI;
 using Intense.Api;
 using Intense.UI;
 using System;
@@ -13,13 +14,14 @@ using ZLinq;
 namespace Intense.Asset
 {
     public enum EAssetBundleErrorKind { None, NotFoundManifest, ProtocolError, ConnectionError, Canceled, Error }
+    public enum EFileSizeType { [Text("KB")] Kb, [Text("MB")] Mb, [Text("GB")] Gb }
 
     internal class AssetBundleManager : SingletonMonoBehaviour<AssetBundleManager>
     {
         private readonly Dictionary<string, AssetBundleManifestInfo> manifestInfoDict = new();
         private readonly Dictionary<string, LoadedAssetBundle> assetBundleDict = new();
         private readonly string[] assetBundleNameList = { "song/", "songselect/", "result/", "sounds/", "charts/" };
-        private string BaseUrl => "";
+        private string BaseUrl => ""; //
 
         internal List<string> NotExistAssetBundleName
             => manifestInfoDict.AsValueEnumerable().Where(kv => assetBundleNameList.AsValueEnumerable().Any(kv.Key.StartsWith) && !Caching.IsVersionCached(new(kv.Value.BundleName, kv.Value.Hash))).Select(x => x.Key).ToList();
@@ -36,9 +38,10 @@ namespace Intense.Asset
 
                     if (manifestInfoDict.Count == 0)
                     {
+                        Loading.Instance.ShowLoading();
                         using var request = UnityWebRequest.Get(await NetworkManager.Instance.GetUrl(ZString.Format("{0}/filelist.txt", BaseUrl)));
                         await request.SendWebRequest();
-                        if (!request.result.EnumEquals(UnityWebRequest.Result.Success)) return;
+                        if (await TryOpenAssetErrorPopupAsync(request.result)) continue;
 
                         foreach (var line in request.downloadHandler.text.Split('\n'))
                         {
@@ -46,6 +49,7 @@ namespace Intense.Asset
                             if (!string.IsNullOrEmpty(info.BundleName)) manifestInfoDict[info.BundleName] = info;
                         }
                         if (manifestInfoDict.Count == 0) return;
+                        Loading.Instance.HideLoading();
                     }
 
                     var newFileSize = 0L;
@@ -57,11 +61,9 @@ namespace Intense.Asset
 
                     if (newFileSize > 0)
                     {
-                        if (!await DownloadSizeConfManager.Instance.OnOpenDownloadSizeConfPopupAsync(newFileSize))
+                        if (!(await TryOpenDownloadPopupAsync(newFileSize)).EnumEquals(EAssetBundleErrorKind.None))
                             return;
-
                         Loading.Instance.ShowLoading();
-                        TouchControlManager.Instance.SetEventSystemEnabled(true);
                     }
 
                     var downloadedFileSize = 0L;
@@ -78,13 +80,11 @@ namespace Intense.Asset
 
                         using var request = UnityWebRequestAssetBundle.GetAssetBundle(await NetworkManager.Instance.GetUrl(ZString.Format("{0}/{1}", BaseUrl, bundleName)), new CachedAssetBundle(info.BundleName, info.Hash), info.Crc);
                         await request.SendWebRequest();
-
-                        if (request.result.EnumEquals(UnityWebRequest.Result.ConnectionError)) return;
-                        if (request.result.EnumEquals(UnityWebRequest.Result.ProtocolError)) return;
+                        if (await TryOpenAssetErrorPopupAsync(request.result)) continue;
 
                         assetBundleDict[bundleName] = new LoadedAssetBundle(DownloadHandlerAssetBundle.GetContent(request));
 
-                        if (DownloadSizeConfManager.Instance.IsProgressInactive && !isCached)
+                        if (!isCached)
                         {
                             downloadedFileSize += info.FileSize;
                             Loading.Instance.SetDownloadFileSize(downloadedFileSize, newFileSize);
@@ -94,46 +94,32 @@ namespace Intense.Asset
                 }
                 finally
                 {
-                    if (DownloadSizeConfManager.Instance.IsProgressInactive)
-                    {
-                        await UniTask.Delay(500);
-                        DownloadSizeConfManager.Instance.ResetProgressInActive();
-                        DownloadSizeConfManager.Instance.ResetDownloadSizePopupNotRun();
-                        Loading.Instance.ClearProgressBar();
-                    }
+                    await UniTask.Delay(500);
+                    Loading.Instance.ClearProgressBar();
                 }
             }
-        }
-
-        private async UniTask<EAssetBundleErrorKind> GetManifestLoadedAsync()
-        {
-            if (manifestInfoDict.Count > 0) return default;
-
-            using var request = UnityWebRequest.Get(await NetworkManager.Instance.GetUrl(ZString.Format("{0}/filelist.txt", BaseUrl)));
-            await request.SendWebRequest();
-
-            if (!request.result.EnumEquals(UnityWebRequest.Result.Success)) return EAssetBundleErrorKind.NotFoundManifest;
-
-            foreach (var line in request.downloadHandler.text.Split('\n'))
-            {
-                var info = new AssetBundleManifestInfo(line);
-                if (!string.IsNullOrEmpty(info.BundleName))
-                    manifestInfoDict[info.BundleName] = info;
-            }
-            return default;
         }
 
         private async UniTask<EAssetBundleErrorKind> TryOpenDownloadPopupAsync(long fileSize)
         {
             if (fileSize <= 0) return default;
 
-            var isConfirm = await DownloadSizeConfManager.Instance.OnOpenDownloadSizeConfPopupAsync(fileSize);
-            if (!isConfirm) return EAssetBundleErrorKind.Canceled;
+            PopupManager.Instance.OpenPopup(new DownloadSizeConfPopupContext { FileSize = fileSize.GetFileSize(), Size = fileSize.GetFileSizeType().GetTextAttribute().Text });
+            var downloadSizeConfPopup = PopupManager.Instance.CurrentOpenPopup as DownloadSizeConfPopup;
+            await UniTask.WaitUntil(() => downloadSizeConfPopup.IsClose);
+            return !downloadSizeConfPopup.IsConfirm ? EAssetBundleErrorKind.Canceled : default;
+        }
 
-            Loading.Instance.ShowLoading();
-            TouchControlManager.Instance.SetEventSystemEnabled(true);
-
-            return default;
+        private async UniTask<bool> TryOpenAssetErrorPopupAsync(UnityWebRequest.Result result)
+        {
+            if (!result.EnumEquals(UnityWebRequest.Result.Success))
+            {
+                var kind = result.EnumEquals(UnityWebRequest.Result.ProtocolError)
+                    ? EAssetBundleErrorKind.ProtocolError
+                    : EAssetBundleErrorKind.ConnectionError;
+                return (await PopupUtils.OpenAssetErrorPopup(kind)).EnumEquals(ECommonPopupTapKind.Positive);
+            }
+            return false;
         }
 
         public async UniTask UnloadAssetsAsync(List<ESceneType> sceneTypes)
@@ -146,11 +132,7 @@ namespace Intense.Asset
             }
         }
 
-        public void AddLoadAssets(string bundleName)
-        {
-            if (!string.IsNullOrEmpty(bundleName) && !assetBundleDict.ContainsKey(bundleName))
-                assetBundleDict.Add(bundleName, null);
-        }
+        public void AddLoadAssets(string bundleName) => assetBundleDict.TryAdd(bundleName, null);
 
         internal async UniTask<UnityEngine.Object> GetLoadedObjectAsync(string bundleName, string assetName = null)
         {
@@ -162,5 +144,20 @@ namespace Intense.Asset
         }
 
         public void ClearCache() => Caching.ClearCache();
+    }
+
+    static class FileSizeExtensions
+    {
+        public static double GetFileSize(this long fileSize) => GetFileSizeType(fileSize) switch
+        {
+            EFileSizeType.Kb => Math.Round((double)fileSize / 1024, 2),
+            EFileSizeType.Mb => Math.Round(fileSize / Math.Pow(1024, 2), 2),
+            EFileSizeType.Gb => Math.Round(fileSize / Math.Pow(1024, 3), 2),
+            _ => 0,
+        };
+
+        public static EFileSizeType GetFileSizeType(this long fileSize) => Math.Pow(1024, 2) > fileSize
+            ? EFileSizeType.Kb : Math.Pow(1024, 3) > fileSize
+            ? EFileSizeType.Mb : EFileSizeType.Gb;
     }
 }

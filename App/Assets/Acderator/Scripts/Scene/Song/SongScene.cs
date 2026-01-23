@@ -46,7 +46,7 @@ namespace Song
             songControllerResolver.Loop.UpdateState(ESongState.Ready);
         });
 
-        public new async UniTask OnErrorScene()
+        protected override async UniTask OnErrorScene()
         {
             songControllerResolver.Loop.UpdateState(ESongState.Stop);
             await songPopupLayerController.DetectedError(new AlertError());

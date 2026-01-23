@@ -14,19 +14,5 @@ namespace Intense.Asset
             EAssetBundleErrorKind.ProtocolError => "通信に失敗しました。",
             _ => "",
         };
-
-        public static bool IsFailed(this EAssetBundleErrorKind kind) =>
-            kind.EnumEquals(EAssetBundleErrorKind.ProtocolError)
-                || kind.EnumEquals(EAssetBundleErrorKind.ConnectionError)
-                || kind.EnumEquals(EAssetBundleErrorKind.Error);
-
-        public static bool IsCanceled(this EAssetBundleErrorKind kind) => kind.EnumEquals(EAssetBundleErrorKind.Canceled);
-
-        public static async UniTask<bool> OnOpenAssetPopup(this EAssetBundleErrorKind kind)
-        {
-            var completionSource = AutoResetUniTaskCompletionSource<ECommonPopupTapKind>.Create();
-            PopupManager.Instance.OpenPopup(PopupContextFactory.CreateAssetErrorPopupContext(completionSource, kind));
-            return (await completionSource.Task).EnumEquals(ECommonPopupTapKind.Negative);
-        }
     }
 }

@@ -13,16 +13,20 @@ public abstract class SceneContext
 }
 #endregion
 
-public abstract class SceneBase : MonoBehaviour, IAlertHandler
+public abstract class SceneBase : MonoBehaviour
 {
     #region MonoBehaviour Handlers
     protected virtual void Awake() => SceneManager.Instance.SetSceneBase(this);
-    protected virtual void Start() => this.OnAtlasRequestedAsObservable().Subscribe().RegisterTo(destroyCancellationToken);
+    protected virtual void Start()
+    {
+        this.OnAtlasRequestedAsObservable().Subscribe().RegisterTo(destroyCancellationToken);
+        this.OnAlertAsObservable().Where(x => x).SubscribeAwait(async (isAlert, _) => await OnErrorScene()).RegisterTo(destroyCancellationToken);
+    }
     #endregion
 
     #region SceneBase Handlers
     public abstract void OnCreateScene();
     public virtual void OnDeleteScene() => Destroy(gameObject);
-    public async UniTask OnErrorScene() => await AutoResetUniTaskCompletionSource.Create().OpenErrorPopup();
+    protected virtual async UniTask OnErrorScene() => await PopupUtils.OpenErrorPopup();
     #endregion
 }

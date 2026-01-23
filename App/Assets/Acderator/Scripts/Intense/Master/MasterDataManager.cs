@@ -44,7 +44,6 @@ namespace Intense.Master
         public async UniTask<byte[]> RequestMasterData(string url)
         {
             Loading.Instance.ShowLoading();
-            TouchControlManager.Instance.SetEventSystemEnabled(true);
 
             using var www = UnityWebRequest.Get(url);
             await www.SendWebRequest();

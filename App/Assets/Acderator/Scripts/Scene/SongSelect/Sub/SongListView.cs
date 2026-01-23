@@ -1,5 +1,6 @@
 ﻿using Cysharp.Threading.Tasks;
 using EnhancedUI.EnhancedScroller;
+using Intense.Internal;
 using Intense.Master;
 using UnityEngine;
 using Zenject;
@@ -70,6 +71,9 @@ namespace SongSelect
 
         public void Save()
         {
+            Error.ThrowIfInvalid(SelectedGroup >= 0, "Invalid selected group");
+            Error.ThrowIfInvalid(SelectedDifficulty >= 0, "Invalid selected difficulty");
+            Error.ThrowIfInvalid(SelectedCellListSid >= 0, "Invalid selected cell list sid");
             songSelectCellListController.SaveSelectedCell();
             songSelectSortController.SaveOrderType();
         }
