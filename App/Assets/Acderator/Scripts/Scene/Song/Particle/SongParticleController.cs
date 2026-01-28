@@ -12,43 +12,33 @@ namespace Song
         [SerializeField] private ParticleObject tapParticleObject;
         [SerializeField] private HoldParticleObject holdParticleObject;
         [SerializeField] private JudgeParticleObject judgeParticleObject;
+        [SerializeField] private Transform particlePoolTransform;
 
         private TapParticlePool tapParticlePool;
         private HoldParticlePool holdParticlePool;
         private JudgeParticlePool judgeParticlePool;
 
-        [SerializeField] private Transform particlePoolTransform;
-
         private readonly Dictionary<int, HoldParticleObject> playingHoldParticleDict = new();
 
         private void Awake()
         {
-            tapParticlePool = new TapParticlePool(
+            tapParticlePool = new(
                 createFunc: () => Instantiate(tapParticleObject, particlePoolTransform),
                 actionOnGet: note => note.gameObject.SetActive(true),
                 actionOnRelease: note => note.gameObject.SetActive(false),
-                actionOnDestroy: note => Destroy(note.gameObject),
-                collectionCheck: false,
-                defaultCapacity: 5,
-                maxSize: 10
+                actionOnDestroy: note => Destroy(note.gameObject)
             );
-            holdParticlePool = new HoldParticlePool(
+            holdParticlePool = new(
                 createFunc: () => Instantiate(holdParticleObject, particlePoolTransform),
                 actionOnGet: note => note.gameObject.SetActive(true),
                 actionOnRelease: note => note.gameObject.SetActive(false),
-                actionOnDestroy: note => Destroy(note.gameObject),
-                collectionCheck: false,
-                defaultCapacity: 5,
-                maxSize: 10
+                actionOnDestroy: note => Destroy(note.gameObject)
             );
-            judgeParticlePool = new JudgeParticlePool(
+            judgeParticlePool = new(
                 createFunc: () => Instantiate(judgeParticleObject, particlePoolTransform),
                 actionOnGet: note => note.gameObject.SetActive(true),
                 actionOnRelease: note => note.gameObject.SetActive(false),
-                actionOnDestroy: note => Destroy(note.gameObject),
-                collectionCheck: false,
-                defaultCapacity: 5,
-                maxSize: 10
+                actionOnDestroy: note => Destroy(note.gameObject)
             );
         }
 
@@ -80,8 +70,7 @@ namespace Song
             };
 
             SpawnJudgeEffect(particlePosition, judgeParticlePosition, particleInfo.Item3).Forget();
-            if (particleInfo.Item2.EnumEquals(ENoteType.Long)
-                || particleInfo.Item2.EnumEquals(ENoteType.Curve))
+            if (particleInfo.Item2.EnumEquals(ENoteType.Long) || particleInfo.Item2.EnumEquals(ENoteType.Curve))
             {
                 if (!particleInfo.Item1.EnumEquals(EFingerType.Up))
                     PlayHoldEffect(particleInfo, particlePosition, judgeParticlePosition).Forget();
@@ -96,7 +85,7 @@ namespace Song
         {
             var judgeParticle = judgeParticlePool.Get();
             judgeParticle.Emit(parentX, childX, judgementType);
-            await UniTask.WaitWhile(() => judgeParticle.IsPlaying);
+            await UniTask.WaitWhile(() => judgeParticle.IsPlaying, cancellationToken: destroyCancellationToken);
             judgeParticlePool.Release(judgeParticle);
         }
 
@@ -104,7 +93,7 @@ namespace Song
         {
             var tapParticle = tapParticlePool.Get();
             tapParticle.Emit(position);
-            await UniTask.WaitWhile(() => tapParticle.IsPlaying);
+            await UniTask.WaitWhile(() => tapParticle.IsPlaying, cancellationToken: destroyCancellationToken);
             tapParticlePool.Release(tapParticle);
         }
 
@@ -135,6 +124,13 @@ namespace Song
                 holdParticlePool.Release(holdParticle);
                 playingHoldParticleDict.Remove(lane);
             }
+        }
+
+        private void OnDestroy()
+        {
+            tapParticlePool.Dispose();
+            holdParticlePool.Dispose();
+            judgeParticlePool.Dispose();
         }
     }
 }

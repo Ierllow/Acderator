@@ -17,7 +17,7 @@ namespace Title
         public async UniTask<bool> ExecuteAsync(CancellationToken token, FailFastExceptionWatcher failFastExceptionWatcher)
         {
             var response = await NetworkManager.Instance.LogInAnonymouslyAsync().AddWatcherTo(failFastExceptionWatcher);
-            if (response?.Error != default && !response.Error.Error.EnumEquals(PlayFabErrorCode.Success))
+            if (!response?.Error?.Error.EnumEquals(PlayFabErrorCode.Success) ?? false)
             {
                 var result = await PopupUtils.OpenNetworkErrorPopup(response.Error);
                 return result.EnumEquals(ECommonPopupTapKind.Negative);

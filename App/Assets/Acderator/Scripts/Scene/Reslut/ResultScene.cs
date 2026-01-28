@@ -2,7 +2,6 @@
 using Intense;
 using Intense.Asset;
 using Intense.Data;
-using Intense.Internal;
 using Intense.Master;
 using Intense.UI;
 using R3;

@@ -15,7 +15,7 @@ public class EditorHierarchyViewEx
 
     private static void OnGUI(int instanceID, Rect selectionRect)
     {
-        var obj = EditorUtility.InstanceIDToObject(instanceID) as GameObject;
+        var obj = EditorUtility.EntityIdToObject(instanceID) as GameObject;
         if (obj == null) return;
 
         var pos = selectionRect;

@@ -12,38 +12,43 @@ namespace Song
     {
         private void StartSubscribes()
         {
-            StartSongLogicSubscribesCore();
-            StartFingerSubscribesCore();
-            StartLayerSubscribesCore();
-            StartPauseSubscribesCore();
+            StartSongLogicSubscribes();
+            StartFingerSubscribes();
+            StartLayerSubscribes();
+            StartPauseSubscribes();
         }
 
-        private void StartSongLogicSubscribesCore()
+        private void StartSongLogicSubscribes()
         {
             songControllerResolver.Loop.EveryUpdateSongStateWhere.Subscribe(_ => UpdateSongProgressNext()).RegisterTo(destroyCancellationToken);
             songControllerResolver.Loop.EverySongStateChanged.SubscribeAwait(ChangeStateNext).RegisterTo(destroyCancellationToken);
-            songControllerResolver.Loop.SongLoopUpdateSubject.Subscribe(OnSongLoop).RegisterTo(destroyCancellationToken);
+            songControllerResolver.Loop.SongLoopUpdateSubject.Subscribe(OnSongLoopNext).RegisterTo(destroyCancellationToken);
             songControllerResolver.Spawner.NoteFactorySubject.Select(noteFactory.SpawnNote).Where(x => x != default).Subscribe(notesManager.AddAliveNote).RegisterTo(destroyCancellationToken);
             songControllerResolver.Loop.SongSecondsZeroWhere.Skip(1).Subscribe(_ => songControllerResolver.Loop.UpdateState(ESongState.Playing)).RegisterTo(destroyCancellationToken);
         }
 
-        private void StartFingerSubscribesCore()
+        private void StartFingerSubscribes()
         {
             songControllerResolver.Auto?.FingerInfoSubject.Subscribe(x => FingerSubscribeNext(x, -1)).RegisterTo(destroyCancellationToken);
             songControllerResolver.Finger?.EveryUseTouchChanged.Subscribe(notesLineController.SetLaneLightActiveAll).RegisterTo(destroyCancellationToken);
             songControllerResolver.Finger?.FingerInfoSubject.TakeWhile(_ => !sceneContext.IsAuto).Subscribe((x) => FingerSubscribeNext(x.Item1, x.Item2)).RegisterTo(destroyCancellationToken);
         }
 
-        private void StartLayerSubscribesCore()
+        private void StartLayerSubscribes()
         {
+            void PauseButtonSubscribeCallback()
+            {
+                songControllerResolver.Loop.UpdateState(ESongState.Stop);
+                songPopupLayerController.OnOpenPausePopup(!sceneContext.IsAuto);
+            }
             songPopupLayerController.ClosedPausePopupAsAsyncEnumerable.TakeWhile(_ => sceneContext.SongMode.EnumEquals(ESongMode.Normal)).SubscribeAwait(ClosedPausePopupSubscribeNext).RegisterTo(destroyCancellationToken);
             songPopupLayerController.EverySceneTypeChanged.Where(s => !(s.EnumEquals(ESceneType.None) && songControllerResolver.Loop.SongStateEnumEquals(ESongState.End)) && s.EnumEquals(ESceneType.Result)).SubscribeAwait(async (s, _) => await SceneManager.Instance.ChangeSceneAsync(s, sceneContext.ToResultSceneContext(songLayerController.CurrentScore, songLayerController.JudgeCountDict))).RegisterTo(destroyCancellationToken);
-            songLayerController.OnTapPauseButtonAsObservable.TakeWhile(_ => sceneContext.SongMode.EnumEquals(ESongMode.Normal) && !songControllerResolver.Loop.SongStateEnumEquals(ESongState.End)).Subscribe(_ => { songControllerResolver.Loop.UpdateState(ESongState.Stop); ApplicationPause(false); }).RegisterTo(destroyCancellationToken);
+            songLayerController.OnTapPauseButtonAsObservable.TakeWhile(_ => sceneContext.SongMode.EnumEquals(ESongMode.Normal) && !songControllerResolver.Loop.SongStateEnumEquals(ESongState.End)).Subscribe(_ => PauseButtonSubscribeCallback()).RegisterTo(destroyCancellationToken);
             songLayerController.Subscribes(_ => !sceneContext.IsAuto, destroyCancellationToken);
             songControllerResolver.TutorialState?.TutorialEventSubject.Subscribe(songControllerResolver.Tutorial.UpdateTutorial).RegisterTo(destroyCancellationToken);
         }
 
-        private void StartPauseSubscribesCore()
+        private void StartPauseSubscribes()
         {
             this.OnApplicationPauseAsObservable().Where(_ => sceneContext.SongMode.EnumEquals(ESongMode.Normal)).TakeWhile(_ => !SoundManager.Instance.SongExPlayer.IsPlayEnd() && notesManager.AliveNoteList.Count > 0).Subscribe(ApplicationPause).RegisterTo(destroyCancellationToken);
 #if UNITY_EDITOR

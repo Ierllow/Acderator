@@ -1,19 +1,15 @@
 ﻿using Cysharp.Threading.Tasks;
-using Cysharp.Threading.Tasks.Linq;
 using Intense;
 using Intense.Asset;
 using Intense.Master;
 using Intense.UI;
-using R3;
-using R3.Triggers;
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
-using ZLinq;
 
 namespace SongSelect
 {
-    public class SongSelectScene : SceneBase
+    public partial class SongSelectScene : SceneBase
     {
         [SerializeField] private AtlasImage backgroundImage;
         [SerializeField] private CommonButton decideButton;
@@ -26,12 +22,7 @@ namespace SongSelect
 
         protected override void Start()
         {
-            autoButton.SetToggleTextAsAsyncEnumerableForEachAsync(isOn => isOn ? "オートON" : "オートOFF");
-            decideButton.OnTapButtonAsObservable.SubscribeLockAwait(new(true), async (_, __) => await TapDecideButton()).RegisterTo(destroyCancellationToken);
-            orderButton.OnTapButtonAsObservable.SubscribeLock(new(true), _ => TapOrderButton()).RegisterTo(destroyCancellationToken);
-            songListView.EverySelectedCellChanged.Skip(1).Subscribe(SelectedCellChanged).RegisterTo(destroyCancellationToken);
-            songSelectDetail.EveryToggleChanged.Skip(1).Where(x => x != null).Subscribe(SelectedDifficultChanged).RegisterTo(destroyCancellationToken);
-            this.OnApplicationPauseAsObservable().Where(x => x).Subscribe(_ => songListView.Save()).RegisterTo(destroyCancellationToken);
+            StartSubscribes();
             base.Start();
         }
 

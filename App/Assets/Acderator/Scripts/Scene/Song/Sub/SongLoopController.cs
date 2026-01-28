@@ -36,7 +36,7 @@ namespace Song
 
             var sec = SoundManager.Instance.SongExPlayer.GetTime().ToSeconds();
             var elapsedSec = Time.timeSinceLevelLoad - PauseTime - offset;
-            SongLoopUpdateSubject.OnNext(SongStateEnumEquals(ESongState.Playing) ? sec : elapsedSec);
+            SongLoopUpdateSubject.OnNext(sec <= 0 ? elapsedSec : sec);
         }
     }
 }

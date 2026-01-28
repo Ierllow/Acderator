@@ -22,16 +22,14 @@ namespace Song
 
                 var positionBeginY = note.IsTapping ? 0.0f : (note.NoteData.BeatBegin - notesManager.CurrentBeat) * notesManager.CurrentNoteSpeed;
                 var positionEndY = (note.NoteData.BeatEnd - notesManager.CurrentBeat) * notesManager.CurrentNoteSpeed;
-
-                if (note is CurveNote curveNote) curveNote.MoveNote(positionBeginY, positionEndY, notesManager.CurrentNoteSpeed, notesManager.CurrentSec);
-                else note.MoveNote(positionBeginY, positionEndY, notesManager.CurrentNoteSpeed);
-
-                if (!notesManager.SongOption.IsAuto) MissNote(note, notifyFinger);
+                note.MoveNote(positionBeginY, positionEndY, notesManager.CurrentNoteSpeed);
+                MissNote(note, notifyFinger);
             }
         }
 
         private void MissNote(NoteBase noteBase, Action<FingerInfo> notifyFinger)
         {
+            if (!notesManager.SongOption.IsAuto) return;
             if (!noteBase.NoteData.NoteType.EnumEquals(ENoteType.Long) && !noteBase.NoteData.NoteType.EnumEquals(ENoteType.Curve)) return;
 
             var judgmentZone = MasterDataManager.Instance.MemoryDatabase.SongJudgeZoneMasterTable.FirstOrDefault(x => x.Type <= EJudgementType.Bad.GetLength()).Zone;

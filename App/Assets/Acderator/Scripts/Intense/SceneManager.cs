@@ -111,27 +111,5 @@ namespace Intense
             SceneBaseDict.GetValueOrDefault(sceneType)?.OnCreateScene();
             await UniTask.Yield();
         }
-
-        public async UniTask DeleteSceneAsync(ESceneType sceneType)
-        {
-            if (SceneBaseDict.AsValueEnumerable().Count() == 1)
-            {
-                // TODO
-                throw new Exception("");
-            }
-
-            if (SceneBaseDict.TryGetValue(sceneType, out var sceneBase))
-            {
-                SceneBaseDict.Remove(sceneType);
-
-                sceneBase.OnDeleteScene();
-
-                var asyncOperation = UnloadSceneAsync(sceneType.ToString());
-                await UniTask.WaitUntil(() => asyncOperation.isDone);
-
-                await AssetBundleManager.Instance.UnloadAssetsAsync(new() { sceneType });
-                await UniTask.Yield();
-            }
-        }
     }
 }

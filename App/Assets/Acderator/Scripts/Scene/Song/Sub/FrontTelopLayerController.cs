@@ -2,7 +2,6 @@
 using Cysharp.Threading.Tasks;
 using Cysharp.Threading.Tasks.Linq;
 using DG.Tweening;
-using Intense.UI;
 using System;
 using TMPro;
 using UnityEngine;
@@ -15,11 +14,9 @@ namespace Song
     public class FrontTelopLayerController : MonoBehaviour
     {
         [SerializeField] private GameObject missMask;
-        [SerializeField] private GameObject countDownRoot;
-        [SerializeField] private AtlasImage sliderRing;
-        [SerializeField] private TextMeshProUGUI restTimeText;
-        [SerializeField] private TextMeshProUGUI resultText;
+        [SerializeField] private CountDownBar countDownBar;
         [SerializeField] private Image inputBlocker;
+        [SerializeField] private TextMeshProUGUI resultText;
 
         public void ShowMissMask() => UniTask.Void(async () =>
         {
@@ -30,14 +27,10 @@ namespace Song
 
         public async UniTask CountDownStart()
         {
-            restTimeText.SetTextFormat("{0}", 3);
-            countDownRoot.SetActive(true);
+            countDownBar.gameObject.SetActive(true);
             inputBlocker.raycastTarget = false;
-            await UniTask.WhenAll(
-                sliderRing.DOFillAmount(1, 1).SetLoops(3, LoopType.Restart).WithCancellation(destroyCancellationToken),
-                restTimeText.DOCounter(3, 0, 3).SetEase(Ease.Linear).SetDelay(0.5f).WithCancellation(destroyCancellationToken));
-            sliderRing.fillAmount = 0;
-            countDownRoot.SetActive(false);
+            await countDownBar.CountDown();
+            countDownBar.gameObject.SetActive(false);
             inputBlocker.raycastTarget = true;
         }
 

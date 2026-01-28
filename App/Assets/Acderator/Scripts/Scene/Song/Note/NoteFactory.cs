@@ -22,7 +22,7 @@ namespace Song
         public void Init()
         {
             var laneCount = parents.Length;
-            var typeCount = Enum.GetValues(typeof(ENoteType)).Length;
+            var typeCount = EnumExtensions.GetValues<ENoteType>().Count;
             pools = new NotePool<NoteBase>[typeCount, laneCount];
 
             for (var lane = 0; lane < laneCount; lane++)
@@ -39,10 +39,7 @@ namespace Song
             createFunc: () => Instantiate(prefab, parent),
             actionOnGet: note => note.gameObject.SetActive(true),
             actionOnRelease: note => note.gameObject.SetActive(false),
-            actionOnDestroy: note => Destroy(note.gameObject),
-            collectionCheck: false,
-            defaultCapacity: 5,
-            maxSize: 10
+            actionOnDestroy: note => Destroy(note.gameObject)
         );
 
         public NoteBase SpawnNote(NoteData noteData)

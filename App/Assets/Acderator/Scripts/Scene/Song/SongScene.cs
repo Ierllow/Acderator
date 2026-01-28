@@ -196,12 +196,12 @@ namespace Song
             SoundManager.Instance.PlaySe(fingerInfo.IsFlick ? ESeType.Flick : ESeType.Tap);
         }
 
-        private void OnSongLoop(float sec)
+        private void OnSongLoopNext(float sec)
         {
             notesManager.UpdateNoteSpeed();
             notesManager.UpdateBeat(sec);
             songControllerResolver.Spawner.UpdateSpawn(sec);
-            songControllerResolver.Optimizer.UpdatePositionNotes(songControllerResolver.Auto.NotifyFinger);
+            songControllerResolver.Optimizer.UpdatePositionNotes((x) => songControllerResolver.Auto?.NotifyFinger(x));
             songControllerResolver.Auto?.OnAutoFinger();
             if (SoundManager.Instance.SongExPlayer.IsPlayEnd()) songControllerResolver.Loop.UpdateState(ESongState.End);
         }

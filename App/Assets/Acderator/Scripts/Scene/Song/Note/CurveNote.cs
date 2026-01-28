@@ -27,7 +27,7 @@ namespace Song
             curvePointList = data.CurvePointList;
             curveDuration = data.CurveDuration;
 
-            if (curveLineRenderer != default && curvePointList.AsValueEnumerable().Count() >= 2)
+            if (curvePointList.AsValueEnumerable().Count() >= 2)
             {
                 curveLineRenderer.positionCount = curveSegments + 1;
                 curveLineRenderer.useWorldSpace = false;
@@ -36,20 +36,20 @@ namespace Song
 
             if (!data.UseMidPoint)
             {
-                if (endSprite != default) endSprite.gameObject.SetActive(false);
-                if (trailSprite != default) trailSprite.gameObject.SetActive(false);
+                endSprite.gameObject.SetActive(false);
+                trailSprite.gameObject.SetActive(false);
                 return;
             }
-            if (endSprite != default) endSprite.gameObject.SetActive(true);
-            if (trailSprite != default) trailSprite.gameObject.SetActive(true);
+            endSprite.gameObject.SetActive(true);
+            trailSprite.gameObject.SetActive(true);
         }
 
-        public void MoveNote(float positionBeginY, float positionEndY, float currentNoteSpeed, float currentSec)
+        public override void MoveNote(float positionBeginY, float _, float currentNoteSpeed)
         {
             if (curvePointList.Count < 2) return;
 
             transform.localPosition = new(0, positionBeginY, transform.localPosition.z);
-            var curveProgress = Mathf.Clamp01((currentSec - NoteData.SecBegin) / curveDuration);
+            var curveProgress = Mathf.Clamp01((currentNoteSpeed - NoteData.SecBegin) / curveDuration);
             var startCurvePos = GetCurvePosition(curveProgress);
             beginSprite.transform.localPosition = new(startCurvePos.x, startCurvePos.y, 0);
 
@@ -96,7 +96,7 @@ namespace Song
 
         private void UpdateCurvePosition(float yOffset)
         {
-            if (curveLineRenderer == default || curvePointList.Count < 2) return;
+            if (curvePointList.Count < 2) return;
 
             for (var i = 0; i <= curveSegments; i++)
             {
@@ -112,7 +112,7 @@ namespace Song
             {
                 case EFingerType.Down when !judgmentType.EnumEquals(EJudgementType.None):
                     IsTapping = true;
-                    if (trailSprite != default) trailSprite.color = tappingTrailColor;
+                    trailSprite.color = tappingTrailColor;
                     break;
                 case EFingerType.Up:
                     Final();
