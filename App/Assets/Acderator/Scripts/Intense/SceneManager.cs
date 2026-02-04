@@ -8,13 +8,13 @@ using Intense.Master;
 using Intense.UI;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.Serialization;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Zenject;
 using ZLinq;
-using static UnityEngine.SceneManagement.SceneManager;
 
 namespace Intense
 {
@@ -27,41 +27,26 @@ namespace Intense
 
         [Inject] private ZenjectSceneLoader zenjectSceneLoader;
 
-        public ESceneType CurrentSceneType { get; private set; } = ESceneType.None;
-        public Dictionary<ESceneType, SceneBase> SceneBaseDict { get; private set; } = new();
+        public ESceneType CurrentSceneType => sceneBaseDict.AsValueEnumerable().Count() > 0 ? sceneBaseDict.LastOrDefault().Key : default;
         public bool IsFadeIn { get; private set; } = false;
 
-        private readonly IUniTaskAsyncEnumerable<ESceneType> everySceneTypeChanged = default;
-        public IUniTaskAsyncEnumerable<ESceneType> EverySceneTypeChanged => everySceneTypeChanged ?? UniTaskAsyncEnumerable.EveryValueChanged(this, x => x.CurrentSceneType).Queue();
+        private readonly Dictionary<ESceneType, SceneBase> sceneBaseDict = new();
 
-        private void Start()
+        private void Start() => UniTaskAsyncEnumerable.EveryValueChanged(this, x => x.fadeMask.color.a).Queue().ForEachAsync(a =>
         {
-            EverySceneTypeChanged.ForEachAsync(sceneType =>
+            if (a == 0.0f)
             {
-                Application.targetFrameRate = sceneType.EnumEquals(ESceneType.Song) ? 60 : 30;
-                SoundManager.Instance.UpdateSounds(sceneType switch
-                {
-                    ESceneType.Boot => EBgmType.None,
-                    ESceneType.Title or ESceneType.SongSelect or ESceneType.Song or ESceneType.Result => EBgmType.Stop,
-                    _ => throw new NotImplementedException("Missing ESceneType case in switch")
-                });
-            });
-            UniTaskAsyncEnumerable.EveryValueChanged(this, x => x.fadeMask.color.a).Queue().ForEachAsync(a =>
+                IsFadeIn = true;
+                header.SetHeaderActive(CurrentSceneType.EnumEquals(ESceneType.SongSelect));
+                Loading.Instance.HideLoading();
+            }
+            else if (a == 1.0f)
             {
-                if (a == 0.0f)
-                {
-                    IsFadeIn = true;
-                    header.SetHeaderActive(CurrentSceneType.EnumEquals(ESceneType.SongSelect));
-                    Loading.Instance.HideLoading();
-                }
-                else if (a == 1.0f)
-                {
-                    IsFadeIn = false;
-                    header.SetHeaderActive(false);
-                    Loading.Instance.ShowLoading();
-                }
-            });
-        }
+                IsFadeIn = false;
+                header.SetHeaderActive(false);
+                Loading.Instance.ShowLoading();
+            }
+        });
 
         public async UniTask FadeInAsync() => await fadeMask.DOFade(0.0f, 0.2f);
 
@@ -70,9 +55,8 @@ namespace Intense
         public void SetSceneBase(SceneBase scene)
         {
             var sceneName = scene.GetType().Name;
-            var sceneType = default(ESceneType);
-            var isAdded = sceneName.Contains("Scene") && Enum.TryParse(sceneName.Replace("Scene", ""), out sceneType) && SceneBaseDict.TryAdd(sceneType, scene);
-            CurrentSceneType = isAdded ? sceneType : throw new ParseErrorException("the scene class name is not fine");
+            var isAdded = sceneName.Contains("Scene") && Enum.TryParse(sceneName.Replace("Scene", ""), out ESceneType sceneType) && sceneBaseDict.TryAdd(sceneType, scene);
+            if (!isAdded) throw new ParseErrorException("the scene class name is not fine");
         }
 
         public async UniTask ChangeSceneAsync(ESceneType sceneType, SceneContext context = default, bool sameScene = false)
@@ -81,18 +65,20 @@ namespace Intense
             {
                 await FadeOutAsync();
 
-                foreach (var kvp in SceneBaseDict) kvp.Value.OnDeleteScene();
+                foreach (var kvp in sceneBaseDict) kvp.Value.OnDeleteScene();
 
                 if (!sameScene)
                 {
-                    await AssetBundleManager.Instance.UnloadAssetsAsync(SceneBaseDict.AsValueEnumerable().Select(x => x.Key).ToList());
+                    await AssetBundleManager.Instance.UnloadAssetsAsync(sceneBaseDict.AsValueEnumerable().Select(x => x.Key).ToList());
                     await Resources.UnloadUnusedAssets();
                 }
 
-                SceneBaseDict.Clear();
+                sceneBaseDict.Clear();
 
                 await zenjectSceneLoader.LoadSceneAsync(sceneType.ToString(), extraBindings: container => container.Bind<SceneContext>().FromInstance(context).AsSingle()).ToUniTask();
-                SceneBaseDict.GetValueOrDefault(sceneType)?.OnCreateScene();
+                sceneBaseDict.GetValueOrDefault(sceneType)?.OnCreateScene();
+                Application.targetFrameRate = context.FrameRate;
+                SoundManager.Instance.UpdateSounds(context.BgmType);
                 await UniTask.Yield();
                 return;
             }
@@ -102,13 +88,13 @@ namespace Intense
         public async UniTask ChangeSceneAdditiveAsync(ESceneType sceneType, SceneContext context = default)
         {
             Loading.Instance.ShowLoading();
-            if (SceneBaseDict.ContainsKey(sceneType))
+            if (sceneBaseDict.ContainsKey(sceneType))
             {
                 Loading.Instance.HideLoading();
                 return;
             }
             await zenjectSceneLoader.LoadSceneAsync(sceneType.ToString(), LoadSceneMode.Additive, container => container.Bind<SceneContext>().FromInstance(context).AsSingle()).ToUniTask();
-            SceneBaseDict.GetValueOrDefault(sceneType)?.OnCreateScene();
+            sceneBaseDict.GetValueOrDefault(sceneType)?.OnCreateScene();
             await UniTask.Yield();
         }
     }

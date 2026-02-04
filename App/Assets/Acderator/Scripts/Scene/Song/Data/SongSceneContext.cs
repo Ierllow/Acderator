@@ -1,6 +1,5 @@
 ﻿using Cysharp.Text;
 using Intense;
-using System;
 using System.Collections.Generic;
 
 namespace Song
@@ -13,6 +12,8 @@ namespace Song
         public bool IsRestart { get; private set; }
         public TutorialInfo TutorialInfo { get; private init; }
         public TutorialData TutorialData { get; private init; }
+        public override int FrameRate { get; } = 60;
+        public override EBgmType BgmType { get; } = EBgmType.Stop;
 
         public bool IsAuto => SongOption?.IsAuto ?? false;
 

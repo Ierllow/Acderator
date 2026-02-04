@@ -9,6 +9,9 @@ using UnityEngine;
 #region SceneContext
 public abstract class SceneContext
 {
+    public virtual EBgmType BgmType { get; }
+    public virtual int FrameRate { get; } = 30;
+
     protected SceneContext() { }
 }
 #endregion
