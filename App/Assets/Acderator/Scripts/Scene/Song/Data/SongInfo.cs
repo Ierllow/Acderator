@@ -2,7 +2,6 @@
 
 namespace Song
 {
-    [System.Serializable]
     public class SongInfo
     {
         private readonly SongMaster mSong;

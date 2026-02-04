@@ -1,5 +1,4 @@
-﻿using Cysharp.Text;
-using Intense.UI;
+﻿using Intense.UI;
 using TMPro;
 using UnityEngine;
 
@@ -11,7 +10,7 @@ namespace Song
 
         public void Open(ELoadResult type, System.Action closeCallback)
         {
-            errorText.SetTextFormat("{0}", type switch
+            errorText.SetText(type switch
             {
                 ELoadResult.Unknown => "譜面情報を取得出来ませんでした。",
                 ELoadResult.Unsupported or ELoadResult.Exception => "譜面情報の読み込みに失敗しました。",

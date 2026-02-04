@@ -27,9 +27,9 @@ namespace Element.UI
         private void Start()
         {
             noteSppedSlider.value = LocalDataManager.Instance.Option.NoteSpeed / 10;
-            noteSpeedNum.SetTextFormat("{0}", Math.Round(noteSppedSlider.value * 10));
+            noteSpeedNum.SetText(Math.Round(noteSppedSlider.value * 10));
             offsetSlider.value = LocalDataManager.Instance.Option.TapTimingNum;
-            tapTimingNum.SetTextFormat("{0}", Math.Round(offsetSlider.value * 10));
+            tapTimingNum.SetText(Math.Round(offsetSlider.value * 10));
             BgmSlider.value = LocalDataManager.Instance.Option.BgmVolume;
             BgmNum.SetTextFormat("{0}%", Math.Round(BgmSlider.value * 100));
             SeSlider.value = LocalDataManager.Instance.Option.SeVolume;
@@ -48,11 +48,11 @@ namespace Element.UI
             {
                 case ConfigType.NoteSpeed:
                     LocalDataManager.Instance.Option.NoteSpeed = noteSppedSlider.value * 10;
-                    noteSpeedNum.SetTextFormat("{0}", Math.Round(noteSppedSlider.value * 10));
+                    noteSpeedNum.SetText(Math.Round(noteSppedSlider.value * 10));
                     break;
                 case ConfigType.Offset:
                     LocalDataManager.Instance.Option.TapTimingNum = offsetSlider.value;
-                    tapTimingNum.SetTextFormat("{0}", Math.Round(offsetSlider.value * 10));
+                    tapTimingNum.SetText(Math.Round(offsetSlider.value * 10));
                     break;
                 case ConfigType.Bgm:
                     LocalDataManager.Instance.Option.BgmVolume = BgmSlider.value;

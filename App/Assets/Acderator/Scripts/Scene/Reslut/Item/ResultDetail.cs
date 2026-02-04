@@ -28,8 +28,8 @@ namespace Result
             var mSong = MasterDataManager.Instance.MemoryDatabase.SongMasterTable.FindBySid(resultInfo.Sid);
 
             jacket.SetAtlasFormat("{0}", mSong.Group, "song/jacket");
-            songName.SetTextFormat("{0}", mSong.Name);
-            composer.SetTextFormat("{0}", mSong.Composer);
+            songName.SetText(mSong.Name);
+            composer.SetText(mSong.Composer);
             perfectNum.SetTextFormat("{0:D3}", resultInfo.JudgeCountDict.GetValueOrDefault(EJudgementType.Perfect));
             greatNum.SetTextFormat("{0:D3}", resultInfo.JudgeCountDict.GetValueOrDefault(EJudgementType.Great));
             goodNum.SetTextFormat("{0:D3}", resultInfo.JudgeCountDict.GetValueOrDefault(EJudgementType.Good));

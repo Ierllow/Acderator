@@ -36,9 +36,27 @@ namespace Song
             base.Start();
         }
 
+        private void OnApplicationPause(bool pauseStatus)
+        {
+            if (!sceneContext.SongMode.EnumEquals(ESongMode.Normal)) return;
+            if (SoundManager.Instance.SongExPlayer.IsPlayEnd()) return;
+            if (notesManager.AliveNoteList.Count == 0) return;
+
+            if (pauseStatus)
+            {
+                songControllerResolver.Loop.UpdateState(ESongState.Stop);
+                return;
+            }
+            songPopupLayerController.OnOpenPausePopup(!sceneContext.IsAuto);
+        }
+
         public override void OnCreateScene() => UniTask.Void(async () =>
         {
-            await LoadAssets().AddWatcherTo(failFastExceptionWatcher);
+            if (!sceneContext.IsRestart)
+            {
+                sceneContext.SongBundlePathList.ForEach(AssetBundleManager.Instance.AddLoadAssets);
+                await AssetBundleManager.Instance.LoadAssetsAsync(destroyCancellationToken).AddWatcherTo(failFastExceptionWatcher);
+            }
             await (sceneContext.IsRestart ? SceneManager.Instance.FadeInAsync().AddWatcherTo(failFastExceptionWatcher) : backTelopLayerController.ShowSongIntro(sceneContext.SongInfo));
             songLayerController.Show(sceneContext.IsAuto);
             await notesLineController.Show().AddWatcherTo(failFastExceptionWatcher);
@@ -50,23 +68,6 @@ namespace Song
         {
             songControllerResolver.Loop.UpdateState(ESongState.Stop);
             await songPopupLayerController.DetectedError(new AlertError());
-        }
-
-        private void ApplicationPause(bool pauseStatus)
-        {
-            if (pauseStatus)
-            {
-                songControllerResolver.Loop.UpdateState(ESongState.Stop);
-                return;
-            }
-            songPopupLayerController.OnOpenPausePopup(!sceneContext.IsAuto);
-        }
-
-        private async UniTask LoadAssets()
-        {
-            if (sceneContext.IsRestart) return;
-            sceneContext.SongBundlePathList.ForEach(AssetBundleManager.Instance.AddLoadAssets);
-            await AssetBundleManager.Instance.LoadAssetsAsync(destroyCancellationToken);
         }
 
         private async UniTask ChangeStateNext(ESongState songState)

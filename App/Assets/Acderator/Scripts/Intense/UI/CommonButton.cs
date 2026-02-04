@@ -1,11 +1,10 @@
 ﻿using Coffee.UIEffects;
 using Cysharp.Text;
-using Cysharp.Threading.Tasks.Linq;
 using R3;
-using R3.Triggers;
 using System;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using ColorMode = Coffee.UIEffects.ColorMode;
 
@@ -13,7 +12,7 @@ namespace Intense.UI
 {
     [DisallowMultipleComponent]
     [RequireComponent(typeof(Button), typeof(ButtonAnimation))]
-    public class CommonButton : MonoBehaviour
+    public class CommonButton : MonoBehaviour, IPointerUpHandler, IPointerDownHandler
     {
         [SerializeField] protected Button button;
         [SerializeField] protected TextMeshProUGUI buttonText;
@@ -33,7 +32,9 @@ namespace Intense.UI
             if (!uIEffect.blurMode.EnumEquals(BlurMode.None)) uIEffect.blurMode = BlurMode.None;
         }
 
-        protected virtual void Start() => this.OnPointerUpDownAsObservable().Subscribe(type => IsTapping = type.EnumEquals(R3.Triggers.PointerType.Down)).RegisterTo(destroyCancellationToken);
+        public void OnPointerUp(PointerEventData eventData) => IsTapping = false;
+
+        public void OnPointerDown(PointerEventData eventData) => IsTapping = true;
 
         public virtual void SetGrayOut(bool value)
         {
@@ -53,7 +54,7 @@ namespace Intense.UI
                 Debug.LogWarning(ZString.Format("{0} is null", buttonText.GetType().Name));
                 return;
             }
-            buttonText.SetTextFormat("{0}", text);
+            buttonText.SetText(text);
         }
     }
 }

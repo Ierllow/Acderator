@@ -40,9 +40,7 @@ namespace Song
                         var rate = MasterDataManager.Instance.MemoryDatabase.SongScoreRateMasterTable.First(x => x.Type == judgmentType.GetLength()).Rate;
                         CurrentScore += Mathf.RoundToInt(baseScore * rate);
                         var maxScore = MasterDataManager.Instance.MemoryDatabase.SongBaseScoreMasterTable.First().Score;
-                        if (CurrentScore == maxScore)
-                        {
-                        }
+                        if (CurrentScore == maxScore) CurrentScore += noteCount;
                     }
                     break;
             }

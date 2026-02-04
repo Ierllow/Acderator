@@ -52,7 +52,7 @@ namespace Intense.Data
             }
             else
             {
-                ScoreDataList.Add(new ScoreData(sid, scoreNum));
+                ScoreDataList.Add(new() { Sid = sid, ScoreNum = scoreNum });
             }
         }
 
@@ -62,13 +62,10 @@ namespace Intense.Data
             request.AddData("sid", sid);
             request.AddData("score", score);
             var response = await NetworkManager.Instance.RequestAsync(request);
-            return response?.Error == null;
+            return response?.Error == default;
         }
 
-        public int GetScore(int sid)
-        {
-            return ScoreDataList.AsValueEnumerable().FirstOrDefault(x => x.Sid == sid)?.ScoreNum ?? 0;
-        }
+        public int GetScore(int sid) => ScoreDataList.AsValueEnumerable().FirstOrDefault(x => x.Sid == sid)?.ScoreNum ?? 0;
 
 #if UNITY_EDITOR
         public async UniTask<string> RequestChart(string url)

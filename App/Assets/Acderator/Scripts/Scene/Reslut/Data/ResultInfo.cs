@@ -3,7 +3,6 @@ using System.Collections.Generic;
 
 namespace Result
 {
-    [System.Serializable]
     public class ResultInfo
     {
         public int Sid { get; init; }

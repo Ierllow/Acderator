@@ -1,15 +1,14 @@
 ﻿using DG.Tweening;
-using R3;
-using R3.Triggers;
-using System;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace Intense.UI
 {
     [DisallowMultipleComponent, RequireComponent(typeof(Button))]
-    public class ButtonAnimation : MonoBehaviour
+    public class ButtonAnimation : MonoBehaviour, IPointerUpHandler, IPointerDownHandler
     {
-        private void Start() => this.OnPointerUpDownAsObservable().Subscribe(type => transform.DOScale(type.EnumEquals(R3.Triggers.PointerType.Down) ? new Vector3(0.9f, 0.9f, 1.0f) : Vector3.one, 0.1f).SetLink(gameObject)).RegisterTo(destroyCancellationToken);
+        public void OnPointerUp(PointerEventData eventData) => transform.DOScale(Vector3.one, 0.1f).SetLink(gameObject);
+        public void OnPointerDown(PointerEventData eventData) => transform.DOScale(new Vector3(0.9f, 0.9f, 1.0f), 0.1f).SetLink(gameObject);
     }
 }

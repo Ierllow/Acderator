@@ -18,12 +18,9 @@ namespace Song
         private List<Vector2> curvePointList;
         private float curveDuration;
 
-        public new void Init(NoteData data, NotePool<NoteBase> pool)
+        public override void Init(NoteData data, NotePool<NoteBase> pool)
         {
             base.Init(data, pool);
-
-            NoteData = data;
-            this.pool = pool;
             curvePointList = data.CurvePointList;
             curveDuration = data.CurveDuration;
 

@@ -10,9 +10,9 @@ namespace Song
     {
         public float CurrentSec { get; private set; } = default;
         public float CurrentBeat { get; private set; } = default;
-        public List<NoteBase> AliveNoteList { get; private set; } = new();
+        public List<NoteBase> AliveNoteList { get; } = new();
         public LoadedChartInfo LoadedChartInfo { get; private set; } = default;
-        public List<NoteSpeedChange> NoteSpeedChangeList { get; private set; } = new();
+        public List<NoteSpeedChange> NoteSpeedChangeList { get; } = new();
         public SongOption SongOption { get; private set; } = default;
         public float CurrentNoteSpeed { get; private set; } = default;
 
@@ -26,7 +26,7 @@ namespace Song
         {
             CurrentNoteSpeed = SongOption.NoteSpeed;
             LoadedChartInfo = loadedChartInfo;
-            NoteSpeedChangeList = loadedChartInfo.HeaderData.NoteSpeedChangeList;
+            NoteSpeedChangeList.AddRange(loadedChartInfo.HeaderData.NoteSpeedChangeList);
             UpdateNoteSpeed();
         }
 

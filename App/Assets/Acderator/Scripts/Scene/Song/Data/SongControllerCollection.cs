@@ -1,5 +1,3 @@
-using Cysharp.Text;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Zenject;
@@ -7,7 +5,6 @@ using ZLinq;
 
 namespace Song
 {
-    [Serializable]
     public sealed class SongControllerCollection : IInitializable
     {
         private readonly List<IController> controllerList = new();

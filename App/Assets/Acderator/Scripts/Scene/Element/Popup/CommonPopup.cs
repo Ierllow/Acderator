@@ -1,5 +1,4 @@
-﻿using Cysharp.Text;
-using Intense.UI;
+﻿using Intense.UI;
 using System;
 using TMPro;
 using UnityEngine;
@@ -33,13 +32,13 @@ namespace Element.UI
             positiveCallback = context.PositiveCallback;
             closeCallback = context.NegativeCallback;
 
-            title.SetTextFormat("{0}", context.Title);
-            text.Text.SetTextFormat("{0}", context.Text);
-            negativeText.SetTextFormat("{0}", context.NegativeText);
+            title.SetText(context.Title);
+            text.Text.SetText(context.Text);
+            negativeText.SetText(context.NegativeText);
 
             var isBoth = context.ButtonType.EnumEquals(EButtonType.Both);
             positiveObj.SetActive(isBoth);
-            positiveText.SetTextFormat("{0}", isBoth ? context.PositiveText : "");
+            positiveText.SetText(isBoth ? context.PositiveText : "");
 
             base.Open(closeCallback);
         }

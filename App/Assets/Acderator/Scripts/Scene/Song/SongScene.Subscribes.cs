@@ -50,7 +50,6 @@ namespace Song
 
         private void StartPauseSubscribes()
         {
-            this.OnApplicationPauseAsObservable().Where(_ => sceneContext.SongMode.EnumEquals(ESongMode.Normal)).TakeWhile(_ => !SoundManager.Instance.SongExPlayer.IsPlayEnd() && notesManager.AliveNoteList.Count > 0).Subscribe(ApplicationPause).RegisterTo(destroyCancellationToken);
 #if UNITY_EDITOR
             this.OnPauseStateChangedAsObservable().Subscribe((state) =>
             {

@@ -2,7 +2,6 @@
 
 namespace Song
 {
-    [System.Serializable]
     public class HeaderData
     {
         public List<NoteSpeedChange> NoteSpeedChangeList { get; init; }

@@ -1,5 +1,4 @@
-﻿using Cysharp.Text;
-using Intense.UI;
+﻿using Intense.UI;
 using TMPro;
 using UnityEngine;
 
@@ -16,8 +15,8 @@ namespace Song
         {
             atlas.SetAtlasFormat("{0}", songInfo.Group);
             difficultyImage.SetAtlasFormat("difficulty_{0}", songInfo.Difficulty, "song/difficulty");
-            songName.SetTextFormat("{0}", songInfo.Name);
-            composer.SetTextFormat("{0}", songInfo.Composer);
+            songName.SetText(songInfo.Name);
+            composer.SetText(songInfo.Composer);
         }
     }
 }

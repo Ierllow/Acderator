@@ -16,7 +16,7 @@ namespace Song
 
         public CommonButton PauseButton => pauseButton;
 
-        private readonly ScoreNumController scoreNumController = new();
+        [Zenject.Inject] private ScoreNumController scoreNumController;
 
         public void Setup()
         {

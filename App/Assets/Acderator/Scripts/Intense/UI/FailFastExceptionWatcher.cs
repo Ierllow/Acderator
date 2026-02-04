@@ -5,6 +5,7 @@ using UnityEngine;
 
 namespace Intense.UI
 {
+    [DisallowMultipleComponent]
     public sealed class FailFastExceptionWatcher : MonoBehaviour
     {
         private CancellationTokenSource cancellationTokenSource;

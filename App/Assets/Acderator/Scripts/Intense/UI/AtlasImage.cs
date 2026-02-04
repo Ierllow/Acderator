@@ -28,11 +28,6 @@ namespace Intense.UI
             m_SpriteName = spriteName;
             sprite = m_Atlas != null && !string.IsNullOrEmpty(m_SpriteName) ? m_Atlas.GetSprite(m_SpriteName) : null;
         });
-
-        protected virtual void DestroySprite()
-        {
-            if (Application.isPlaying) sprite = null;
-        }
     }
 
     public static class AtlasImageExtensions

@@ -1,4 +1,5 @@
 ﻿using Cysharp.Text;
+using Intense.Internal;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -20,6 +21,7 @@ namespace Song
             Container.Bind<ComboController>().AsSingle();
             Container.Bind<HpBarController>().AsSingle();
             Container.Bind<SongResultCalculator>().AsSingle();
+            Container.Bind<ScoreNumController>().AsSingle();
             Container.BindInterfacesAndSelfTo<SongParticleController>().FromComponentInHierarchy().AsSingle();
             Container.BindInterfacesAndSelfTo<FrameRateController>().AsSingle();
             Container.BindInterfacesAndSelfTo<SongLoopController>().AsSingle();
@@ -34,6 +36,16 @@ namespace Song
             }
             Container.Bind<SongControllerCollection>().AsSingle().WithArguments(songSceneContext.TutorialData);
             Container.Bind<SongControllerResolver>().AsSingle();
+        }
+    }
+
+    static class SceneContextExtensions
+    {
+        public static SongSceneContext AsSongSceneContext(this SceneContext sceneContext)
+        {
+            var songSceneContext = sceneContext as SongSceneContext;
+            Error.ThrowArgumentNullException(songSceneContext, nameof(songSceneContext));
+            return songSceneContext;
         }
     }
 }

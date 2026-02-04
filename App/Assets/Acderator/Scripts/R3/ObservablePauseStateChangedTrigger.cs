@@ -5,18 +5,18 @@ namespace R3.Triggers
 {
     public class ObservablePauseStateChangedTrigger : ObservableTriggerBase
     {
-        private Subject<PauseState> puaseStateChanged;
+        private Subject<PauseState> pauseStateChanged;
 
-        private void Start() => EditorApplication.pauseStateChanged += PuaseStateChanged;
+        private void Start() => EditorApplication.pauseStateChanged += PauseStateChanged;
 
-        private void PuaseStateChanged(PauseState state) => puaseStateChanged?.OnNext(state);
+        private void PauseStateChanged(PauseState state) => pauseStateChanged?.OnNext(state);
 
-        public Observable<PauseState> OnPauseStateChangedAsObservable() => puaseStateChanged ??= new Subject<PauseState>();
+        public Observable<PauseState> OnPauseStateChangedAsObservable() => pauseStateChanged ??= new Subject<PauseState>();
 
         protected override void RaiseOnCompletedOnDestroy()
         {
-            EditorApplication.pauseStateChanged -= PuaseStateChanged;
-            puaseStateChanged?.OnCompleted();
+            EditorApplication.pauseStateChanged -= PauseStateChanged;
+            pauseStateChanged?.OnCompleted();
         }
     }
 }

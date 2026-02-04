@@ -1,5 +1,4 @@
-﻿using Cysharp.Text;
-using EnhancedUI.EnhancedScroller;
+﻿using EnhancedUI.EnhancedScroller;
 using Intense.Master;
 using Intense.UI;
 using System;
@@ -23,8 +22,8 @@ namespace SongSelect
             this.selected = selected;
             MSong = mSong;
             SetSelectedCell(true);
-            songName.SetTextFormat("{0}", mSong.Name);
-            composer.SetTextFormat("{0}", mSong.Composer);
+            songName.SetText(mSong.Name);
+            composer.SetText(mSong.Composer);
         }
 
         public void SetSelectedCell(bool value) => bg.SetAtlas(value ? "song_selected" : "song_not_selected");

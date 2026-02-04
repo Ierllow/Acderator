@@ -1,7 +1,6 @@
 ﻿using Intense;
 using System;
 using UnityEngine;
-using Zenject;
 
 namespace Song
 {

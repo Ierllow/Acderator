@@ -5,7 +5,6 @@ using ZLinq;
 
 namespace Song
 {
-    [System.Serializable]
     public class TutorialInfo
     {
         public TutorialMaster MTutorial { get; }

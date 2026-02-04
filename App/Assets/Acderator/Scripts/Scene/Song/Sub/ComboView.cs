@@ -1,5 +1,4 @@
-﻿using Cysharp.Text;
-using TMPro;
+﻿using TMPro;
 using UnityEngine;
 
 namespace Song
@@ -8,6 +7,6 @@ namespace Song
     {
         [SerializeField] private TextMeshProUGUI comboNumText;
 
-        public void UpdateComboNum(int currentCombo) => comboNumText.SetTextFormat("{0}", currentCombo == 0 ? "" : currentCombo.ToString());
+        public void UpdateComboNum(int currentCombo) => comboNumText.SetText(currentCombo == 0 ? "" : currentCombo.ToString());
     }
 }

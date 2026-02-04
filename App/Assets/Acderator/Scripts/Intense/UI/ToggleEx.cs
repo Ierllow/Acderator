@@ -1,5 +1,4 @@
 ﻿using System;
-using Cysharp.Text;
 using Cysharp.Threading.Tasks;
 using Cysharp.Threading.Tasks.Linq;
 using TMPro;
@@ -19,6 +18,6 @@ namespace Intense.UI
         public IUniTaskAsyncEnumerable<bool> OnValueChangedAsAsyncEnumerable => toggle.OnValueChangedAsAsyncEnumerable(destroyCancellationToken);
         public UniTask SetToggleTextAsAsyncEnumerableForEachAsync(Func<bool, string> predicate) => OnValueChangedAsAsyncEnumerable.ForEachAsync((isOn) => SetToggleText(predicate(isOn)), destroyCancellationToken);
 
-        public void SetToggleText(string text) => toggleText.SetTextFormat("{0}", text);
+        public void SetToggleText(string text) => toggleText.SetText(text);
     }
 }

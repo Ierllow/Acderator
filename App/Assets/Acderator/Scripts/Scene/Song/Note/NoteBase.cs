@@ -12,7 +12,7 @@ namespace Song
 
         protected NotePool<NoteBase> pool;
 
-        public void Init(NoteData data, NotePool<NoteBase> pool)
+        public virtual void Init(NoteData data, NotePool<NoteBase> pool)
         {
             this.pool = pool;
             NoteData = data;

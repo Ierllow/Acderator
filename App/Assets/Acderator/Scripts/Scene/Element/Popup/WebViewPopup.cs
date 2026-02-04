@@ -1,5 +1,4 @@
-﻿using Cysharp.Text;
-using Intense.UI;
+﻿using Intense.UI;
 using UnityEngine;
 
 namespace Element.UI
@@ -21,7 +20,7 @@ namespace Element.UI
             closeCallback = context.NegativeCallback;
             url = context.Url;
 
-            title.SetTextFormat("{0}", context.TitleText);
+            title.SetText(context.TitleText);
             base.Open();
         }
 

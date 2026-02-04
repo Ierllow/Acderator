@@ -12,7 +12,6 @@ namespace SongSelect
         {
             StartButtonSubscribes();
             StartUISubscribes();
-            StartPauseSubscribes();
         }
 
         private void StartButtonSubscribes()
@@ -26,11 +25,6 @@ namespace SongSelect
         {
             songListView.EverySelectedCellChanged.Skip(1).Subscribe(SelectedCellChanged).RegisterTo(destroyCancellationToken);
             songSelectDetail.EveryToggleChanged.Skip(1).Where(x => x != null).Subscribe(SelectedDifficultChanged).RegisterTo(destroyCancellationToken);
-        }
-
-        private void StartPauseSubscribes()
-        {
-            this.OnApplicationPauseAsObservable().Where(x => x).Subscribe(_ => songListView.Save()).RegisterTo(destroyCancellationToken);
         }
     }
 }

@@ -14,7 +14,7 @@ using ZLinq;
 namespace Intense.Asset
 {
     public enum EAssetBundleErrorKind { None, NotFoundManifest, ProtocolError, ConnectionError, Canceled, Error }
-    public enum EFileSizeType { [Text("KB")] Kb, [Text("MB")] Mb, [Text("GB")] Gb }
+    internal enum EFileSizeType { [Text("KB")] Kb, [Text("MB")] Mb, [Text("GB")] Gb }
 
     internal class AssetBundleManager : SingletonMonoBehaviour<AssetBundleManager>
     {
@@ -41,7 +41,7 @@ namespace Intense.Asset
                         Loading.Instance.ShowLoading();
                         using var request = UnityWebRequest.Get(await NetworkManager.Instance.GetUrl(ZString.Format("{0}/filelist.txt", BaseUrl)));
                         await request.SendWebRequest();
-                        if (await TryOpenAssetErrorPopupAsync(request.result)) continue;
+                        if (await request.result.TryOpenAssetErrorPopupAsync()) continue;
 
                         foreach (var line in request.downloadHandler.text.Split('\n'))
                         {
@@ -61,7 +61,7 @@ namespace Intense.Asset
 
                     if (newFileSize > 0)
                     {
-                        if (!(await TryOpenDownloadPopupAsync(newFileSize)).EnumEquals(EAssetBundleErrorKind.None))
+                        if (!await newFileSize.TryOpenDownloadPopupAsync())
                             return;
                         Loading.Instance.ShowLoading();
                     }
@@ -80,9 +80,9 @@ namespace Intense.Asset
 
                         using var request = UnityWebRequestAssetBundle.GetAssetBundle(await NetworkManager.Instance.GetUrl(ZString.Format("{0}/{1}", BaseUrl, bundleName)), new CachedAssetBundle(info.BundleName, info.Hash), info.Crc);
                         await request.SendWebRequest();
-                        if (await TryOpenAssetErrorPopupAsync(request.result)) continue;
+                        if (await request.result.TryOpenAssetErrorPopupAsync()) continue;
 
-                        assetBundleDict[bundleName] = new LoadedAssetBundle(DownloadHandlerAssetBundle.GetContent(request));
+                        assetBundleDict[bundleName] = new LoadedAssetBundle { Bundle = DownloadHandlerAssetBundle.GetContent(request) };
 
                         if (!isCached)
                         {
@@ -98,28 +98,6 @@ namespace Intense.Asset
                     Loading.Instance.ClearProgressBar();
                 }
             }
-        }
-
-        private async UniTask<EAssetBundleErrorKind> TryOpenDownloadPopupAsync(long fileSize)
-        {
-            if (fileSize <= 0) return default;
-
-            PopupManager.Instance.OpenPopup(new DownloadSizeConfPopupContext { FileSize = fileSize.GetFileSize(), Size = fileSize.GetFileSizeType().GetTextAttribute().Text });
-            var downloadSizeConfPopup = PopupManager.Instance.CurrentOpenPopup as DownloadSizeConfPopup;
-            await UniTask.WaitUntil(() => downloadSizeConfPopup.IsClose);
-            return !downloadSizeConfPopup.IsConfirm ? EAssetBundleErrorKind.Canceled : default;
-        }
-
-        private async UniTask<bool> TryOpenAssetErrorPopupAsync(UnityWebRequest.Result result)
-        {
-            if (!result.EnumEquals(UnityWebRequest.Result.Success))
-            {
-                var kind = result.EnumEquals(UnityWebRequest.Result.ProtocolError)
-                    ? EAssetBundleErrorKind.ProtocolError
-                    : EAssetBundleErrorKind.ConnectionError;
-                return (await PopupUtils.OpenAssetErrorPopup(kind)).EnumEquals(ECommonPopupTapKind.Positive);
-            }
-            return false;
         }
 
         public async UniTask UnloadAssetsAsync(List<ESceneType> sceneTypes)
@@ -159,5 +137,30 @@ namespace Intense.Asset
         public static EFileSizeType GetFileSizeType(this long fileSize) => Math.Pow(1024, 2) > fileSize
             ? EFileSizeType.Kb : Math.Pow(1024, 3) > fileSize
             ? EFileSizeType.Mb : EFileSizeType.Gb;
+    }
+
+    static class AssetBundleErrorPopupExtensions
+    {
+        public static async UniTask<bool> TryOpenDownloadPopupAsync(this long fileSize)
+        {
+            if (fileSize <= 0) return default;
+
+            PopupManager.Instance.OpenPopup(new DownloadSizeConfPopupContext { FileSize = fileSize.GetFileSize(), Size = fileSize.GetFileSizeType().GetTextAttribute().Text });
+            var downloadSizeConfPopup = PopupManager.Instance.CurrentOpenPopup as DownloadSizeConfPopup;
+            await UniTask.WaitUntil(() => downloadSizeConfPopup.IsClose);
+            return !(!downloadSizeConfPopup.IsConfirm ? EAssetBundleErrorKind.Canceled : default).EnumEquals(EAssetBundleErrorKind.None);
+        }
+
+        public static async UniTask<bool> TryOpenAssetErrorPopupAsync(this UnityWebRequest.Result result)
+        {
+            if (!result.EnumEquals(UnityWebRequest.Result.Success))
+            {
+                var kind = result.EnumEquals(UnityWebRequest.Result.ProtocolError)
+                    ? EAssetBundleErrorKind.ProtocolError
+                    : EAssetBundleErrorKind.ConnectionError;
+                return (await PopupUtils.OpenAssetErrorPopup(kind)).EnumEquals(ECommonPopupTapKind.Positive);
+            }
+            return false;
+        }
     }
 }

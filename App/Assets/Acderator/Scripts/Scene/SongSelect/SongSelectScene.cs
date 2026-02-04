@@ -26,6 +26,11 @@ namespace SongSelect
             base.Start();
         }
 
+        private void OnApplicationPause(bool pauseStatus)
+        {
+            if (pauseStatus) songListView.Save();
+        }
+
         public override void OnCreateScene() => UniTask.Void(async () =>
         {
             await LoadAssets();
