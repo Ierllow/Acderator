@@ -1,11 +1,9 @@
 ﻿using Cysharp.Text;
 using Cysharp.Threading.Tasks;
 using Element.UI;
-using Intense.Api;
 using Intense.UI;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -18,10 +16,11 @@ namespace Intense.Asset
 
     internal class AssetBundleManager : SingletonMonoBehaviour<AssetBundleManager>
     {
+        [SerializeField] private NetworkConfig networkConfigObject;
+
         private readonly Dictionary<string, AssetBundleManifestInfo> manifestInfoDict = new();
         private readonly Dictionary<string, LoadedAssetBundle> assetBundleDict = new();
         private readonly string[] assetBundleNameList = { "song/", "songselect/", "result/", "sounds/", "charts/" };
-        private string BaseUrl => ""; //
 
         internal List<string> NotExistAssetBundleName
             => manifestInfoDict.AsValueEnumerable().Where(kv => assetBundleNameList.AsValueEnumerable().Any(kv.Key.StartsWith) && !Caching.IsVersionCached(new(kv.Value.BundleName, kv.Value.Hash))).Select(x => x.Key).ToList();
@@ -39,7 +38,7 @@ namespace Intense.Asset
                     if (manifestInfoDict.Count == 0)
                     {
                         Loading.Instance.ShowLoading();
-                        using var request = UnityWebRequest.Get(await NetworkManager.Instance.GetUrl(ZString.Format("{0}/filelist.txt", BaseUrl)));
+                        using var request = UnityWebRequest.Get(ZString.Format("{0}/filelist.txt", networkConfigObject.assetServerUrl));
                         await request.SendWebRequest();
                         if (await request.result.TryOpenAssetErrorPopupAsync()) continue;
 
@@ -68,7 +67,7 @@ namespace Intense.Asset
 
                     var downloadedFileSize = 0L;
                     var allLoadedAssetBundle = AssetBundle.GetAllLoadedAssetBundles();
-                    var loadedSet = new HashSet<string>(allLoadedAssetBundle.Count());
+                    var loadedSet = new HashSet<string>(allLoadedAssetBundle.AsValueEnumerable().Count());
                     foreach (var b in allLoadedAssetBundle) loadedSet.Add(b.name);
 
                     foreach (var bundleName in targets)
@@ -78,7 +77,7 @@ namespace Intense.Asset
 
                         var isCached = Caching.IsVersionCached(new(info.BundleName, info.Hash));
 
-                        using var request = UnityWebRequestAssetBundle.GetAssetBundle(await NetworkManager.Instance.GetUrl(ZString.Format("{0}/{1}", BaseUrl, bundleName)), new CachedAssetBundle(info.BundleName, info.Hash), info.Crc);
+                        using var request = UnityWebRequestAssetBundle.GetAssetBundle(ZString.Format("{0}/{1}", networkConfigObject.assetServerUrl, bundleName), new CachedAssetBundle(info.BundleName, info.Hash), info.Crc);
                         await request.SendWebRequest();
                         if (await request.result.TryOpenAssetErrorPopupAsync()) continue;
 

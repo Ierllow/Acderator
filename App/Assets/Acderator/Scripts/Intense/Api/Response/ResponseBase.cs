@@ -1,18 +1,20 @@
-﻿using PlayFab;
-using PlayFab.SharedModels;
+﻿using System.Collections.Generic;
 
 namespace Intense.Api
 {
-    public class ResponseBase<T> where T : PlayFabResultCommon
+    public class ResponseBase
     {
-        public virtual T Result { get; private set; }
+        protected readonly Dictionary<string, object> responseDate;
 
-        public virtual PlayFabError Error { get; private set; }
+        protected Dictionary<string, object> Header => responseDate.TryGetValue("header", out var header) ? header as Dictionary<string, object> : default;
 
-        public ResponseBase(T result, PlayFabError error)
+        public int Status => Header?.TryGetValue("status", out var status) ?? false ? (int)status : 0;
+
+        public string ErrorMessage => responseDate.TryGetValue("error", out var error) ? (string)error : string.Empty;
+
+        public ResponseBase(Dictionary<string, object> responseDate)
         {
-            Result = result;
-            Error = error;
+            this.responseDate = responseDate;
         }
     }
 }

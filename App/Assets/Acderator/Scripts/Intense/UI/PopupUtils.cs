@@ -1,7 +1,8 @@
 using Cysharp.Threading.Tasks;
 using Element.UI;
+using Intense.Api;
 using Intense.Asset;
-using PlayFab;
+using System;
 
 namespace Intense.UI
 {
@@ -14,10 +15,10 @@ namespace Intense.UI
             await completionSource.Task;
         }
 
-        public static async UniTask<ECommonPopupTapKind> OpenNetworkErrorPopup(PlayFabError error)
+        public static async UniTask<ECommonPopupTapKind> OpenNetworkErrorPopup(string error, int errorCode)
         {
             var completionSource = AutoResetUniTaskCompletionSource<ECommonPopupTapKind>.Create();
-            PopupManager.Instance.OpenPopup(PopupContextFactory.CreateNetworkErrorPopupContext(completionSource, error));
+            PopupManager.Instance.OpenPopup(PopupContextFactory.CreateNetworkErrorPopupContext(completionSource, error, errorCode));
             return await completionSource.Task;
         }
 
@@ -26,6 +27,12 @@ namespace Intense.UI
             var completionSource = AutoResetUniTaskCompletionSource<ECommonPopupTapKind>.Create();
             PopupManager.Instance.OpenPopup(PopupContextFactory.CreateAssetErrorPopupContext(completionSource, kind, titleBake));
             return await completionSource.Task;
+        }
+
+        public static async UniTask<bool> TryOpenNetworkErrorPopup(ResponseBase response)
+        {
+            var result = await OpenNetworkErrorPopup(response.ErrorMessage, response.Status);
+            return result.EnumEquals(ECommonPopupTapKind.Negative);
         }
     }
 }

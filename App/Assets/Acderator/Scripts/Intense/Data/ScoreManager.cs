@@ -2,8 +2,6 @@
 using Intense.Api;
 using Intense.Master;
 using Intense.UI;
-using PlayFab.ClientModels;
-using PlayFab.Json;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -18,23 +16,13 @@ namespace Intense.Data
 
         public List<ScoreData> ScoreDataList { get; private set; } = new();
 
-        public void SetScoreData(IDictionary<string, UserDataRecord> dataDict = default)
+        public void SetScoreData(Dictionary<string, object> dataDict)
         {
             if (IsInit) return;
-            if (dataDict == default)
+            foreach (var (key, value) in dataDict)
             {
-                IsInit = true;
-                return;
-            }
-
-            var deserializeDataDict = (dataDict.Values as object[]).AsValueEnumerable().Select(x => PlayFabSimpleJson.DeserializeObject(x.ToString()) as IDictionary<string, object>).ToList();
-            var value = default(object);
-            foreach (var deserializeData in deserializeDataDict)
-            {
-                var sid = 0;
-                var score = 0;
-                if (deserializeData.TryGetValue("sid", out value)) sid = int.Parse(value.ToString());
-                if (deserializeData.TryGetValue("score", out value)) score = int.Parse(value.ToString());
+                var sid = int.Parse(key);
+                var score = int.Parse(value.ToString());
                 UpdateScoreData(sid, score);
             }
             IsInit = true;
@@ -56,13 +44,13 @@ namespace Intense.Data
             }
         }
 
-        public async UniTask<bool> RequestUpdateScoreAsync(int sid, int score)
+        public async UniTask<bool> RequestUpdateScoreAsync(string sessionId, int score)
         {
-            var request = new UpdateScoreRequest();
-            request.AddData("sid", sid);
-            request.AddData("score", score);
+            var request = new ScoreSubmitRequest();
+            request.PostData.Add("session_id", sessionId);
+            request.PostData.Add("sid", score);
             var response = await NetworkManager.Instance.RequestAsync(request);
-            return response?.Error == default;
+            return response.Status == 200;
         }
 
         public int GetScore(int sid) => ScoreDataList.AsValueEnumerable().FirstOrDefault(x => x.Sid == sid)?.ScoreNum ?? 0;

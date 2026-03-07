@@ -12,6 +12,7 @@ namespace Song
         public bool IsRestart { get; private set; }
         public TutorialInfo TutorialInfo { get; private init; }
         public TutorialData TutorialData { get; private init; }
+        public string SessionId { get; private init; }
         public override int FrameRate { get; } = 60;
         public override EBgmType BgmType { get; } = EBgmType.Stop;
 
@@ -33,14 +34,15 @@ namespace Song
 
         SongSceneContext() { }
 
-        public static SongSceneContext Create(SongInfo songInfo, bool isAuto, ESongMode songMode, bool isRetry = false) => new()
+        public static SongSceneContext Create(SongInfo songInfo, bool isAuto, ESongMode songMode, string sessionId, bool isRetry = false) => new()
         {
             SongInfo = songInfo,
             SongOption = new() { IsAuto = isAuto },
             SongMode = songMode,
-            IsRestart = isRetry
+            IsRestart = isRetry,
+            SessionId = sessionId
         };
-        public static SongSceneContext Create(SongInfo songInfo, TutorialInfo tutorialInfo = default) => new()
+        public static SongSceneContext Create(SongInfo songInfo, string sessionId, TutorialInfo tutorialInfo = default) => new()
         {
             SongInfo = songInfo,
             SongOption = new() { IsAuto = false },
@@ -52,6 +54,7 @@ namespace Song
                 TutorialMaster = tutorialInfo.MTutorial,
                 StepList = tutorialInfo.MTutorialStepList,
             },
+            SessionId = sessionId,
         };
         public void Refresh(bool isRetry = false) => IsRestart = isRetry;
         public Result.ResultSceneContext ToResultSceneContext(int currentScore, Dictionary<EJudgementType, int> judgeCountDict) => new()

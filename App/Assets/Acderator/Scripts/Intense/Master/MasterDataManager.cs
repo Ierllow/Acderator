@@ -1,5 +1,4 @@
 ﻿using Cysharp.Threading.Tasks;
-using Intense.Api;
 using Intense.Asset;
 using Intense.UI;
 using Master;
@@ -30,7 +29,7 @@ namespace Intense.Master
 #if UNITY_EDITOR
             if (isMasterDebug)
             {
-                MemoryDatabase = new MemoryDatabase(await RequestMasterData(await NetworkManager.Instance.GetUrl("master/master")));
+                MemoryDatabase = new MemoryDatabase(await RequestMasterData("master/master"));
                 return;
             }
 #endif
@@ -45,7 +44,7 @@ namespace Intense.Master
         {
             Loading.Instance.ShowLoading();
 
-            using var www = UnityWebRequest.Get(url);
+            using var www = UnityWebRequest.Get(ScriptableObjectUtils.Load<NetworkConfig>().assetServerUrl + "/" + url);
             await www.SendWebRequest();
             if (!string.IsNullOrEmpty(www.error))
             {

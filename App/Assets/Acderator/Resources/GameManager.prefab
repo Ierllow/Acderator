@@ -1622,6 +1622,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d0585978aab7cb84c8860879251d0f9c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  networkConfigObject: {fileID: 11400000, guid: 74872aedf3dc949459f8058bb2e11411, type: 2}
 --- !u!114 &2123188491852164520
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1634,6 +1635,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 47b08f06fc5d3b34faa2df574c4c7080, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  networkConfigObject: {fileID: 11400000, guid: 74872aedf3dc949459f8058bb2e11411, type: 2}
 --- !u!114 &-998151275508826643
 MonoBehaviour:
   m_ObjectHideFlags: 0

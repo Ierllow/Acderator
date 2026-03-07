@@ -1,5 +1,6 @@
 ﻿using Cysharp.Threading.Tasks;
 using Intense;
+using Intense.Api;
 using Intense.Asset;
 using Intense.Data;
 using Intense.Master;
@@ -24,7 +25,7 @@ namespace Result
 
         protected override void Start()
         {
-            retryButton.OnTapButtonAsObservable.SubscribeLockAwait(new(true), async (_, __) => await SceneManager.Instance.ChangeSceneAsync(ESceneType.Song, Song.SongSceneContext.Create(new(sceneContext.ResultInfo.Sid), sceneContext.ResultInfo.IsAuto, Song.ESongMode.Normal))).RegisterTo(destroyCancellationToken);
+            retryButton.OnTapButtonAsObservable.SubscribeLockAwait(new(true), async (_, __) => await TapRetryButton()).RegisterTo(destroyCancellationToken);
             quitButton.OnTapButtonAsObservable.SubscribeLockAwait(new(true), async (_, ___) => await SceneManager.Instance.ChangeSceneAsync(ESceneType.SongSelect, new SongSelect.SongSelectSceneContext())).RegisterTo(destroyCancellationToken);
             base.Start();
         }
@@ -42,5 +43,13 @@ namespace Result
             await SceneManager.Instance.FadeInAsync();
             SoundManager.Instance.PlayBgm(ScoreUtils.IsClear(sceneContext.ResultInfo.CurrentScore) ? EBgmType.GameResult : EBgmType.GameResultFailed);
         });
+
+        private async UniTask TapRetryButton()
+        {
+            var request = new ScoreBeginRequest();
+            request.PostData.Add("sid", sceneContext.ResultInfo.Sid);
+            var response = await NetworkManager.Instance.RequestAsync(request) as ScoreBeginResponse;
+            await SceneManager.Instance.ChangeSceneAsync(ESceneType.Song, Song.SongSceneContext.Create(new(sceneContext.ResultInfo.Sid), sceneContext.ResultInfo.IsAuto, Song.ESongMode.Normal, response.SessionId));
+        }
     }
 }

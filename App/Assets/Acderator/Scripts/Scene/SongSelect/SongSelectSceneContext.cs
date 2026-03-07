@@ -24,6 +24,6 @@ namespace SongSelect
             }
         }
 
-        public Song.SongSceneContext ToSongSceneContext(int sid, bool isAuto) => Song.SongSceneContext.Create(new(sid), isAuto, Song.ESongMode.Normal);
+        public Song.SongSceneContext ToSongSceneContext(int sid, bool isAuto, string sessionId) => Song.SongSceneContext.Create(new(sid), isAuto, Song.ESongMode.Normal, sessionId);
     }
 }

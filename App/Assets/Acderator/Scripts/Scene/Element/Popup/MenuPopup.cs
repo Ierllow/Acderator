@@ -18,6 +18,7 @@ namespace Element.UI
         [SerializeField] private CommonButton deleteAccountButton;
         [SerializeField] private CommonButton licenseButton;
         [SerializeField] private CommonButton titleSceneButton;
+        [SerializeField] private NetworkConfig networkConfigObject;
 
         private new Action<ESceneType> closeCallback;
 
@@ -63,7 +64,7 @@ namespace Element.UI
         private async void TapLicenseButton()
         {
             var title = "権利表記";
-            var url = await NetworkManager.Instance.GetUrl("lisence.html");
+            var url = networkConfigObject.webViewServerUrl + "/lisence.html";
             PopupManager.Instance.OpenPopup(new WebViewPopupContext { TitleText = title, Url = url });
         }
 

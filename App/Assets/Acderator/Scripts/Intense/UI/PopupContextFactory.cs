@@ -2,7 +2,6 @@
 using Element.UI;
 using Intense.Api;
 using Intense.Asset;
-using PlayFab;
 
 namespace Intense.UI
 {
@@ -36,10 +35,10 @@ namespace Intense.UI
             }
         };
 
-        public static CommonPopupContext CreateNetworkErrorPopupContext(AutoResetUniTaskCompletionSource<ECommonPopupTapKind> completionSource, PlayFabError error) => new()
+        public static CommonPopupContext CreateNetworkErrorPopupContext(AutoResetUniTaskCompletionSource<ECommonPopupTapKind> completionSource, string error, int errorCode) => new()
         {
             Title = "エラー",
-            Text = error.Error.GetErrorMessage() + "\n エラーコード:" + "" + error.HttpCode.ToString(),
+            Text = error + "\n エラーコード:" + "" + errorCode.ToString(),
             PositiveText = "リトライ",
             NegativeText = "閉じる",
             PositiveCallback = () => completionSource.TrySetResult(ECommonPopupTapKind.Positive),

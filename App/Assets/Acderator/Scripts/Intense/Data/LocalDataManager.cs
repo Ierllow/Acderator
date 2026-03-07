@@ -5,6 +5,7 @@ namespace Intense.Data
 {
     internal partial class LocalDataManager : SingletonMonoBehaviour<LocalDataManager>
     {
+        internal SystemTempData System { get; } = new();
         internal LocalUserData LocalUser { get; } = new();
         internal ConfigData Option { get; } = new();
         internal SongSelectSavaData SelectSavaData { get; } = new();
@@ -13,6 +14,7 @@ namespace Intense.Data
         protected override void Awake()
         {
             base.Awake();
+            System.Load();
             LocalUser.Load();
             Option.Load();
             SelectSavaData.Load();
@@ -21,6 +23,7 @@ namespace Intense.Data
 
         protected override void OnDestroy()
         {
+            System.Save();
             LocalUser.Save();
             Option.Save();
             SelectSavaData.Save();
@@ -35,6 +38,13 @@ namespace Intense.Data
 
             public abstract void Load();
             public virtual void Save() { }
+        }
+
+        internal class SystemTempData : Base
+        {
+            public string Token { get; set; }
+
+            public override void Load() => IsInit = true;
         }
 
         internal class LocalUserData : Base
@@ -80,9 +90,9 @@ namespace Intense.Data
                 BgmVolume = PlayerPrefs.GetFloat("bgmVolume", 1f);
                 SeVolume = PlayerPrefs.GetFloat("seVolume", 1f);
                 SongVolume = PlayerPrefs.GetFloat("songVolume", 1f);
-                IsMuteBgm = PlayerPrefs.HasKey("bgmMute") ? PlayerPrefs.GetInt("bgmMute") == 1 : false;
-                IsMuteSe = PlayerPrefs.HasKey("seMute") ? PlayerPrefs.GetInt("seMute") == 1 : false;
-                IsMuteSong = PlayerPrefs.HasKey("songMute") ? PlayerPrefs.GetInt("songMute") == 1 : false;
+                IsMuteBgm = PlayerPrefs.HasKey("bgmMute") && PlayerPrefs.GetInt("bgmMute") == 1;
+                IsMuteSe = PlayerPrefs.HasKey("seMute") && PlayerPrefs.GetInt("seMute") == 1;
+                IsMuteSong = PlayerPrefs.HasKey("songMute") && PlayerPrefs.GetInt("songMute") == 1;
                 NoteSpeed = PlayerPrefs.GetFloat("noteSpeedConfig", 1f);
                 TapTimingNum = PlayerPrefs.GetFloat("tapTimingNum", 0f);
 

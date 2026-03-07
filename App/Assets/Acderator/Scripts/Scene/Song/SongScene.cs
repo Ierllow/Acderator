@@ -144,7 +144,7 @@ namespace Song
             var noteCount = notesManager.LoadedChartInfo.NoteCount;
             await frontTelopLayerController.ShowResult(songLayerController.GetSongResult(noteCount));
 
-            var isSaved = await ScoreManager.Instance.RequestUpdateScoreAsync(sceneContext.SongInfo.Sid, currentScore);
+            var isSaved = await ScoreManager.Instance.RequestUpdateScoreAsync(sceneContext.SessionId, currentScore);
             if (!isSaved)
             {
                 await scoreSaveError;

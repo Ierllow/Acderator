@@ -1,5 +1,6 @@
 ﻿using Cysharp.Threading.Tasks;
 using Intense;
+using Intense.Api;
 using Intense.Asset;
 using Intense.Master;
 using Intense.UI;
@@ -56,7 +57,13 @@ namespace SongSelect
             await AssetBundleManager.Instance.LoadAssetsAsync(destroyCancellationToken);
         }
 
-        private async UniTask TapDecideButton() => await SceneManager.Instance.ChangeSceneAsync(ESceneType.Song, sceneContext.ToSongSceneContext(songListView.SelectedCellListSid, autoButton.IsOn));
+        private async UniTask TapDecideButton()
+        {
+            var request = new ScoreBeginRequest();
+            request.PostData.Add("sid", songListView.SelectedCellListSid);
+            var response = await NetworkManager.Instance.RequestAsync(request) as ScoreBeginResponse;
+            await SceneManager.Instance.ChangeSceneAsync(ESceneType.Song, sceneContext.ToSongSceneContext(songListView.SelectedCellListSid, autoButton.IsOn, response.SessionId));
+        }
 
         private void TapOrderButton()
         {

@@ -13,8 +13,6 @@ You can download the exact version from the [official Download Archive here](htt
 ### Project status  
 - [ ] Add Tutorial Mode  
 - [ ] Update ConfigPopup UI  
-- [ ] Delete Firebase Plugin  
-- [ ] Delete PlayFab Plugin  
 - [ ] Add Account Linking  
    
 ## Credits

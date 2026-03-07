@@ -1,95 +1,52 @@
 ﻿using Cysharp.Text;
 using Cysharp.Threading.Tasks;
-using Firebase.Auth;
-using Firebase.Storage;
 using Intense.Data;
 using Intense.UI;
-using PlayFab;
-using PlayFab.ClientModels;
+using MessagePack;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 
 namespace Intense.Api
 {
     internal class NetworkManager : SingletonMonoBehaviour<NetworkManager>
     {
-        public bool IsLoggedIn { get; private set; }
-        public bool IsInit { get; private set; }
+        [SerializeField] private NetworkConfig networkConfigObject;
 
-        protected override void Awake()
+        public async UniTask<ResponseBase> RequestAsync(RequestBase request)
         {
-            UniTask.Void(async () =>
+            if (Application.internetReachability.EnumEquals(NetworkReachability.NotReachable))
             {
-                await FirebaseAuth.DefaultInstance.SignInAnonymouslyAsync().AsUniTask();
-                IsInit = true;
-            });
-            base.Awake();
-        }
-
-        public async UniTask<string> GetUrl(string path)
-        {
-            if (!IsInit) await UniTask.WaitUntil(() => IsInit);
-
-            var storageUrl = FirebaseStorage.DefaultInstance.GetReferenceFromUrl(""); //
-            var storagePath = storageUrl.Child(path);
-            var downloadUrl = await storagePath.GetDownloadUrlAsync().AsUniTask();
-            return downloadUrl.AbsoluteUri;
-        }
-
-        public async UniTask<ResponseBase<LoginResult>> LogInAnonymouslyAsync()
-        {
-            if (IsLoggedIn) return null;
-
-            Loading.Instance.ShowLoading();
-
-            var userId = LocalDataManager.Instance.LocalUser.UserId;
-            var passWard = LocalDataManager.Instance.LocalUser.PassWard;
-            var customId = "";
-            var request = new LoginWithCustomIDRequest
-            {
-                CustomId = userId,
-                CreateAccount = false,
-            };
-            if (string.IsNullOrEmpty(userId) && string.IsNullOrEmpty(passWard))
-            {
-                request.CustomId = customId = Guid.NewGuid().ToString();
-                request.CreateAccount = true;
+                return default;
             }
 
-            LoginResult result = null;
-            PlayFabError error = null;
-
-            PlayFabClientAPI.LoginWithCustomID(request, x => result = x, x => error = x);
-            await UniTask.WaitUntil(() => result != null || error != null);
-
-            if (result != null)
-            {
-                if (result.NewlyCreated)
-                {
-                    LocalDataManager.Instance.LocalUser.UserId = request.CustomId;
-                    LocalDataManager.Instance.LocalUser.PassWard = request.CustomId;
-                }
-                IsLoggedIn = true;
-            }
-            Debug.Log(ZString.Format("errorResponse: {0}", error?.GenerateErrorReport()));
-            Loading.Instance.HideLoading();
-
-            return new(result, error);
-        }
-
-        public async UniTask<ResponseBase<UpdateUserDataResult>> RequestAsync(RequestBase request)
-        {
             Loading.Instance.ShowLoading();
+            try
+            {
+                var requestBytes = MessagePackSerializer.Serialize(request.PostData);
+                var session = LocalDataManager.Instance.System.Token;
+                var url = !string.IsNullOrEmpty(session)
+                    ? networkConfigObject.apiServerUrl + "/" + session + "/" + request.ApiKey
+                    : networkConfigObject.apiServerUrl + "/" + request.ApiKey;
 
-            UpdateUserDataResult result = null;
-            PlayFabError error = null;
-
-            PlayFabClientAPI.UpdateUserData(request.CreateUpdateUserDataRequest(), x => result = x, x => error = x);
-            await UniTask.WaitUntil(() => result != null || error != null);
-            Debug.Log(ZString.Format("errorResponse: {0}", error?.GenerateErrorReport()));
-            Loading.Instance.HideLoading();
-
-            return new(result, error);
+                using var www = new UnityWebRequest(url, UnityWebRequest.kHttpVerbPOST);
+                www.SetRequestHeader("Content-Type", "application/x-msgpack");
+                www.uploadHandler = new UploadHandlerRaw(requestBytes);
+                www.downloadHandler = new DownloadHandlerBuffer();
+                www.timeout = 60;
+                await www.SendWebRequest();
+                if (!www.result.EnumEquals(UnityWebRequest.Result.Success)) return default;
+                var responseBytes = www.downloadHandler.data;
+                var responseData = MessagePackSerializer.Deserialize<Dictionary<string, object>>(responseBytes);
+                var response = new ResponseBase(responseData);
+                Debug.Log(ZString.Format("status: {0}, errorResponse: {1}", response.Status, response.ErrorMessage));
+                return response;
+            }
+            finally
+            {
+                Loading.Instance.HideLoading();
+            }
         }
     }
 }
