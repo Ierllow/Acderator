@@ -27,7 +27,8 @@ namespace Song
 
         protected override void Awake()
         {
-            failFastExceptionWatcher.Init(CancellationTokenSource.CreateLinkedTokenSource(destroyCancellationToken));
+            var tokenSource = CancellationTokenSource.CreateLinkedTokenSource(destroyCancellationToken);
+            failFastExceptionWatcher.Init(tokenSource);
             base.Awake();
         }
 

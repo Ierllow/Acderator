@@ -33,7 +33,7 @@ namespace Song
             hpBar.Move();
         }
 
-        public void InitScore() => songGameLogic.InitScore();
+        public void Init(int sid) => songGameLogic.Init(sid);
 
         public void UpdateSongLayer(FingerInfo fingerInfo) => songGameLogic.UpdateGameLogic(fingerInfo);
 

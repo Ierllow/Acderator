@@ -14,7 +14,7 @@ namespace Song
         public void SetHp(float currentHp)
         {
             gaugeImage.fillAmount = currentHp;
-            percent.SetTextFormat("{0}", (int)(currentHp * 100));
+            percent.SetText((int)(currentHp * 100));
         }
 
         public void Move() => gameObject.transform.DOMoveX(170, 0.6f).SetLink(gameObject);

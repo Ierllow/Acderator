@@ -11,6 +11,7 @@ namespace Song
     {
         private int currentHpNum;
         private decimal currentHpPercent;
+        private int baseHp;
 
         public float CurrentHpPercent => (float)currentHpPercent;
 
@@ -18,9 +19,10 @@ namespace Song
 
         public const int MAX_HP_PERCENT = 100;
 
+        public void Init(int sid) => baseHp = MasterDataManager.Instance.MemoryDatabase.SongMasterTable.FindBySid(sid).Hp;
+
         public void UpdateHp(EJudgementType judgmentType, int noteCount)
         {
-            var baseHp = MasterDataManager.Instance.MemoryDatabase.SongBaseHpMasterTable.First().Hp;
             if (judgmentType.EnumEquals(EJudgementType.Bad) || judgmentType.EnumEquals(EJudgementType.Miss)) return;
             if (currentHpNum >= baseHp) return;
             if (currentHpPercent >= MAX_HP_PERCENT) return;

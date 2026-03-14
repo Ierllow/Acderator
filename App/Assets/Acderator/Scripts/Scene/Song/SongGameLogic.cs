@@ -21,7 +21,11 @@ namespace Song
         public int CurrentCombo => comboController.CurrentCombo;
         public float CurrentHpPercent => hpBarController.CurrentHpPercent;
 
-        public void InitScore() => scoreController.Init(notesManager.LoadedChartInfo.NoteCount);
+        public void Init(int sid)
+        {
+            scoreController.Init(sid, notesManager.LoadedChartInfo.NoteCount);
+            hpBarController.Init(sid);
+        }
 
         public void UpdateGameLogic(FingerInfo fingerInfo)
         {

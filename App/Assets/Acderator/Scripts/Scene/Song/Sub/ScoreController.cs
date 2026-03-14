@@ -18,11 +18,12 @@ namespace Song
 
         private readonly Queue<int> scoreQueue = new();
         private int noteCount = 0;
+        private int maxScore = 0;
 
-        public void Init(int noteCount)
+        public void Init(int sid, int noteCount)
         {
             this.noteCount = noteCount;
-            var maxScore = MasterDataManager.Instance.MemoryDatabase.SongBaseScoreMasterTable.First().Score;
+            maxScore = MasterDataManager.Instance.MemoryDatabase.SongMasterTable.FindBySid(sid).Score;
             var perNoteScore = maxScore / noteCount;
             var remainder = maxScore % noteCount;
             ValueEnumerable.Repeat(0, noteCount).Select(i => perNoteScore + (i < remainder ? 1 : 0)).ToList().ForEach(scoreQueue.Enqueue);
@@ -39,7 +40,6 @@ namespace Song
                     {
                         var rate = MasterDataManager.Instance.MemoryDatabase.SongScoreRateMasterTable.First(x => x.Type == judgmentType.GetLength()).Rate;
                         CurrentScore += Mathf.RoundToInt(baseScore * rate);
-                        var maxScore = MasterDataManager.Instance.MemoryDatabase.SongBaseScoreMasterTable.First().Score;
                         if (CurrentScore == maxScore) CurrentScore += noteCount;
                     }
                     break;
