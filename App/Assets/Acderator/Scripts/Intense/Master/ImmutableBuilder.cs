@@ -30,9 +30,7 @@ namespace Master
                 memory.SongSelectMasterTable,
                 memory.SongMasterTable,
                 memory.SongScoreRateMasterTable,
-                memory.SongBaseScoreMasterTable,
                 memory.SongJudgeZoneMasterTable,
-                memory.SongBaseHpMasterTable,
                 memory.SongHpRateMasterTable,
                 memory.ResultMasterTable,
                 memory.SoundSheetNameMasterTable,
@@ -52,9 +50,7 @@ namespace Master
                 memory.SongSelectMasterTable,
                 memory.SongMasterTable,
                 memory.SongScoreRateMasterTable,
-                memory.SongBaseScoreMasterTable,
                 memory.SongJudgeZoneMasterTable,
-                memory.SongBaseHpMasterTable,
                 memory.SongHpRateMasterTable,
                 memory.ResultMasterTable,
                 memory.SoundSheetNameMasterTable,
@@ -74,9 +70,7 @@ namespace Master
                 memory.SongSelectMasterTable,
                 memory.SongMasterTable,
                 memory.SongScoreRateMasterTable,
-                memory.SongBaseScoreMasterTable,
                 memory.SongJudgeZoneMasterTable,
-                memory.SongBaseHpMasterTable,
                 memory.SongHpRateMasterTable,
                 memory.ResultMasterTable,
                 memory.SoundSheetNameMasterTable,
@@ -95,9 +89,7 @@ namespace Master
                 table,
                 memory.SongMasterTable,
                 memory.SongScoreRateMasterTable,
-                memory.SongBaseScoreMasterTable,
                 memory.SongJudgeZoneMasterTable,
-                memory.SongBaseHpMasterTable,
                 memory.SongHpRateMasterTable,
                 memory.ResultMasterTable,
                 memory.SoundSheetNameMasterTable,
@@ -117,9 +109,7 @@ namespace Master
                 table,
                 memory.SongMasterTable,
                 memory.SongScoreRateMasterTable,
-                memory.SongBaseScoreMasterTable,
                 memory.SongJudgeZoneMasterTable,
-                memory.SongBaseHpMasterTable,
                 memory.SongHpRateMasterTable,
                 memory.ResultMasterTable,
                 memory.SoundSheetNameMasterTable,
@@ -139,9 +129,7 @@ namespace Master
                 table,
                 memory.SongMasterTable,
                 memory.SongScoreRateMasterTable,
-                memory.SongBaseScoreMasterTable,
                 memory.SongJudgeZoneMasterTable,
-                memory.SongBaseHpMasterTable,
                 memory.SongHpRateMasterTable,
                 memory.ResultMasterTable,
                 memory.SoundSheetNameMasterTable,
@@ -160,9 +148,7 @@ namespace Master
                 memory.SongSelectMasterTable,
                 table,
                 memory.SongScoreRateMasterTable,
-                memory.SongBaseScoreMasterTable,
                 memory.SongJudgeZoneMasterTable,
-                memory.SongBaseHpMasterTable,
                 memory.SongHpRateMasterTable,
                 memory.ResultMasterTable,
                 memory.SoundSheetNameMasterTable,
@@ -182,9 +168,7 @@ namespace Master
                 memory.SongSelectMasterTable,
                 table,
                 memory.SongScoreRateMasterTable,
-                memory.SongBaseScoreMasterTable,
                 memory.SongJudgeZoneMasterTable,
-                memory.SongBaseHpMasterTable,
                 memory.SongHpRateMasterTable,
                 memory.ResultMasterTable,
                 memory.SoundSheetNameMasterTable,
@@ -204,9 +188,7 @@ namespace Master
                 memory.SongSelectMasterTable,
                 table,
                 memory.SongScoreRateMasterTable,
-                memory.SongBaseScoreMasterTable,
                 memory.SongJudgeZoneMasterTable,
-                memory.SongBaseHpMasterTable,
                 memory.SongHpRateMasterTable,
                 memory.ResultMasterTable,
                 memory.SoundSheetNameMasterTable,
@@ -225,9 +207,7 @@ namespace Master
                 memory.SongSelectMasterTable,
                 memory.SongMasterTable,
                 table,
-                memory.SongBaseScoreMasterTable,
                 memory.SongJudgeZoneMasterTable,
-                memory.SongBaseHpMasterTable,
                 memory.SongHpRateMasterTable,
                 memory.ResultMasterTable,
                 memory.SoundSheetNameMasterTable,
@@ -247,9 +227,7 @@ namespace Master
                 memory.SongSelectMasterTable,
                 memory.SongMasterTable,
                 table,
-                memory.SongBaseScoreMasterTable,
                 memory.SongJudgeZoneMasterTable,
-                memory.SongBaseHpMasterTable,
                 memory.SongHpRateMasterTable,
                 memory.ResultMasterTable,
                 memory.SoundSheetNameMasterTable,
@@ -269,74 +247,7 @@ namespace Master
                 memory.SongSelectMasterTable,
                 memory.SongMasterTable,
                 table,
-                memory.SongBaseScoreMasterTable,
                 memory.SongJudgeZoneMasterTable,
-                memory.SongBaseHpMasterTable,
-                memory.SongHpRateMasterTable,
-                memory.ResultMasterTable,
-                memory.SoundSheetNameMasterTable,
-                memory.TutorialStepMasterTable,
-                memory.TutorialMasterTable
-            
-            );
-        }
-
-        public void ReplaceAll(System.Collections.Generic.IList<SongBaseScoreMaster> data)
-        {
-            var newData = CloneAndSortBy(data, x => x.Score, System.Collections.Generic.Comparer<int>.Default);
-            var table = new SongBaseScoreMasterTable(newData);
-            memory = new MemoryDatabase(
-                memory.TitleMasterTable,
-                memory.SongSelectMasterTable,
-                memory.SongMasterTable,
-                memory.SongScoreRateMasterTable,
-                table,
-                memory.SongJudgeZoneMasterTable,
-                memory.SongBaseHpMasterTable,
-                memory.SongHpRateMasterTable,
-                memory.ResultMasterTable,
-                memory.SoundSheetNameMasterTable,
-                memory.TutorialStepMasterTable,
-                memory.TutorialMasterTable
-            
-            );
-        }
-
-        public void RemoveSongBaseScoreMaster(int[] keys)
-        {
-            var data = RemoveCore(memory.SongBaseScoreMasterTable.GetRawDataUnsafe(), keys, x => x.Score, System.Collections.Generic.Comparer<int>.Default);
-            var newData = CloneAndSortBy(data, x => x.Score, System.Collections.Generic.Comparer<int>.Default);
-            var table = new SongBaseScoreMasterTable(newData);
-            memory = new MemoryDatabase(
-                memory.TitleMasterTable,
-                memory.SongSelectMasterTable,
-                memory.SongMasterTable,
-                memory.SongScoreRateMasterTable,
-                table,
-                memory.SongJudgeZoneMasterTable,
-                memory.SongBaseHpMasterTable,
-                memory.SongHpRateMasterTable,
-                memory.ResultMasterTable,
-                memory.SoundSheetNameMasterTable,
-                memory.TutorialStepMasterTable,
-                memory.TutorialMasterTable
-            
-            );
-        }
-
-        public void Diff(SongBaseScoreMaster[] addOrReplaceData)
-        {
-            var data = DiffCore(memory.SongBaseScoreMasterTable.GetRawDataUnsafe(), addOrReplaceData, x => x.Score, System.Collections.Generic.Comparer<int>.Default);
-            var newData = CloneAndSortBy(data, x => x.Score, System.Collections.Generic.Comparer<int>.Default);
-            var table = new SongBaseScoreMasterTable(newData);
-            memory = new MemoryDatabase(
-                memory.TitleMasterTable,
-                memory.SongSelectMasterTable,
-                memory.SongMasterTable,
-                memory.SongScoreRateMasterTable,
-                table,
-                memory.SongJudgeZoneMasterTable,
-                memory.SongBaseHpMasterTable,
                 memory.SongHpRateMasterTable,
                 memory.ResultMasterTable,
                 memory.SoundSheetNameMasterTable,
@@ -355,9 +266,7 @@ namespace Master
                 memory.SongSelectMasterTable,
                 memory.SongMasterTable,
                 memory.SongScoreRateMasterTable,
-                memory.SongBaseScoreMasterTable,
                 table,
-                memory.SongBaseHpMasterTable,
                 memory.SongHpRateMasterTable,
                 memory.ResultMasterTable,
                 memory.SoundSheetNameMasterTable,
@@ -377,9 +286,7 @@ namespace Master
                 memory.SongSelectMasterTable,
                 memory.SongMasterTable,
                 memory.SongScoreRateMasterTable,
-                memory.SongBaseScoreMasterTable,
                 table,
-                memory.SongBaseHpMasterTable,
                 memory.SongHpRateMasterTable,
                 memory.ResultMasterTable,
                 memory.SoundSheetNameMasterTable,
@@ -399,73 +306,6 @@ namespace Master
                 memory.SongSelectMasterTable,
                 memory.SongMasterTable,
                 memory.SongScoreRateMasterTable,
-                memory.SongBaseScoreMasterTable,
-                table,
-                memory.SongBaseHpMasterTable,
-                memory.SongHpRateMasterTable,
-                memory.ResultMasterTable,
-                memory.SoundSheetNameMasterTable,
-                memory.TutorialStepMasterTable,
-                memory.TutorialMasterTable
-            
-            );
-        }
-
-        public void ReplaceAll(System.Collections.Generic.IList<SongBaseHpMaster> data)
-        {
-            var newData = CloneAndSortBy(data, x => x.Hp, System.Collections.Generic.Comparer<int>.Default);
-            var table = new SongBaseHpMasterTable(newData);
-            memory = new MemoryDatabase(
-                memory.TitleMasterTable,
-                memory.SongSelectMasterTable,
-                memory.SongMasterTable,
-                memory.SongScoreRateMasterTable,
-                memory.SongBaseScoreMasterTable,
-                memory.SongJudgeZoneMasterTable,
-                table,
-                memory.SongHpRateMasterTable,
-                memory.ResultMasterTable,
-                memory.SoundSheetNameMasterTable,
-                memory.TutorialStepMasterTable,
-                memory.TutorialMasterTable
-            
-            );
-        }
-
-        public void RemoveSongBaseHpMaster(int[] keys)
-        {
-            var data = RemoveCore(memory.SongBaseHpMasterTable.GetRawDataUnsafe(), keys, x => x.Hp, System.Collections.Generic.Comparer<int>.Default);
-            var newData = CloneAndSortBy(data, x => x.Hp, System.Collections.Generic.Comparer<int>.Default);
-            var table = new SongBaseHpMasterTable(newData);
-            memory = new MemoryDatabase(
-                memory.TitleMasterTable,
-                memory.SongSelectMasterTable,
-                memory.SongMasterTable,
-                memory.SongScoreRateMasterTable,
-                memory.SongBaseScoreMasterTable,
-                memory.SongJudgeZoneMasterTable,
-                table,
-                memory.SongHpRateMasterTable,
-                memory.ResultMasterTable,
-                memory.SoundSheetNameMasterTable,
-                memory.TutorialStepMasterTable,
-                memory.TutorialMasterTable
-            
-            );
-        }
-
-        public void Diff(SongBaseHpMaster[] addOrReplaceData)
-        {
-            var data = DiffCore(memory.SongBaseHpMasterTable.GetRawDataUnsafe(), addOrReplaceData, x => x.Hp, System.Collections.Generic.Comparer<int>.Default);
-            var newData = CloneAndSortBy(data, x => x.Hp, System.Collections.Generic.Comparer<int>.Default);
-            var table = new SongBaseHpMasterTable(newData);
-            memory = new MemoryDatabase(
-                memory.TitleMasterTable,
-                memory.SongSelectMasterTable,
-                memory.SongMasterTable,
-                memory.SongScoreRateMasterTable,
-                memory.SongBaseScoreMasterTable,
-                memory.SongJudgeZoneMasterTable,
                 table,
                 memory.SongHpRateMasterTable,
                 memory.ResultMasterTable,
@@ -485,9 +325,7 @@ namespace Master
                 memory.SongSelectMasterTable,
                 memory.SongMasterTable,
                 memory.SongScoreRateMasterTable,
-                memory.SongBaseScoreMasterTable,
                 memory.SongJudgeZoneMasterTable,
-                memory.SongBaseHpMasterTable,
                 table,
                 memory.ResultMasterTable,
                 memory.SoundSheetNameMasterTable,
@@ -507,9 +345,7 @@ namespace Master
                 memory.SongSelectMasterTable,
                 memory.SongMasterTable,
                 memory.SongScoreRateMasterTable,
-                memory.SongBaseScoreMasterTable,
                 memory.SongJudgeZoneMasterTable,
-                memory.SongBaseHpMasterTable,
                 table,
                 memory.ResultMasterTable,
                 memory.SoundSheetNameMasterTable,
@@ -529,9 +365,7 @@ namespace Master
                 memory.SongSelectMasterTable,
                 memory.SongMasterTable,
                 memory.SongScoreRateMasterTable,
-                memory.SongBaseScoreMasterTable,
                 memory.SongJudgeZoneMasterTable,
-                memory.SongBaseHpMasterTable,
                 table,
                 memory.ResultMasterTable,
                 memory.SoundSheetNameMasterTable,
@@ -550,9 +384,7 @@ namespace Master
                 memory.SongSelectMasterTable,
                 memory.SongMasterTable,
                 memory.SongScoreRateMasterTable,
-                memory.SongBaseScoreMasterTable,
                 memory.SongJudgeZoneMasterTable,
-                memory.SongBaseHpMasterTable,
                 memory.SongHpRateMasterTable,
                 table,
                 memory.SoundSheetNameMasterTable,
@@ -572,9 +404,7 @@ namespace Master
                 memory.SongSelectMasterTable,
                 memory.SongMasterTable,
                 memory.SongScoreRateMasterTable,
-                memory.SongBaseScoreMasterTable,
                 memory.SongJudgeZoneMasterTable,
-                memory.SongBaseHpMasterTable,
                 memory.SongHpRateMasterTable,
                 table,
                 memory.SoundSheetNameMasterTable,
@@ -594,9 +424,7 @@ namespace Master
                 memory.SongSelectMasterTable,
                 memory.SongMasterTable,
                 memory.SongScoreRateMasterTable,
-                memory.SongBaseScoreMasterTable,
                 memory.SongJudgeZoneMasterTable,
-                memory.SongBaseHpMasterTable,
                 memory.SongHpRateMasterTable,
                 table,
                 memory.SoundSheetNameMasterTable,
@@ -615,9 +443,7 @@ namespace Master
                 memory.SongSelectMasterTable,
                 memory.SongMasterTable,
                 memory.SongScoreRateMasterTable,
-                memory.SongBaseScoreMasterTable,
                 memory.SongJudgeZoneMasterTable,
-                memory.SongBaseHpMasterTable,
                 memory.SongHpRateMasterTable,
                 memory.ResultMasterTable,
                 table,
@@ -637,9 +463,7 @@ namespace Master
                 memory.SongSelectMasterTable,
                 memory.SongMasterTable,
                 memory.SongScoreRateMasterTable,
-                memory.SongBaseScoreMasterTable,
                 memory.SongJudgeZoneMasterTable,
-                memory.SongBaseHpMasterTable,
                 memory.SongHpRateMasterTable,
                 memory.ResultMasterTable,
                 table,
@@ -659,9 +483,7 @@ namespace Master
                 memory.SongSelectMasterTable,
                 memory.SongMasterTable,
                 memory.SongScoreRateMasterTable,
-                memory.SongBaseScoreMasterTable,
                 memory.SongJudgeZoneMasterTable,
-                memory.SongBaseHpMasterTable,
                 memory.SongHpRateMasterTable,
                 memory.ResultMasterTable,
                 table,
@@ -680,9 +502,7 @@ namespace Master
                 memory.SongSelectMasterTable,
                 memory.SongMasterTable,
                 memory.SongScoreRateMasterTable,
-                memory.SongBaseScoreMasterTable,
                 memory.SongJudgeZoneMasterTable,
-                memory.SongBaseHpMasterTable,
                 memory.SongHpRateMasterTable,
                 memory.ResultMasterTable,
                 memory.SoundSheetNameMasterTable,
@@ -702,9 +522,7 @@ namespace Master
                 memory.SongSelectMasterTable,
                 memory.SongMasterTable,
                 memory.SongScoreRateMasterTable,
-                memory.SongBaseScoreMasterTable,
                 memory.SongJudgeZoneMasterTable,
-                memory.SongBaseHpMasterTable,
                 memory.SongHpRateMasterTable,
                 memory.ResultMasterTable,
                 memory.SoundSheetNameMasterTable,
@@ -724,9 +542,7 @@ namespace Master
                 memory.SongSelectMasterTable,
                 memory.SongMasterTable,
                 memory.SongScoreRateMasterTable,
-                memory.SongBaseScoreMasterTable,
                 memory.SongJudgeZoneMasterTable,
-                memory.SongBaseHpMasterTable,
                 memory.SongHpRateMasterTable,
                 memory.ResultMasterTable,
                 memory.SoundSheetNameMasterTable,
@@ -745,9 +561,7 @@ namespace Master
                 memory.SongSelectMasterTable,
                 memory.SongMasterTable,
                 memory.SongScoreRateMasterTable,
-                memory.SongBaseScoreMasterTable,
                 memory.SongJudgeZoneMasterTable,
-                memory.SongBaseHpMasterTable,
                 memory.SongHpRateMasterTable,
                 memory.ResultMasterTable,
                 memory.SoundSheetNameMasterTable,
@@ -767,9 +581,7 @@ namespace Master
                 memory.SongSelectMasterTable,
                 memory.SongMasterTable,
                 memory.SongScoreRateMasterTable,
-                memory.SongBaseScoreMasterTable,
                 memory.SongJudgeZoneMasterTable,
-                memory.SongBaseHpMasterTable,
                 memory.SongHpRateMasterTable,
                 memory.ResultMasterTable,
                 memory.SoundSheetNameMasterTable,
@@ -789,9 +601,7 @@ namespace Master
                 memory.SongSelectMasterTable,
                 memory.SongMasterTable,
                 memory.SongScoreRateMasterTable,
-                memory.SongBaseScoreMasterTable,
                 memory.SongJudgeZoneMasterTable,
-                memory.SongBaseHpMasterTable,
                 memory.SongHpRateMasterTable,
                 memory.ResultMasterTable,
                 memory.SoundSheetNameMasterTable,

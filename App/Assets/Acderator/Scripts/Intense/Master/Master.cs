@@ -1,5 +1,6 @@
 ﻿using MasterMemory;
 using MessagePack;
+using System;
 
 namespace Intense.Master
 {
@@ -30,6 +31,8 @@ namespace Intense.Master
         public string Composer { get; set; }
         public float Start_offset { get; set; }
         public int Bg { get; set; }
+        public int Score { get; set; }
+        public int Hp { get; set; }
     }
 
     [MemoryTable("SongScoreRateMaster")]
@@ -39,8 +42,9 @@ namespace Intense.Master
         public float Rate { get; set; }
     }
 
+    [Obsolete("Will be delete in the future.")]
     [MemoryTable("SongBaseScoreMaster")]
-    public class SongBaseScoreMaster : BaseMaster
+    public class SongBaseScoreMaster
     {
         [PrimaryKey] public int Score { get; set; }
     }
@@ -52,8 +56,9 @@ namespace Intense.Master
         public float Zone { get; set; }
     }
 
+    [Obsolete("Will be delete in the future.")]
     [MemoryTable("SongBaseHpMaster")]
-    public class SongBaseHpMaster : BaseMaster
+    public class SongBaseHpMaster
     {
         [PrimaryKey] public int Hp { get; set; }
     }

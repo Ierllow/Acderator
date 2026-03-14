@@ -110,9 +110,7 @@ public class MasterDataExporter
         builder.Append(SongSelectMasters);
         builder.Append(SongMasters);
         builder.Append(SongScoreRateMasters);
-        builder.Append(SongBaseScoreMasters);
         builder.Append(SongJudgeZoneMasters);
-        builder.Append(SongBaseHpMasters);
         builder.Append(SongHpRateMasters);
         builder.Append(ResultMasters);
         builder.Append(SoundSheetNameMasters);

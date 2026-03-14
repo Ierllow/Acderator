@@ -36,21 +36,9 @@ namespace Master
             return this;
         }
 
-        public DatabaseBuilder Append(System.Collections.Generic.IEnumerable<SongBaseScoreMaster> dataSource)
-        {
-            AppendCore(dataSource, x => x.Score, System.Collections.Generic.Comparer<int>.Default);
-            return this;
-        }
-
         public DatabaseBuilder Append(System.Collections.Generic.IEnumerable<SongJudgeZoneMaster> dataSource)
         {
             AppendCore(dataSource, x => x.Type, System.Collections.Generic.Comparer<int>.Default);
-            return this;
-        }
-
-        public DatabaseBuilder Append(System.Collections.Generic.IEnumerable<SongBaseHpMaster> dataSource)
-        {
-            AppendCore(dataSource, x => x.Hp, System.Collections.Generic.Comparer<int>.Default);
             return this;
         }
 
