@@ -8,7 +8,7 @@ using Intense.Master;
 using Intense.UI;
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Reflection;
 using Unity.Serialization;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -20,6 +20,13 @@ namespace Intense
 {
     public enum ESceneType { None, Boot, Title, SongSelect, Song, Result }
 
+    [AttributeUsage(AttributeTargets.Class, Inherited = true)]
+    public sealed class SceneTypeAttribute : Attribute
+    {
+        public ESceneType Type { get; }
+        public SceneTypeAttribute(ESceneType type) => Type = type;
+    }
+
     public class SceneManager : SingletonMonoBehaviour<SceneManager>
     {
         [SerializeField] private Image fadeMask;
@@ -27,7 +34,7 @@ namespace Intense
 
         [Inject] private ZenjectSceneLoader zenjectSceneLoader;
 
-        public ESceneType CurrentSceneType => sceneBaseDict.AsValueEnumerable().Count() > 0 ? sceneBaseDict.LastOrDefault().Key : default;
+        public ESceneType CurrentSceneType => sceneBaseDict.AsValueEnumerable().Count() > 0 ? sceneBaseDict.AsValueEnumerable().LastOrDefault().Key : default;
         public bool IsFadeIn { get; private set; } = false;
 
         private readonly Dictionary<ESceneType, SceneBase> sceneBaseDict = new();
@@ -54,9 +61,10 @@ namespace Intense
 
         public void SetSceneBase(SceneBase scene)
         {
-            var sceneName = scene.GetType().Name;
-            var isAdded = sceneName.Contains("Scene") && Enum.TryParse(sceneName.Replace("Scene", ""), out ESceneType sceneType) && sceneBaseDict.TryAdd(sceneType, scene);
-            if (!isAdded) throw new ParseErrorException("the scene class name is not fine");
+            var type = scene.GetType();
+            var sceneType = type.GetCustomAttribute<SceneTypeAttribute>().Type;
+            if (sceneType.EnumEquals(ESceneType.None) || !sceneBaseDict.TryAdd(sceneType, scene))
+                throw new ParseErrorException(ZString.Format("The {0} is invalid or duplicate.", type.Name));
         }
 
         public async UniTask ChangeSceneAsync(ESceneType sceneType, SceneContext context = default, bool sameScene = false)

@@ -10,6 +10,7 @@ using Zenject;
 
 namespace Song
 {
+    [SceneType(ESceneType.Song)]
     public partial class SongScene : SceneBase
     {
         [SerializeField] private SongLayerController songLayerController;
@@ -96,7 +97,7 @@ namespace Song
                     var offset = notesManager.GetSpawnOffset(notesLineController.LaneLength);
                     songControllerResolver.Loop.SetOffset(offset);
                     songControllerResolver.Spawner.Init(loadedChartInfo.NoteDataList, offset);
-                    songLayerController.InitScore();
+                    songLayerController.Init(sceneContext.SongInfo.Sid);
                     await backTelopLayerController.FadeIn();
                     return;
                 }

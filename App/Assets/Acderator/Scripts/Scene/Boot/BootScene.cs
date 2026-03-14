@@ -4,6 +4,7 @@ using UnityEngine.Rendering;
 
 namespace Boot
 {
+    [SceneType(ESceneType.Boot)]
     public class BootScene : SceneBase
     {
         private async UniTask Start()

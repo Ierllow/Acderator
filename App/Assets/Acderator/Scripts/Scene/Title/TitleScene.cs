@@ -10,6 +10,7 @@ using Zenject;
 
 namespace Title
 {
+    [SceneType(ESceneType.Title)]
     public class TitleScene : SceneBase
     {
         [SerializeField] private CommonButton startButton;

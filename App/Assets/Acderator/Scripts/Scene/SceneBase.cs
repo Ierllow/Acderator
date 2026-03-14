@@ -16,6 +16,7 @@ public abstract class SceneContext
 }
 #endregion
 
+[SceneType(ESceneType.None)]
 public abstract class SceneBase : MonoBehaviour
 {
     #region MonoBehaviour Handlers

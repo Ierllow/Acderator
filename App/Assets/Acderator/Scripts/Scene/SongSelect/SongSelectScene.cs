@@ -10,6 +10,7 @@ using Zenject;
 
 namespace SongSelect
 {
+    [SceneType(ESceneType.SongSelect)]
     public partial class SongSelectScene : SceneBase
     {
         [SerializeField] private AtlasImage backgroundImage;

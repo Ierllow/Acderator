@@ -13,6 +13,7 @@ using Zenject;
 
 namespace Result
 {
+    [SceneType(ESceneType.Result)]
     public class ResultScene : SceneBase
     {
         [SerializeField] private AtlasImage backgroundImage;
