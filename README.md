@@ -18,7 +18,6 @@ You can download the exact version from the [official Download Archive here](htt
 ## Credits
 ・[Ched](https://github.com/paralleltree/Ched)  
 ・[DOTween](https://assetstore.unity.com/packages/tools/visual-scripting/dotween-pro-32416)  
-・[firebase-unity-sdk](https://github.com/firebase/firebase-unity-sdk)  
 ・[MasterMemory](https://github.com/Cysharp/MasterMemory)  
 ・[R3](https://github.com/Cysharp/R3)  
 ・[UIEffect](https://github.com/mob-sakai/UIEffect)  
