@@ -1,35 +1,20 @@
-using Cysharp.Text;
-using System.IO;
 using UnityEditor;
 using UnityEngine;
 
-public class NetworkConfig : ScriptableObject
+namespace Intense.Api
 {
-#if UNITY_EDITOR
-    #region Create ScriptableObject
-    [MenuItem("Tools/ScriptableObject/Create NetworkConfig")]
-    private static void DebugConfigToAsset()
+    public class NetworkConfig : ScriptableObject
     {
-        var directoryPath = "Assets/Acderator/Scripts/Intense/Api";
-        var filePath = ZString.Format("{0}/networkConfig.asset", directoryPath);
-        if (!File.Exists(filePath))
-        {
-            if (!Directory.Exists(directoryPath))
-            {
-                Directory.CreateDirectory(directoryPath);
-            }
-            AssetDatabase.CreateAsset(CreateInstance<NetworkConfig>(), filePath);
-            AssetDatabase.Refresh();
+#if UNITY_EDITOR
+        #region Create ScriptableObject
+        [MenuItem("Tools/ScriptableObject/Create NetworkConfig")]
+        private static void NetworkConfigToAsset() => ScriptableObjectUtils.ToAsset<NetworkConfig>("Intense/Api");
 
-            Debug.Log("networkConfig.asset is created.");
-            return;
-        }
-        Debug.LogError("networkConfig.asset already exists.");
-    }
-    #endregion
+        #endregion
 #endif
 
-    public string apiServerUrl = "";
-    public string assetServerUrl = "";
-    public string webViewServerUrl = "";
+        public string apiServerUrl = "";
+        public string assetServerUrl = "";
+        public string webViewServerUrl = "";
+    }
 }
