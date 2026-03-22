@@ -21,16 +21,87 @@ namespace Master
             return memory;
         }
 
+        public void ReplaceAll(System.Collections.Generic.IList<VersionMaster> data)
+        {
+            var newData = CloneAndSortBy(data, x => x.Version, System.Collections.Generic.Comparer<int>.Default);
+            var table = new VersionMasterTable(newData);
+            memory = new MemoryDatabase(
+                table,
+                memory.TitleMasterTable,
+                memory.SongSelectMasterTable,
+                memory.SongMasterTable,
+                memory.SongScoreRateMasterTable,
+                memory.SongBaseScoreMasterTable,
+                memory.SongJudgeZoneMasterTable,
+                memory.SongBaseHpMasterTable,
+                memory.SongHpRateMasterTable,
+                memory.ResultMasterTable,
+                memory.SoundSheetNameMasterTable,
+                memory.TutorialStepMasterTable,
+                memory.TutorialMasterTable
+            
+            );
+        }
+
+        public void RemoveVersionMaster(int[] keys)
+        {
+            var data = RemoveCore(memory.VersionMasterTable.GetRawDataUnsafe(), keys, x => x.Version, System.Collections.Generic.Comparer<int>.Default);
+            var newData = CloneAndSortBy(data, x => x.Version, System.Collections.Generic.Comparer<int>.Default);
+            var table = new VersionMasterTable(newData);
+            memory = new MemoryDatabase(
+                table,
+                memory.TitleMasterTable,
+                memory.SongSelectMasterTable,
+                memory.SongMasterTable,
+                memory.SongScoreRateMasterTable,
+                memory.SongBaseScoreMasterTable,
+                memory.SongJudgeZoneMasterTable,
+                memory.SongBaseHpMasterTable,
+                memory.SongHpRateMasterTable,
+                memory.ResultMasterTable,
+                memory.SoundSheetNameMasterTable,
+                memory.TutorialStepMasterTable,
+                memory.TutorialMasterTable
+            
+            );
+        }
+
+        public void Diff(VersionMaster[] addOrReplaceData)
+        {
+            var data = DiffCore(memory.VersionMasterTable.GetRawDataUnsafe(), addOrReplaceData, x => x.Version, System.Collections.Generic.Comparer<int>.Default);
+            var newData = CloneAndSortBy(data, x => x.Version, System.Collections.Generic.Comparer<int>.Default);
+            var table = new VersionMasterTable(newData);
+            memory = new MemoryDatabase(
+                table,
+                memory.TitleMasterTable,
+                memory.SongSelectMasterTable,
+                memory.SongMasterTable,
+                memory.SongScoreRateMasterTable,
+                memory.SongBaseScoreMasterTable,
+                memory.SongJudgeZoneMasterTable,
+                memory.SongBaseHpMasterTable,
+                memory.SongHpRateMasterTable,
+                memory.ResultMasterTable,
+                memory.SoundSheetNameMasterTable,
+                memory.TutorialStepMasterTable,
+                memory.TutorialMasterTable
+            
+            );
+        }
+
         public void ReplaceAll(System.Collections.Generic.IList<TitleMaster> data)
         {
             var newData = CloneAndSortBy(data, x => x.Tid, System.Collections.Generic.Comparer<int>.Default);
             var table = new TitleMasterTable(newData);
             memory = new MemoryDatabase(
+                memory.VersionMasterTable,
                 table,
                 memory.SongSelectMasterTable,
                 memory.SongMasterTable,
                 memory.SongScoreRateMasterTable,
+                memory.SongBaseScoreMasterTable,
                 memory.SongJudgeZoneMasterTable,
+                memory.SongBaseHpMasterTable,
                 memory.SongHpRateMasterTable,
                 memory.ResultMasterTable,
                 memory.SoundSheetNameMasterTable,
@@ -46,11 +117,14 @@ namespace Master
             var newData = CloneAndSortBy(data, x => x.Tid, System.Collections.Generic.Comparer<int>.Default);
             var table = new TitleMasterTable(newData);
             memory = new MemoryDatabase(
+                memory.VersionMasterTable,
                 table,
                 memory.SongSelectMasterTable,
                 memory.SongMasterTable,
                 memory.SongScoreRateMasterTable,
+                memory.SongBaseScoreMasterTable,
                 memory.SongJudgeZoneMasterTable,
+                memory.SongBaseHpMasterTable,
                 memory.SongHpRateMasterTable,
                 memory.ResultMasterTable,
                 memory.SoundSheetNameMasterTable,
@@ -66,11 +140,14 @@ namespace Master
             var newData = CloneAndSortBy(data, x => x.Tid, System.Collections.Generic.Comparer<int>.Default);
             var table = new TitleMasterTable(newData);
             memory = new MemoryDatabase(
+                memory.VersionMasterTable,
                 table,
                 memory.SongSelectMasterTable,
                 memory.SongMasterTable,
                 memory.SongScoreRateMasterTable,
+                memory.SongBaseScoreMasterTable,
                 memory.SongJudgeZoneMasterTable,
+                memory.SongBaseHpMasterTable,
                 memory.SongHpRateMasterTable,
                 memory.ResultMasterTable,
                 memory.SoundSheetNameMasterTable,
@@ -85,11 +162,14 @@ namespace Master
             var newData = CloneAndSortBy(data, x => x.Group, System.Collections.Generic.Comparer<int>.Default);
             var table = new SongSelectMasterTable(newData);
             memory = new MemoryDatabase(
+                memory.VersionMasterTable,
                 memory.TitleMasterTable,
                 table,
                 memory.SongMasterTable,
                 memory.SongScoreRateMasterTable,
+                memory.SongBaseScoreMasterTable,
                 memory.SongJudgeZoneMasterTable,
+                memory.SongBaseHpMasterTable,
                 memory.SongHpRateMasterTable,
                 memory.ResultMasterTable,
                 memory.SoundSheetNameMasterTable,
@@ -105,11 +185,14 @@ namespace Master
             var newData = CloneAndSortBy(data, x => x.Group, System.Collections.Generic.Comparer<int>.Default);
             var table = new SongSelectMasterTable(newData);
             memory = new MemoryDatabase(
+                memory.VersionMasterTable,
                 memory.TitleMasterTable,
                 table,
                 memory.SongMasterTable,
                 memory.SongScoreRateMasterTable,
+                memory.SongBaseScoreMasterTable,
                 memory.SongJudgeZoneMasterTable,
+                memory.SongBaseHpMasterTable,
                 memory.SongHpRateMasterTable,
                 memory.ResultMasterTable,
                 memory.SoundSheetNameMasterTable,
@@ -125,11 +208,14 @@ namespace Master
             var newData = CloneAndSortBy(data, x => x.Group, System.Collections.Generic.Comparer<int>.Default);
             var table = new SongSelectMasterTable(newData);
             memory = new MemoryDatabase(
+                memory.VersionMasterTable,
                 memory.TitleMasterTable,
                 table,
                 memory.SongMasterTable,
                 memory.SongScoreRateMasterTable,
+                memory.SongBaseScoreMasterTable,
                 memory.SongJudgeZoneMasterTable,
+                memory.SongBaseHpMasterTable,
                 memory.SongHpRateMasterTable,
                 memory.ResultMasterTable,
                 memory.SoundSheetNameMasterTable,
@@ -144,11 +230,14 @@ namespace Master
             var newData = CloneAndSortBy(data, x => x.Sid, System.Collections.Generic.Comparer<int>.Default);
             var table = new SongMasterTable(newData);
             memory = new MemoryDatabase(
+                memory.VersionMasterTable,
                 memory.TitleMasterTable,
                 memory.SongSelectMasterTable,
                 table,
                 memory.SongScoreRateMasterTable,
+                memory.SongBaseScoreMasterTable,
                 memory.SongJudgeZoneMasterTable,
+                memory.SongBaseHpMasterTable,
                 memory.SongHpRateMasterTable,
                 memory.ResultMasterTable,
                 memory.SoundSheetNameMasterTable,
@@ -164,11 +253,14 @@ namespace Master
             var newData = CloneAndSortBy(data, x => x.Sid, System.Collections.Generic.Comparer<int>.Default);
             var table = new SongMasterTable(newData);
             memory = new MemoryDatabase(
+                memory.VersionMasterTable,
                 memory.TitleMasterTable,
                 memory.SongSelectMasterTable,
                 table,
                 memory.SongScoreRateMasterTable,
+                memory.SongBaseScoreMasterTable,
                 memory.SongJudgeZoneMasterTable,
+                memory.SongBaseHpMasterTable,
                 memory.SongHpRateMasterTable,
                 memory.ResultMasterTable,
                 memory.SoundSheetNameMasterTable,
@@ -184,11 +276,14 @@ namespace Master
             var newData = CloneAndSortBy(data, x => x.Sid, System.Collections.Generic.Comparer<int>.Default);
             var table = new SongMasterTable(newData);
             memory = new MemoryDatabase(
+                memory.VersionMasterTable,
                 memory.TitleMasterTable,
                 memory.SongSelectMasterTable,
                 table,
                 memory.SongScoreRateMasterTable,
+                memory.SongBaseScoreMasterTable,
                 memory.SongJudgeZoneMasterTable,
+                memory.SongBaseHpMasterTable,
                 memory.SongHpRateMasterTable,
                 memory.ResultMasterTable,
                 memory.SoundSheetNameMasterTable,
@@ -203,11 +298,14 @@ namespace Master
             var newData = CloneAndSortBy(data, x => x.Type, System.Collections.Generic.Comparer<int>.Default);
             var table = new SongScoreRateMasterTable(newData);
             memory = new MemoryDatabase(
+                memory.VersionMasterTable,
                 memory.TitleMasterTable,
                 memory.SongSelectMasterTable,
                 memory.SongMasterTable,
                 table,
+                memory.SongBaseScoreMasterTable,
                 memory.SongJudgeZoneMasterTable,
+                memory.SongBaseHpMasterTable,
                 memory.SongHpRateMasterTable,
                 memory.ResultMasterTable,
                 memory.SoundSheetNameMasterTable,
@@ -223,11 +321,14 @@ namespace Master
             var newData = CloneAndSortBy(data, x => x.Type, System.Collections.Generic.Comparer<int>.Default);
             var table = new SongScoreRateMasterTable(newData);
             memory = new MemoryDatabase(
+                memory.VersionMasterTable,
                 memory.TitleMasterTable,
                 memory.SongSelectMasterTable,
                 memory.SongMasterTable,
                 table,
+                memory.SongBaseScoreMasterTable,
                 memory.SongJudgeZoneMasterTable,
+                memory.SongBaseHpMasterTable,
                 memory.SongHpRateMasterTable,
                 memory.ResultMasterTable,
                 memory.SoundSheetNameMasterTable,
@@ -243,11 +344,82 @@ namespace Master
             var newData = CloneAndSortBy(data, x => x.Type, System.Collections.Generic.Comparer<int>.Default);
             var table = new SongScoreRateMasterTable(newData);
             memory = new MemoryDatabase(
+                memory.VersionMasterTable,
                 memory.TitleMasterTable,
                 memory.SongSelectMasterTable,
                 memory.SongMasterTable,
                 table,
+                memory.SongBaseScoreMasterTable,
                 memory.SongJudgeZoneMasterTable,
+                memory.SongBaseHpMasterTable,
+                memory.SongHpRateMasterTable,
+                memory.ResultMasterTable,
+                memory.SoundSheetNameMasterTable,
+                memory.TutorialStepMasterTable,
+                memory.TutorialMasterTable
+            
+            );
+        }
+
+        public void ReplaceAll(System.Collections.Generic.IList<SongBaseScoreMaster> data)
+        {
+            var newData = CloneAndSortBy(data, x => x.Score, System.Collections.Generic.Comparer<int>.Default);
+            var table = new SongBaseScoreMasterTable(newData);
+            memory = new MemoryDatabase(
+                memory.VersionMasterTable,
+                memory.TitleMasterTable,
+                memory.SongSelectMasterTable,
+                memory.SongMasterTable,
+                memory.SongScoreRateMasterTable,
+                table,
+                memory.SongJudgeZoneMasterTable,
+                memory.SongBaseHpMasterTable,
+                memory.SongHpRateMasterTable,
+                memory.ResultMasterTable,
+                memory.SoundSheetNameMasterTable,
+                memory.TutorialStepMasterTable,
+                memory.TutorialMasterTable
+            
+            );
+        }
+
+        public void RemoveSongBaseScoreMaster(int[] keys)
+        {
+            var data = RemoveCore(memory.SongBaseScoreMasterTable.GetRawDataUnsafe(), keys, x => x.Score, System.Collections.Generic.Comparer<int>.Default);
+            var newData = CloneAndSortBy(data, x => x.Score, System.Collections.Generic.Comparer<int>.Default);
+            var table = new SongBaseScoreMasterTable(newData);
+            memory = new MemoryDatabase(
+                memory.VersionMasterTable,
+                memory.TitleMasterTable,
+                memory.SongSelectMasterTable,
+                memory.SongMasterTable,
+                memory.SongScoreRateMasterTable,
+                table,
+                memory.SongJudgeZoneMasterTable,
+                memory.SongBaseHpMasterTable,
+                memory.SongHpRateMasterTable,
+                memory.ResultMasterTable,
+                memory.SoundSheetNameMasterTable,
+                memory.TutorialStepMasterTable,
+                memory.TutorialMasterTable
+            
+            );
+        }
+
+        public void Diff(SongBaseScoreMaster[] addOrReplaceData)
+        {
+            var data = DiffCore(memory.SongBaseScoreMasterTable.GetRawDataUnsafe(), addOrReplaceData, x => x.Score, System.Collections.Generic.Comparer<int>.Default);
+            var newData = CloneAndSortBy(data, x => x.Score, System.Collections.Generic.Comparer<int>.Default);
+            var table = new SongBaseScoreMasterTable(newData);
+            memory = new MemoryDatabase(
+                memory.VersionMasterTable,
+                memory.TitleMasterTable,
+                memory.SongSelectMasterTable,
+                memory.SongMasterTable,
+                memory.SongScoreRateMasterTable,
+                table,
+                memory.SongJudgeZoneMasterTable,
+                memory.SongBaseHpMasterTable,
                 memory.SongHpRateMasterTable,
                 memory.ResultMasterTable,
                 memory.SoundSheetNameMasterTable,
@@ -262,11 +434,14 @@ namespace Master
             var newData = CloneAndSortBy(data, x => x.Type, System.Collections.Generic.Comparer<int>.Default);
             var table = new SongJudgeZoneMasterTable(newData);
             memory = new MemoryDatabase(
+                memory.VersionMasterTable,
                 memory.TitleMasterTable,
                 memory.SongSelectMasterTable,
                 memory.SongMasterTable,
                 memory.SongScoreRateMasterTable,
+                memory.SongBaseScoreMasterTable,
                 table,
+                memory.SongBaseHpMasterTable,
                 memory.SongHpRateMasterTable,
                 memory.ResultMasterTable,
                 memory.SoundSheetNameMasterTable,
@@ -282,11 +457,14 @@ namespace Master
             var newData = CloneAndSortBy(data, x => x.Type, System.Collections.Generic.Comparer<int>.Default);
             var table = new SongJudgeZoneMasterTable(newData);
             memory = new MemoryDatabase(
+                memory.VersionMasterTable,
                 memory.TitleMasterTable,
                 memory.SongSelectMasterTable,
                 memory.SongMasterTable,
                 memory.SongScoreRateMasterTable,
+                memory.SongBaseScoreMasterTable,
                 table,
+                memory.SongBaseHpMasterTable,
                 memory.SongHpRateMasterTable,
                 memory.ResultMasterTable,
                 memory.SoundSheetNameMasterTable,
@@ -302,10 +480,81 @@ namespace Master
             var newData = CloneAndSortBy(data, x => x.Type, System.Collections.Generic.Comparer<int>.Default);
             var table = new SongJudgeZoneMasterTable(newData);
             memory = new MemoryDatabase(
+                memory.VersionMasterTable,
                 memory.TitleMasterTable,
                 memory.SongSelectMasterTable,
                 memory.SongMasterTable,
                 memory.SongScoreRateMasterTable,
+                memory.SongBaseScoreMasterTable,
+                table,
+                memory.SongBaseHpMasterTable,
+                memory.SongHpRateMasterTable,
+                memory.ResultMasterTable,
+                memory.SoundSheetNameMasterTable,
+                memory.TutorialStepMasterTable,
+                memory.TutorialMasterTable
+            
+            );
+        }
+
+        public void ReplaceAll(System.Collections.Generic.IList<SongBaseHpMaster> data)
+        {
+            var newData = CloneAndSortBy(data, x => x.Hp, System.Collections.Generic.Comparer<int>.Default);
+            var table = new SongBaseHpMasterTable(newData);
+            memory = new MemoryDatabase(
+                memory.VersionMasterTable,
+                memory.TitleMasterTable,
+                memory.SongSelectMasterTable,
+                memory.SongMasterTable,
+                memory.SongScoreRateMasterTable,
+                memory.SongBaseScoreMasterTable,
+                memory.SongJudgeZoneMasterTable,
+                table,
+                memory.SongHpRateMasterTable,
+                memory.ResultMasterTable,
+                memory.SoundSheetNameMasterTable,
+                memory.TutorialStepMasterTable,
+                memory.TutorialMasterTable
+            
+            );
+        }
+
+        public void RemoveSongBaseHpMaster(int[] keys)
+        {
+            var data = RemoveCore(memory.SongBaseHpMasterTable.GetRawDataUnsafe(), keys, x => x.Hp, System.Collections.Generic.Comparer<int>.Default);
+            var newData = CloneAndSortBy(data, x => x.Hp, System.Collections.Generic.Comparer<int>.Default);
+            var table = new SongBaseHpMasterTable(newData);
+            memory = new MemoryDatabase(
+                memory.VersionMasterTable,
+                memory.TitleMasterTable,
+                memory.SongSelectMasterTable,
+                memory.SongMasterTable,
+                memory.SongScoreRateMasterTable,
+                memory.SongBaseScoreMasterTable,
+                memory.SongJudgeZoneMasterTable,
+                table,
+                memory.SongHpRateMasterTable,
+                memory.ResultMasterTable,
+                memory.SoundSheetNameMasterTable,
+                memory.TutorialStepMasterTable,
+                memory.TutorialMasterTable
+            
+            );
+        }
+
+        public void Diff(SongBaseHpMaster[] addOrReplaceData)
+        {
+            var data = DiffCore(memory.SongBaseHpMasterTable.GetRawDataUnsafe(), addOrReplaceData, x => x.Hp, System.Collections.Generic.Comparer<int>.Default);
+            var newData = CloneAndSortBy(data, x => x.Hp, System.Collections.Generic.Comparer<int>.Default);
+            var table = new SongBaseHpMasterTable(newData);
+            memory = new MemoryDatabase(
+                memory.VersionMasterTable,
+                memory.TitleMasterTable,
+                memory.SongSelectMasterTable,
+                memory.SongMasterTable,
+                memory.SongScoreRateMasterTable,
+                memory.SongBaseScoreMasterTable,
+                memory.SongJudgeZoneMasterTable,
                 table,
                 memory.SongHpRateMasterTable,
                 memory.ResultMasterTable,
@@ -321,11 +570,14 @@ namespace Master
             var newData = CloneAndSortBy(data, x => x.Type, System.Collections.Generic.Comparer<int>.Default);
             var table = new SongHpRateMasterTable(newData);
             memory = new MemoryDatabase(
+                memory.VersionMasterTable,
                 memory.TitleMasterTable,
                 memory.SongSelectMasterTable,
                 memory.SongMasterTable,
                 memory.SongScoreRateMasterTable,
+                memory.SongBaseScoreMasterTable,
                 memory.SongJudgeZoneMasterTable,
+                memory.SongBaseHpMasterTable,
                 table,
                 memory.ResultMasterTable,
                 memory.SoundSheetNameMasterTable,
@@ -341,11 +593,14 @@ namespace Master
             var newData = CloneAndSortBy(data, x => x.Type, System.Collections.Generic.Comparer<int>.Default);
             var table = new SongHpRateMasterTable(newData);
             memory = new MemoryDatabase(
+                memory.VersionMasterTable,
                 memory.TitleMasterTable,
                 memory.SongSelectMasterTable,
                 memory.SongMasterTable,
                 memory.SongScoreRateMasterTable,
+                memory.SongBaseScoreMasterTable,
                 memory.SongJudgeZoneMasterTable,
+                memory.SongBaseHpMasterTable,
                 table,
                 memory.ResultMasterTable,
                 memory.SoundSheetNameMasterTable,
@@ -361,11 +616,14 @@ namespace Master
             var newData = CloneAndSortBy(data, x => x.Type, System.Collections.Generic.Comparer<int>.Default);
             var table = new SongHpRateMasterTable(newData);
             memory = new MemoryDatabase(
+                memory.VersionMasterTable,
                 memory.TitleMasterTable,
                 memory.SongSelectMasterTable,
                 memory.SongMasterTable,
                 memory.SongScoreRateMasterTable,
+                memory.SongBaseScoreMasterTable,
                 memory.SongJudgeZoneMasterTable,
+                memory.SongBaseHpMasterTable,
                 table,
                 memory.ResultMasterTable,
                 memory.SoundSheetNameMasterTable,
@@ -380,11 +638,14 @@ namespace Master
             var newData = CloneAndSortBy(data, x => x.Rid, System.Collections.Generic.Comparer<int>.Default);
             var table = new ResultMasterTable(newData);
             memory = new MemoryDatabase(
+                memory.VersionMasterTable,
                 memory.TitleMasterTable,
                 memory.SongSelectMasterTable,
                 memory.SongMasterTable,
                 memory.SongScoreRateMasterTable,
+                memory.SongBaseScoreMasterTable,
                 memory.SongJudgeZoneMasterTable,
+                memory.SongBaseHpMasterTable,
                 memory.SongHpRateMasterTable,
                 table,
                 memory.SoundSheetNameMasterTable,
@@ -400,11 +661,14 @@ namespace Master
             var newData = CloneAndSortBy(data, x => x.Rid, System.Collections.Generic.Comparer<int>.Default);
             var table = new ResultMasterTable(newData);
             memory = new MemoryDatabase(
+                memory.VersionMasterTable,
                 memory.TitleMasterTable,
                 memory.SongSelectMasterTable,
                 memory.SongMasterTable,
                 memory.SongScoreRateMasterTable,
+                memory.SongBaseScoreMasterTable,
                 memory.SongJudgeZoneMasterTable,
+                memory.SongBaseHpMasterTable,
                 memory.SongHpRateMasterTable,
                 table,
                 memory.SoundSheetNameMasterTable,
@@ -420,11 +684,14 @@ namespace Master
             var newData = CloneAndSortBy(data, x => x.Rid, System.Collections.Generic.Comparer<int>.Default);
             var table = new ResultMasterTable(newData);
             memory = new MemoryDatabase(
+                memory.VersionMasterTable,
                 memory.TitleMasterTable,
                 memory.SongSelectMasterTable,
                 memory.SongMasterTable,
                 memory.SongScoreRateMasterTable,
+                memory.SongBaseScoreMasterTable,
                 memory.SongJudgeZoneMasterTable,
+                memory.SongBaseHpMasterTable,
                 memory.SongHpRateMasterTable,
                 table,
                 memory.SoundSheetNameMasterTable,
@@ -439,11 +706,14 @@ namespace Master
             var newData = CloneAndSortBy(data, x => x.Category, System.Collections.Generic.Comparer<int>.Default);
             var table = new SoundSheetNameMasterTable(newData);
             memory = new MemoryDatabase(
+                memory.VersionMasterTable,
                 memory.TitleMasterTable,
                 memory.SongSelectMasterTable,
                 memory.SongMasterTable,
                 memory.SongScoreRateMasterTable,
+                memory.SongBaseScoreMasterTable,
                 memory.SongJudgeZoneMasterTable,
+                memory.SongBaseHpMasterTable,
                 memory.SongHpRateMasterTable,
                 memory.ResultMasterTable,
                 table,
@@ -459,11 +729,14 @@ namespace Master
             var newData = CloneAndSortBy(data, x => x.Category, System.Collections.Generic.Comparer<int>.Default);
             var table = new SoundSheetNameMasterTable(newData);
             memory = new MemoryDatabase(
+                memory.VersionMasterTable,
                 memory.TitleMasterTable,
                 memory.SongSelectMasterTable,
                 memory.SongMasterTable,
                 memory.SongScoreRateMasterTable,
+                memory.SongBaseScoreMasterTable,
                 memory.SongJudgeZoneMasterTable,
+                memory.SongBaseHpMasterTable,
                 memory.SongHpRateMasterTable,
                 memory.ResultMasterTable,
                 table,
@@ -479,11 +752,14 @@ namespace Master
             var newData = CloneAndSortBy(data, x => x.Category, System.Collections.Generic.Comparer<int>.Default);
             var table = new SoundSheetNameMasterTable(newData);
             memory = new MemoryDatabase(
+                memory.VersionMasterTable,
                 memory.TitleMasterTable,
                 memory.SongSelectMasterTable,
                 memory.SongMasterTable,
                 memory.SongScoreRateMasterTable,
+                memory.SongBaseScoreMasterTable,
                 memory.SongJudgeZoneMasterTable,
+                memory.SongBaseHpMasterTable,
                 memory.SongHpRateMasterTable,
                 memory.ResultMasterTable,
                 table,
@@ -498,11 +774,14 @@ namespace Master
             var newData = CloneAndSortBy(data, x => x.Tid, System.Collections.Generic.Comparer<int>.Default);
             var table = new TutorialStepMasterTable(newData);
             memory = new MemoryDatabase(
+                memory.VersionMasterTable,
                 memory.TitleMasterTable,
                 memory.SongSelectMasterTable,
                 memory.SongMasterTable,
                 memory.SongScoreRateMasterTable,
+                memory.SongBaseScoreMasterTable,
                 memory.SongJudgeZoneMasterTable,
+                memory.SongBaseHpMasterTable,
                 memory.SongHpRateMasterTable,
                 memory.ResultMasterTable,
                 memory.SoundSheetNameMasterTable,
@@ -518,11 +797,14 @@ namespace Master
             var newData = CloneAndSortBy(data, x => x.Tid, System.Collections.Generic.Comparer<int>.Default);
             var table = new TutorialStepMasterTable(newData);
             memory = new MemoryDatabase(
+                memory.VersionMasterTable,
                 memory.TitleMasterTable,
                 memory.SongSelectMasterTable,
                 memory.SongMasterTable,
                 memory.SongScoreRateMasterTable,
+                memory.SongBaseScoreMasterTable,
                 memory.SongJudgeZoneMasterTable,
+                memory.SongBaseHpMasterTable,
                 memory.SongHpRateMasterTable,
                 memory.ResultMasterTable,
                 memory.SoundSheetNameMasterTable,
@@ -538,11 +820,14 @@ namespace Master
             var newData = CloneAndSortBy(data, x => x.Tid, System.Collections.Generic.Comparer<int>.Default);
             var table = new TutorialStepMasterTable(newData);
             memory = new MemoryDatabase(
+                memory.VersionMasterTable,
                 memory.TitleMasterTable,
                 memory.SongSelectMasterTable,
                 memory.SongMasterTable,
                 memory.SongScoreRateMasterTable,
+                memory.SongBaseScoreMasterTable,
                 memory.SongJudgeZoneMasterTable,
+                memory.SongBaseHpMasterTable,
                 memory.SongHpRateMasterTable,
                 memory.ResultMasterTable,
                 memory.SoundSheetNameMasterTable,
@@ -557,11 +842,14 @@ namespace Master
             var newData = CloneAndSortBy(data, x => x.Tid, System.Collections.Generic.Comparer<int>.Default);
             var table = new TutorialMasterTable(newData);
             memory = new MemoryDatabase(
+                memory.VersionMasterTable,
                 memory.TitleMasterTable,
                 memory.SongSelectMasterTable,
                 memory.SongMasterTable,
                 memory.SongScoreRateMasterTable,
+                memory.SongBaseScoreMasterTable,
                 memory.SongJudgeZoneMasterTable,
+                memory.SongBaseHpMasterTable,
                 memory.SongHpRateMasterTable,
                 memory.ResultMasterTable,
                 memory.SoundSheetNameMasterTable,
@@ -577,11 +865,14 @@ namespace Master
             var newData = CloneAndSortBy(data, x => x.Tid, System.Collections.Generic.Comparer<int>.Default);
             var table = new TutorialMasterTable(newData);
             memory = new MemoryDatabase(
+                memory.VersionMasterTable,
                 memory.TitleMasterTable,
                 memory.SongSelectMasterTable,
                 memory.SongMasterTable,
                 memory.SongScoreRateMasterTable,
+                memory.SongBaseScoreMasterTable,
                 memory.SongJudgeZoneMasterTable,
+                memory.SongBaseHpMasterTable,
                 memory.SongHpRateMasterTable,
                 memory.ResultMasterTable,
                 memory.SoundSheetNameMasterTable,
@@ -597,11 +888,14 @@ namespace Master
             var newData = CloneAndSortBy(data, x => x.Tid, System.Collections.Generic.Comparer<int>.Default);
             var table = new TutorialMasterTable(newData);
             memory = new MemoryDatabase(
+                memory.VersionMasterTable,
                 memory.TitleMasterTable,
                 memory.SongSelectMasterTable,
                 memory.SongMasterTable,
                 memory.SongScoreRateMasterTable,
+                memory.SongBaseScoreMasterTable,
                 memory.SongJudgeZoneMasterTable,
+                memory.SongBaseHpMasterTable,
                 memory.SongHpRateMasterTable,
                 memory.ResultMasterTable,
                 memory.SoundSheetNameMasterTable,

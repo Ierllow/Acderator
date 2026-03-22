@@ -12,6 +12,12 @@ namespace Master
         public DatabaseBuilder() : this(null) { }
         public DatabaseBuilder(MessagePack.IFormatterResolver resolver) : base(resolver) { }
 
+        public DatabaseBuilder Append(System.Collections.Generic.IEnumerable<VersionMaster> dataSource)
+        {
+            AppendCore(dataSource, x => x.Version, System.Collections.Generic.Comparer<int>.Default);
+            return this;
+        }
+
         public DatabaseBuilder Append(System.Collections.Generic.IEnumerable<TitleMaster> dataSource)
         {
             AppendCore(dataSource, x => x.Tid, System.Collections.Generic.Comparer<int>.Default);
@@ -36,9 +42,21 @@ namespace Master
             return this;
         }
 
+        public DatabaseBuilder Append(System.Collections.Generic.IEnumerable<SongBaseScoreMaster> dataSource)
+        {
+            AppendCore(dataSource, x => x.Score, System.Collections.Generic.Comparer<int>.Default);
+            return this;
+        }
+
         public DatabaseBuilder Append(System.Collections.Generic.IEnumerable<SongJudgeZoneMaster> dataSource)
         {
             AppendCore(dataSource, x => x.Type, System.Collections.Generic.Comparer<int>.Default);
+            return this;
+        }
+
+        public DatabaseBuilder Append(System.Collections.Generic.IEnumerable<SongBaseHpMaster> dataSource)
+        {
+            AppendCore(dataSource, x => x.Hp, System.Collections.Generic.Comparer<int>.Default);
             return this;
         }
 

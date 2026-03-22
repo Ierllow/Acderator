@@ -6,6 +6,7 @@ using Intense.Data;
 using Intense.Master;
 using Intense.UI;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 
 namespace Title
@@ -14,6 +15,8 @@ namespace Title
     {
         public async UniTask<bool> ExecuteAsync(CancellationToken token, FailFastExceptionWatcher failFastExceptionWatcher)
         {
+            static async UniTask loadMasterFunc(Dictionary<string, object> masterDict) => await MasterDataManager.Instance.LoadMasterAsync(masterDict);
+
             var userid = LocalDataManager.Instance.LocalUser.UserId;
             RequestBase request;
             if (string.IsNullOrEmpty(userid))
@@ -35,15 +38,16 @@ namespace Title
                 LocalDataManager.Instance.LocalUser.UserId = rr.UserId.ToString();
                 LocalDataManager.Instance.LocalUser.PassWard = rr.PassWord;
                 LocalDataManager.Instance.System.Token = rr.Token;
+                await loadMasterFunc(rr.Master).AddWatcherTo(failFastExceptionWatcher);
             }
             else
             {
                 LocalDataManager.Instance.System.Token = (authResponse as LoginResponse).Token;
+                await loadMasterFunc((authResponse as LoginResponse).Master).AddWatcherTo(failFastExceptionWatcher);
             }
             await LoadAssets(token).AddWatcherTo(failFastExceptionWatcher);
             var userDataResponse = await NetworkManager.Instance.RequestAsync(new UserDataRequest()).AddWatcherTo(failFastExceptionWatcher) as UserDataResponse;
             if (userDataResponse?.Status != 200) return await PopupUtils.TryOpenNetworkErrorPopup(userDataResponse);
-            await MasterDataManager.Instance.LoadMasterAsync();
             ScoreManager.Instance.SetScoreData(userDataResponse.Scores);
             await SoundManager.Instance.InitializeAsync();
             await SceneManager.Instance.ChangeSceneAsync(ESceneType.SongSelect, new SongSelect.SongSelectSceneContext());

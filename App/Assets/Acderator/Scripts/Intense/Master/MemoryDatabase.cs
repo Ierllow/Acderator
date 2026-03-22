@@ -9,11 +9,14 @@ namespace Master
 {
    public sealed class MemoryDatabase : MemoryDatabaseBase
    {
+        public VersionMasterTable VersionMasterTable { get; private set; }
         public TitleMasterTable TitleMasterTable { get; private set; }
         public SongSelectMasterTable SongSelectMasterTable { get; private set; }
         public SongMasterTable SongMasterTable { get; private set; }
         public SongScoreRateMasterTable SongScoreRateMasterTable { get; private set; }
+        public SongBaseScoreMasterTable SongBaseScoreMasterTable { get; private set; }
         public SongJudgeZoneMasterTable SongJudgeZoneMasterTable { get; private set; }
+        public SongBaseHpMasterTable SongBaseHpMasterTable { get; private set; }
         public SongHpRateMasterTable SongHpRateMasterTable { get; private set; }
         public ResultMasterTable ResultMasterTable { get; private set; }
         public SoundSheetNameMasterTable SoundSheetNameMasterTable { get; private set; }
@@ -21,11 +24,14 @@ namespace Master
         public TutorialMasterTable TutorialMasterTable { get; private set; }
 
         public MemoryDatabase(
+            VersionMasterTable VersionMasterTable,
             TitleMasterTable TitleMasterTable,
             SongSelectMasterTable SongSelectMasterTable,
             SongMasterTable SongMasterTable,
             SongScoreRateMasterTable SongScoreRateMasterTable,
+            SongBaseScoreMasterTable SongBaseScoreMasterTable,
             SongJudgeZoneMasterTable SongJudgeZoneMasterTable,
+            SongBaseHpMasterTable SongBaseHpMasterTable,
             SongHpRateMasterTable SongHpRateMasterTable,
             ResultMasterTable ResultMasterTable,
             SoundSheetNameMasterTable SoundSheetNameMasterTable,
@@ -33,11 +39,14 @@ namespace Master
             TutorialMasterTable TutorialMasterTable
         )
         {
+            this.VersionMasterTable = VersionMasterTable;
             this.TitleMasterTable = TitleMasterTable;
             this.SongSelectMasterTable = SongSelectMasterTable;
             this.SongMasterTable = SongMasterTable;
             this.SongScoreRateMasterTable = SongScoreRateMasterTable;
+            this.SongBaseScoreMasterTable = SongBaseScoreMasterTable;
             this.SongJudgeZoneMasterTable = SongJudgeZoneMasterTable;
+            this.SongBaseHpMasterTable = SongBaseHpMasterTable;
             this.SongHpRateMasterTable = SongHpRateMasterTable;
             this.ResultMasterTable = ResultMasterTable;
             this.SoundSheetNameMasterTable = SoundSheetNameMasterTable;
@@ -52,11 +61,14 @@ namespace Master
 
         protected override void Init(Dictionary<string, (int offset, int count)> header, int headerOffset, byte[] databaseBinary, MessagePack.IFormatterResolver resolver)
         {
+            this.VersionMasterTable = ExtractTableData<VersionMaster, VersionMasterTable>(header, headerOffset, databaseBinary, resolver, xs => new VersionMasterTable(xs));
             this.TitleMasterTable = ExtractTableData<TitleMaster, TitleMasterTable>(header, headerOffset, databaseBinary, resolver, xs => new TitleMasterTable(xs));
             this.SongSelectMasterTable = ExtractTableData<SongSelectMaster, SongSelectMasterTable>(header, headerOffset, databaseBinary, resolver, xs => new SongSelectMasterTable(xs));
             this.SongMasterTable = ExtractTableData<SongMaster, SongMasterTable>(header, headerOffset, databaseBinary, resolver, xs => new SongMasterTable(xs));
             this.SongScoreRateMasterTable = ExtractTableData<SongScoreRateMaster, SongScoreRateMasterTable>(header, headerOffset, databaseBinary, resolver, xs => new SongScoreRateMasterTable(xs));
+            this.SongBaseScoreMasterTable = ExtractTableData<SongBaseScoreMaster, SongBaseScoreMasterTable>(header, headerOffset, databaseBinary, resolver, xs => new SongBaseScoreMasterTable(xs));
             this.SongJudgeZoneMasterTable = ExtractTableData<SongJudgeZoneMaster, SongJudgeZoneMasterTable>(header, headerOffset, databaseBinary, resolver, xs => new SongJudgeZoneMasterTable(xs));
+            this.SongBaseHpMasterTable = ExtractTableData<SongBaseHpMaster, SongBaseHpMasterTable>(header, headerOffset, databaseBinary, resolver, xs => new SongBaseHpMasterTable(xs));
             this.SongHpRateMasterTable = ExtractTableData<SongHpRateMaster, SongHpRateMasterTable>(header, headerOffset, databaseBinary, resolver, xs => new SongHpRateMasterTable(xs));
             this.ResultMasterTable = ExtractTableData<ResultMaster, ResultMasterTable>(header, headerOffset, databaseBinary, resolver, xs => new ResultMasterTable(xs));
             this.SoundSheetNameMasterTable = ExtractTableData<SoundSheetNameMaster, SoundSheetNameMasterTable>(header, headerOffset, databaseBinary, resolver, xs => new SoundSheetNameMasterTable(xs));
@@ -72,11 +84,14 @@ namespace Master
         public DatabaseBuilder ToDatabaseBuilder()
         {
             var builder = new DatabaseBuilder();
+            builder.Append(this.VersionMasterTable.GetRawDataUnsafe());
             builder.Append(this.TitleMasterTable.GetRawDataUnsafe());
             builder.Append(this.SongSelectMasterTable.GetRawDataUnsafe());
             builder.Append(this.SongMasterTable.GetRawDataUnsafe());
             builder.Append(this.SongScoreRateMasterTable.GetRawDataUnsafe());
+            builder.Append(this.SongBaseScoreMasterTable.GetRawDataUnsafe());
             builder.Append(this.SongJudgeZoneMasterTable.GetRawDataUnsafe());
+            builder.Append(this.SongBaseHpMasterTable.GetRawDataUnsafe());
             builder.Append(this.SongHpRateMasterTable.GetRawDataUnsafe());
             builder.Append(this.ResultMasterTable.GetRawDataUnsafe());
             builder.Append(this.SoundSheetNameMasterTable.GetRawDataUnsafe());

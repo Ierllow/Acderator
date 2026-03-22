@@ -42,18 +42,21 @@ namespace Master
 
         static MasterMemoryResolverGetFormatterHelper()
         {
-            lookup = new global::System.Collections.Generic.Dictionary<Type, int>(10)
+            lookup = new global::System.Collections.Generic.Dictionary<Type, int>(13)
             {
-                {typeof(TitleMaster[]), 0 },
-                {typeof(SongSelectMaster[]), 1 },
-                {typeof(SongMaster[]), 2 },
-                {typeof(SongScoreRateMaster[]), 3 },
-                {typeof(SongJudgeZoneMaster[]), 4 },
-                {typeof(SongHpRateMaster[]), 5 },
-                {typeof(ResultMaster[]), 6 },
-                {typeof(SoundSheetNameMaster[]), 7 },
-                {typeof(TutorialStepMaster[]), 8 },
-                {typeof(TutorialMaster[]), 9 },
+                {typeof(VersionMaster[]), 0 },
+                {typeof(TitleMaster[]), 1 },
+                {typeof(SongSelectMaster[]), 2 },
+                {typeof(SongMaster[]), 3 },
+                {typeof(SongScoreRateMaster[]), 4 },
+                {typeof(SongBaseScoreMaster[]), 5 },
+                {typeof(SongJudgeZoneMaster[]), 6 },
+                {typeof(SongBaseHpMaster[]), 7 },
+                {typeof(SongHpRateMaster[]), 8 },
+                {typeof(ResultMaster[]), 9 },
+                {typeof(SoundSheetNameMaster[]), 10 },
+                {typeof(TutorialStepMaster[]), 11 },
+                {typeof(TutorialMaster[]), 12 },
             };
         }
 
@@ -64,16 +67,19 @@ namespace Master
 
             switch (key)
             {
-                case 0: return new MessagePack.Formatters.ArrayFormatter<TitleMaster>();
-                case 1: return new MessagePack.Formatters.ArrayFormatter<SongSelectMaster>();
-                case 2: return new MessagePack.Formatters.ArrayFormatter<SongMaster>();
-                case 3: return new MessagePack.Formatters.ArrayFormatter<SongScoreRateMaster>();
-                case 4: return new MessagePack.Formatters.ArrayFormatter<SongJudgeZoneMaster>();
-                case 5: return new MessagePack.Formatters.ArrayFormatter<SongHpRateMaster>();
-                case 6: return new MessagePack.Formatters.ArrayFormatter<ResultMaster>();
-                case 7: return new MessagePack.Formatters.ArrayFormatter<SoundSheetNameMaster>();
-                case 8: return new MessagePack.Formatters.ArrayFormatter<TutorialStepMaster>();
-                case 9: return new MessagePack.Formatters.ArrayFormatter<TutorialMaster>();
+                case 0: return new MessagePack.Formatters.ArrayFormatter<VersionMaster>();
+                case 1: return new MessagePack.Formatters.ArrayFormatter<TitleMaster>();
+                case 2: return new MessagePack.Formatters.ArrayFormatter<SongSelectMaster>();
+                case 3: return new MessagePack.Formatters.ArrayFormatter<SongMaster>();
+                case 4: return new MessagePack.Formatters.ArrayFormatter<SongScoreRateMaster>();
+                case 5: return new MessagePack.Formatters.ArrayFormatter<SongBaseScoreMaster>();
+                case 6: return new MessagePack.Formatters.ArrayFormatter<SongJudgeZoneMaster>();
+                case 7: return new MessagePack.Formatters.ArrayFormatter<SongBaseHpMaster>();
+                case 8: return new MessagePack.Formatters.ArrayFormatter<SongHpRateMaster>();
+                case 9: return new MessagePack.Formatters.ArrayFormatter<ResultMaster>();
+                case 10: return new MessagePack.Formatters.ArrayFormatter<SoundSheetNameMaster>();
+                case 11: return new MessagePack.Formatters.ArrayFormatter<TutorialStepMaster>();
+                case 12: return new MessagePack.Formatters.ArrayFormatter<TutorialMaster>();
                 default: return null;
             }
         }
