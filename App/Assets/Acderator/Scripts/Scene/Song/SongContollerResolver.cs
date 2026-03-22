@@ -19,6 +19,11 @@ namespace Song
 
         public SongControllerResolver(SongControllerCollection songControllerCollection) => this.songControllerCollection = songControllerCollection;
 
-        private T GetController<T>() where T : class, IController => cacheDict.TryGetValue(typeof(T), out var cachedController) ? (T)cachedController : songControllerCollection.TryGet<T>(out var controller) ? controller : default;
+        private T GetController<T>() where T : class, IController
+        {
+            if (cacheDict.TryGetValue(typeof(T), out var controller)) return controller as T;
+            if (songControllerCollection.TryGet<T>(out var targetController)) cacheDict.TryAdd(typeof(T), targetController);
+            return targetController;
+        }
     }
 }
