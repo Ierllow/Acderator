@@ -4,6 +4,7 @@ using Cysharp.Threading.Tasks.Linq;
 using DG.Tweening;
 using Element;
 using Intense.Asset;
+using Intense.Attribute;
 using Intense.Master;
 using Intense.UI;
 using System;
@@ -19,13 +20,6 @@ using ZLinq;
 namespace Intense
 {
     public enum ESceneType { None, Boot, Title, SongSelect, Song, Result }
-
-    [AttributeUsage(AttributeTargets.Class, Inherited = true)]
-    public sealed class SceneTypeAttribute : Attribute
-    {
-        public ESceneType Type { get; }
-        public SceneTypeAttribute(ESceneType type) => Type = type;
-    }
 
     public class SceneManager : SingletonMonoBehaviour<SceneManager>
     {

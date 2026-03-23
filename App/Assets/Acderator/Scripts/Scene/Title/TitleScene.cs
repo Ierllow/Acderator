@@ -2,6 +2,7 @@
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Intense;
+using Intense.Attribute;
 using Intense.UI;
 using R3;
 using TMPro;

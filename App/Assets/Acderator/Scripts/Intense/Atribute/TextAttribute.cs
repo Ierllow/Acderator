@@ -1,9 +1,10 @@
-﻿using ZLinq;
+﻿using System;
+using ZLinq;
 
-namespace System
+namespace Intense.Attribute
 {
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = true)]
-    public class TextAttribute : Attribute
+    public class TextAttribute : System.Attribute
     {
         public string Text { get; }
 

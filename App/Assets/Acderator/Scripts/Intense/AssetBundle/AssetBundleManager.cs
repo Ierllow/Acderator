@@ -1,6 +1,7 @@
 ﻿using Cysharp.Text;
 using Cysharp.Threading.Tasks;
 using Element.UI;
+using Intense.Attribute;
 using Intense.UI;
 using System;
 using System.Collections.Generic;

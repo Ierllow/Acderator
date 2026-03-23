@@ -1,6 +1,7 @@
 ﻿using Cysharp.Threading.Tasks;
 using Cysharp.Threading.Tasks.Linq;
 using Intense;
+using Intense.Attribute;
 using Intense.UI;
 using R3;
 using R3.Triggers;

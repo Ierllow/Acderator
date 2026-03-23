@@ -1,6 +1,7 @@
 ﻿using Cysharp.Threading.Tasks;
 using Intense;
 using Intense.Asset;
+using Intense.Attribute;
 using Intense.Data;
 using Intense.UI;
 using System;
