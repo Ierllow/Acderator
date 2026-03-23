@@ -1,10 +1,6 @@
-﻿using Cysharp.Text;
-using Intense.Internal;
+﻿using Intense.Internal;
 using System;
-using System.Collections.Generic;
-using UnityEngine;
 using Zenject;
-using ZLinq;
 
 namespace Song
 {
@@ -27,13 +23,10 @@ namespace Song
             Container.BindInterfacesAndSelfTo<SongLoopController>().AsSingle();
             Container.BindInterfacesAndSelfTo<NoteUpdateOptimizer>().AsSingle();
             Container.BindInterfacesAndSelfTo<NoteSpawnController>().FromComponentInHierarchy().AsSingle();
-            if (songSceneContext.IsAuto) Container.BindInterfacesAndSelfTo<AutoFingerController>().AsSingle();
-            else Container.BindInterfacesAndSelfTo<FingerController>().FromComponentInHierarchy().AsSingle();
-            if (songSceneContext.SongMode.EnumEquals(ESongMode.Tutorial))
-            {
-                Container.BindInterfacesAndSelfTo<SongTutorialLayerController>().AsSingle();
-                Container.BindInterfacesAndSelfTo<SongTutorialStateController>().AsSingle();
-            }
+            Container.If(songSceneContext.IsAuto).BindInterfacesAndSelfTo<AutoFingerController>().AsSingle();
+            Container.If(!songSceneContext.IsAuto).BindInterfacesAndSelfTo<FingerController>().FromComponentInHierarchy().AsSingle();
+            Container.If(songSceneContext.SongMode.EnumEquals(ESongMode.Tutorial)).BindInterfacesAndSelfTo<SongTutorialLayerController>().AsSingle();
+            Container.If(songSceneContext.SongMode.EnumEquals(ESongMode.Tutorial)).BindInterfacesAndSelfTo<SongTutorialStateController>().AsSingle();
             Container.Bind<SongControllerCollection>().AsSingle().WithArguments(songSceneContext.TutorialData);
             Container.Bind<SongControllerResolver>().AsSingle();
         }
