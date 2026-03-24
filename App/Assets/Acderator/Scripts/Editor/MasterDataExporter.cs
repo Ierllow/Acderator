@@ -43,11 +43,6 @@ public class MasterDataExporter
         new() { Type = 5, Rate = 0.0f, },
     };
 
-    private static SongBaseScoreMaster[] SongBaseScoreMasters => new[]
-    {
-        new SongBaseScoreMaster { Score = 1000000, } ,
-    };
-
     private static SongJudgeZoneMaster[] SongJudgeZoneMasters => new SongJudgeZoneMaster[]
     {
         new() { Type = EJudgementType.Perfect.GetLength(), Zone = 0.05f },
@@ -55,11 +50,6 @@ public class MasterDataExporter
         new() { Type = EJudgementType.Good.GetLength(), Zone = 0.20f },
         new() { Type = EJudgementType.Bad.GetLength(), Zone = 0.30f },
         new() { Type = EJudgementType.Miss.GetLength(), Zone = 0.00f },
-    };
-
-    private static SongBaseHpMaster[] SongBaseHpMasters => new SongBaseHpMaster[]
-    {
-        new() { Hp = 70 },
     };
 
     private static SongHpRateMaster[] SongHpRateMasters => new SongHpRateMaster[]

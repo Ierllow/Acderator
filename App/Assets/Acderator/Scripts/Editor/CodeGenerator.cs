@@ -46,7 +46,7 @@ public class CodeGenerators
                 var p = Process.Start(psi);
 
                 p.EnableRaisingEvents = true;
-                p.Exited += (object sender, System.EventArgs e) =>
+                p.Exited += (sender, e) =>
                 {
                         var data = p.StandardOutput.ReadToEnd();
                         UnityEngine.Debug.Log(ZString.Format("{0}", data));
@@ -59,8 +59,6 @@ public class CodeGenerators
         private static void ExecuteMessagePackCodeGenerator()
         {
                 UnityEngine.Debug.Log("start ExecuteMessagePackCodeGenerator");
-
-                var exProcess = new Process();
 
                 var rootPath = Application.dataPath + "/..";
                 var filePath = rootPath + "/GeneratorTools/MessagePackUniversalCodeGenerator";
@@ -75,6 +73,9 @@ public class CodeGenerators
         return;
 #endif
 
+                var input = $"{Application.dataPath}/../Assembly-CSharp.csproj";
+                var output = $"{Application.dataPath}/Acderator/Scripts/Intense/Master/Master.Generated.cs";
+
                 var psi = new ProcessStartInfo()
                 {
                         CreateNoWindow = true,
@@ -83,20 +84,25 @@ public class CodeGenerators
                         RedirectStandardError = true,
                         UseShellExecute = false,
                         FileName = filePath + exeFileName,
-                        Arguments = $@"-i ""{Application.dataPath}/../Assembly-CSharp.csproj"" -o ""{Application.dataPath}/Acderator/Scripts/Intense/Master/Master.Generated.cs""",
+                        Arguments = $@"-i ""{input}"" -o ""{output}""",
+                        WorkingDirectory = rootPath
                 };
 
-                var p = Process.Start(psi);
+                using var p = Process.Start(psi);
+                var stdout = p.StandardOutput.ReadToEnd();
+                var stderr = p.StandardError.ReadToEnd();
+                p.WaitForExit();
 
-                p.EnableRaisingEvents = true;
-                p.Exited += (object sender, System.EventArgs e) =>
-                {
-                        var data = p.StandardOutput.ReadToEnd();
-                        UnityEngine.Debug.Log(ZString.Format("{0}", data));
-                        UnityEngine.Debug.Log("end ExecuteMessagePackCodeGenerator");
-                        p.Dispose();
-                        p = null;
-                };
+                UnityEngine.Debug.Log($"exe: {filePath + exeFileName}");
+                UnityEngine.Debug.Log($"input: {input}");
+                UnityEngine.Debug.Log($"output: {output}");
+                UnityEngine.Debug.Log($"ExitCode: {p.ExitCode}");
+
+                if (!string.IsNullOrEmpty(stdout)) UnityEngine.Debug.Log(stdout);
+                if (!string.IsNullOrEmpty(stderr)) UnityEngine.Debug.LogError(stderr);
+
+                AssetDatabase.Refresh();
+                UnityEngine.Debug.Log("end ExecuteMessagePackCodeGenerator");
         }
 }
 #endif

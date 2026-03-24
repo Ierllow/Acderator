@@ -6,9 +6,20 @@ using System.Collections.Generic;
 namespace Intense.Master
 {
     [MessagePackObject(true)]
+    [Union(0, typeof(VersionMaster))]
+    [Union(1, typeof(TitleMaster))]
+    [Union(2, typeof(SongSelectMaster))]
+    [Union(3, typeof(SongMaster))]
+    [Union(4, typeof(SongScoreRateMaster))]
+    [Union(5, typeof(SongJudgeZoneMaster))]
+    [Union(6, typeof(SongHpRateMaster))]
+    [Union(7, typeof(ResultMaster))]
+    [Union(8, typeof(SoundSheetNameMaster))]
+    [Union(9, typeof(TutorialStepMaster))]
+    [Union(10, typeof(TutorialMaster))]
     public abstract class BaseMaster { }
 
-    [MemoryTable("VersionMaster")]
+    [MessagePackObject(true), MemoryTable("VersionMaster")]
     public class VersionMaster : BaseMaster
     {
         [PrimaryKey] public int Version { get; set; }
@@ -19,7 +30,7 @@ namespace Intense.Master
         };
     }
 
-    [MemoryTable("TitleMaster")]
+    [MessagePackObject(true), MemoryTable("TitleMaster")]
     public class TitleMaster : BaseMaster
     {
         [PrimaryKey] public int Tid { get; set; }
@@ -30,7 +41,7 @@ namespace Intense.Master
         };
     }
 
-    [MemoryTable("SongSelectMaster")]
+    [MessagePackObject(true), MemoryTable("SongSelectMaster")]
     public class SongSelectMaster : BaseMaster
     {
         [PrimaryKey] public int Group { get; set; }
@@ -45,7 +56,7 @@ namespace Intense.Master
         };
     }
 
-    [MemoryTable("SongMaster")]
+    [MessagePackObject(true), MemoryTable("SongMaster")]
     public class SongMaster : BaseMaster
     {
         [PrimaryKey] public int Sid { get; set; }
@@ -72,7 +83,7 @@ namespace Intense.Master
         };
     }
 
-    [MemoryTable("SongScoreRateMaster")]
+    [MessagePackObject(true), MemoryTable("SongScoreRateMaster")]
     public class SongScoreRateMaster : BaseMaster
     {
         [PrimaryKey] public int Type { get; set; }
@@ -85,14 +96,7 @@ namespace Intense.Master
         };
     }
 
-    [Obsolete("Will be delete in the future.")]
-    [MemoryTable("SongBaseScoreMaster")]
-    public class SongBaseScoreMaster
-    {
-        [PrimaryKey] public int Score { get; set; }
-    }
-
-    [MemoryTable("SongJudgeZoneMaster")]
+    [MessagePackObject(true), MemoryTable("SongJudgeZoneMaster")]
     public class SongJudgeZoneMaster : BaseMaster
     {
         [PrimaryKey] public int Type { get; set; }
@@ -105,14 +109,7 @@ namespace Intense.Master
         };
     }
 
-    [Obsolete("Will be delete in the future.")]
-    [MemoryTable("SongBaseHpMaster")]
-    public class SongBaseHpMaster
-    {
-        [PrimaryKey] public int Hp { get; set; }
-    }
-
-    [MemoryTable("SongHpRateMaster")]
+    [MessagePackObject(true), MemoryTable("SongHpRateMaster")]
     public class SongHpRateMaster : BaseMaster
     {
         [PrimaryKey] public int Type { get; set; }
@@ -125,7 +122,7 @@ namespace Intense.Master
         };
     }
 
-    [MemoryTable("ResultMaster")]
+    [MessagePackObject(true), MemoryTable("ResultMaster")]
     public class ResultMaster : BaseMaster
     {
         [PrimaryKey] public int Rid { get; set; }
@@ -136,7 +133,7 @@ namespace Intense.Master
         };
     }
 
-    [MemoryTable("SoundSheetNameMaster")]
+    [MessagePackObject(true), MemoryTable("SoundSheetNameMaster")]
     public class SoundSheetNameMaster : BaseMaster
     {
         [PrimaryKey] public int Category { get; set; }
@@ -153,7 +150,7 @@ namespace Intense.Master
         };
     }
 
-    [MemoryTable("TutorialStepMaster")]
+    [MessagePackObject(true), MemoryTable("TutorialStepMaster")]
     public class TutorialStepMaster : BaseMaster
     {
         [PrimaryKey] public int Tid { get; set; }
@@ -176,7 +173,7 @@ namespace Intense.Master
         };
     }
 
-    [MemoryTable("TutorialMaster")]
+    [MessagePackObject(true), MemoryTable("TutorialMaster")]
     public class TutorialMaster : BaseMaster
     {
         [PrimaryKey] public int Tid { get; set; }
