@@ -1,5 +1,6 @@
 ﻿using Cysharp.Threading.Tasks;
 using Intense;
+using Intense.Attribute;
 using UnityEngine.Rendering;
 
 namespace Boot

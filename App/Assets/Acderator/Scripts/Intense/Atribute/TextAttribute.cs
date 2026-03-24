@@ -4,14 +4,10 @@ using ZLinq;
 namespace Intense.Attribute
 {
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = true)]
-    public class TextAttribute : System.Attribute
+    public sealed class TextAttribute : System.Attribute
     {
         public string Text { get; }
-
-        public TextAttribute(string text)
-        {
-            Text = text;
-        }
+        public TextAttribute(string text) => Text = text;
     }
 
     public static class AttributeExtensions

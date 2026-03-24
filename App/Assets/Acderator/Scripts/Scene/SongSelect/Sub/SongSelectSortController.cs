@@ -1,4 +1,5 @@
 ﻿using FastEnumUtility;
+using Intense.Attribute;
 using Intense.Data;
 using Intense.Master;
 using System;

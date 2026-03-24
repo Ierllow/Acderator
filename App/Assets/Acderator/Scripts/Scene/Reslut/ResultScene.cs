@@ -2,6 +2,7 @@
 using Intense;
 using Intense.Api;
 using Intense.Asset;
+using Intense.Attribute;
 using Intense.Data;
 using Intense.Master;
 using Intense.UI;
