@@ -19,6 +19,7 @@ namespace Song
         public const int MIN_NOTES_SPEED = 1;
 
         private int currentSpeedChangeIndex = 0;
+        private readonly List<NoteBase>[] aliveNotesByLaneList = { new(), new(), new(), new(), };
 
         public NotesManager(SongOption songOption) => SongOption = songOption;
 
@@ -30,9 +31,18 @@ namespace Song
             UpdateNoteSpeed();
         }
 
-        public void AddAliveNote(NoteBase note) => AliveNoteList.Add(note);
+        public void AddAliveNote(NoteBase note)
+        {
+            AliveNoteList.Add(note);
+            aliveNotesByLaneList[note.NoteData.Lane].Add(note);
+        }
 
-        public bool TryRemoveNote(NoteBase note) => AliveNoteList.Remove(note);
+        public bool TryRemoveNote(NoteBase note)
+        {
+            var removed = AliveNoteList.Remove(note);
+            aliveNotesByLaneList[note.NoteData.Lane].Remove(note);
+            return removed;
+        }
 
         public void UpdateBeat(float sec)
         {
@@ -58,10 +68,23 @@ namespace Song
 
         public bool TryGetNote(EFingerType type, int lane, out NoteBase note)
         {
-            var noteList = AliveNoteList.AsValueEnumerable().Where(x => x.NoteData.Lane == lane && type.EnumEquals(EFingerType.Down) ? !x.IsTapping : x.IsTapping && x.IsActive).ToList();
-            note = noteList.AsValueEnumerable().Any()
-                ? noteList.AsValueEnumerable().OrderBy(x => Math.Abs(x.NoteData.BeatBegin - CurrentBeat)).First()
-                : null;
+            var laneNoteList = aliveNotesByLaneList[lane];
+            var aliveNotes = laneNoteList.AsValueEnumerable().Where(x => x != null && x.IsActive);
+            note = (type.EnumEquals(EFingerType.Down) ? aliveNotes.Where(x => !x.IsTapping) : aliveNotes.Where(x => x.IsTapping))
+                .OrderBy(x => Math.Abs(x.NoteData.BeatBegin - CurrentBeat))
+                .FirstOrDefault();
+
+            return note != null;
+        }
+
+        public bool TryGetFlickNote(int lane, out NoteBase note)
+        {
+            note = aliveNotesByLaneList[lane]
+                .AsValueEnumerable()
+                .Where(x => x != null && x.IsActive && x.NoteData.NoteType.EnumEquals(ENoteType.Flick))
+                .OrderBy(x => Math.Abs(x.NoteData.BeatBegin - CurrentBeat))
+                .FirstOrDefault();
+
             return note != null;
         }
 

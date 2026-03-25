@@ -26,9 +26,9 @@ namespace Song
 
         [Inject] private NotesManager notesManager;
 
-        private readonly List<(LeanFinger finger, int touchLane)> linkList = new();
         private readonly Plane touchPlane = new();
         private float dist;
+        private readonly Dictionary<LeanFinger, int> fingerLaneDict = new();
 
         public Subject<(FingerInfo, int)> FingerInfoSubject { get; } = new();
 
@@ -54,11 +54,11 @@ namespace Song
             if (requiredSelectable != null && !requiredSelectable) return;
 
             var touchInPlane = finger.GetWorldPosition(dist, choose);
-            var link = FindLink(finger, true);
-
             var fingerInfo = new FingerInfo { FingerType = EFingerType.Down };
             if (TryGetTouchLane(touchInPlane.x, touchInPlane.y, out var lane))
             {
+                fingerLaneDict[finger] = lane;
+
                 if (notesManager.TryGetNote(EFingerType.Down, lane, out var note))
                 {
                     var diff = GetNoteDiffSec(EFingerType.Down, note.NoteData);
@@ -66,11 +66,15 @@ namespace Song
                     {
                         var judgementType = diff.GetJudgmentType();
                         note.OnJudgedNote(EFingerType.Down, judgementType);
-                        fingerInfo = new FingerInfo { NoteBase = note, JudgmentType = judgementType, FingerType = EFingerType.Down };
+                        fingerInfo = new FingerInfo
+                        {
+                            NoteBase = note,
+                            JudgmentType = judgementType,
+                            FingerType = EFingerType.Down
+                        };
                     }
                 }
                 NotifyFinger(fingerInfo, lane);
-                link.touchLane = lane;
             }
         }
 
@@ -86,21 +90,22 @@ namespace Song
 
         private void FingerUpdate(LeanFinger finger)
         {
-            var link = FindLink(finger, false);
-            if (link == default) return;
+            if (!fingerLaneDict.TryGetValue(finger, out var previousLane)) return;
 
             var fingerInfo = new FingerInfo { FingerType = EFingerType.Down };
             var touchInPlane = finger.GetWorldPosition(dist, choose);
 
             if (TryGetTouchLane(touchInPlane.x, touchInPlane.y, out var lane)
-                && link.touchLane != lane
+                && previousLane != lane
                 && notesManager.TryGetNote(EFingerType.Up, lane, out var note)
                 && note.IsTapping
                 && (note.NoteData.NoteType.EnumEquals(ENoteType.Long) || note.NoteData.NoteType.EnumEquals(ENoteType.Curve)))
             {
                 var judgementType = GetNoteDiffSec(EFingerType.Up, note.NoteData).GetJudgmentType();
                 judgementType = !judgementType.EnumEquals(EJudgementType.None) ? judgementType : EJudgementType.Miss;
+
                 note.OnJudgedNote(EFingerType.Up, judgementType);
+
                 fingerInfo = new FingerInfo
                 {
                     NoteBase = note,
@@ -108,44 +113,60 @@ namespace Song
                     FingerType = EFingerType.Up,
                     TappingNoteList = notesManager.AliveNoteList.AsValueEnumerable().Where(x => x.IsActive && x.IsTapping).ToList()
                 };
-                linkList.Remove(link);
+
+                fingerLaneDict.Remove(finger);
             }
+            else
+            {
+                fingerLaneDict[finger] = lane;
+            }
+
             NotifyFinger(fingerInfo, lane);
         }
 
         private void FingerUp(LeanFinger finger)
         {
-            var link = FindLink(finger, false);
-            if (link == default) return;
+            if (!fingerLaneDict.TryGetValue(finger, out var lane)) return;
+
             var fingerInfo = new FingerInfo { FingerType = EFingerType.Up };
-            if (notesManager.TryGetNote(EFingerType.Up, link.touchLane, out var note))
+
+            if (notesManager.TryGetNote(EFingerType.Up, lane, out var note))
             {
                 var judgementType = GetNoteDiffSec(EFingerType.Up, note.NoteData).GetJudgmentType();
                 judgementType = !judgementType.EnumEquals(EJudgementType.None) ? judgementType : EJudgementType.Miss;
+
                 note.OnJudgedNote(EFingerType.Up, judgementType);
-                fingerInfo = new FingerInfo { NoteBase = note, JudgmentType = judgementType, FingerType = EFingerType.Up };
+                fingerInfo = new FingerInfo
+                {
+                    NoteBase = note,
+                    JudgmentType = judgementType,
+                    FingerType = EFingerType.Up
+                };
             }
-            linkList.Remove(link);
-            NotifyFinger(fingerInfo, link.touchLane);
+
+            fingerLaneDict.Remove(finger);
+            NotifyFinger(fingerInfo, lane);
         }
 
         private void FingerSwipe(LeanFinger finger)
         {
-            var link = FindLink(finger, false);
-            if (link == default) return;
-            if (notesManager.TryGetNote(EFingerType.Up, link.touchLane, out var note)) note.OnJudgedNote(EFingerType.Up);
-        }
+            if (!fingerLaneDict.TryGetValue(finger, out var lane)) return;
+            if (!notesManager.TryGetFlickNote(lane, out var note)) return;
 
-        private (LeanFinger finger, int touchLane) FindLink(LeanFinger finger, bool createIfNull)
-        {
-            if (createIfNull)
+            var diff = GetNoteDiffSec(EFingerType.Up, note.NoteData);
+            var judgementType = diff.GetJudgmentType();
+            judgementType = !judgementType.EnumEquals(EJudgementType.None) ? judgementType : EJudgementType.Miss;
+
+            note.OnJudgedNote(EFingerType.Up, judgementType);
+
+            NotifyFinger(new()
             {
-                var link = (finger, 0);
-                linkList.Add(link);
+                NoteBase = note,
+                JudgmentType = judgementType,
+                FingerType = EFingerType.Up
+            }, lane);
 
-                return link;
-            }
-            return linkList.AsValueEnumerable().FirstOrDefault(x => x.finger == finger);
+            fingerLaneDict.Remove(finger);
         }
 
         private bool TryGetTouchLane(float positionX, float positionY, out int lane)

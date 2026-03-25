@@ -14,6 +14,7 @@ namespace Song
         private readonly List<NoteData> spawnedNoteDataList = new();
 
         private float offset = 0f;
+        private int nextSpawnIndex;
 
         public Subject<NoteData> NoteFactorySubject { get; } = new();
 
@@ -25,11 +26,13 @@ namespace Song
 
         public void UpdateSpawn(float currentSec)
         {
-            var swapnNoteList = noteDataList.AsValueEnumerable().Where(note => !spawnedNoteDataList.AsValueEnumerable().Any(x => x == note) && note.SecBegin - offset <= currentSec).ToList();
-            foreach (var noteData in swapnNoteList)
+            while (nextSpawnIndex < noteDataList.Count)
             {
+                var noteData = noteDataList[nextSpawnIndex];
+                if (noteData.SecBegin - offset > currentSec) break;
+
                 NoteFactorySubject.OnNext(noteData);
-                spawnedNoteDataList.Add(noteData);
+                nextSpawnIndex++;
             }
         }
     }
