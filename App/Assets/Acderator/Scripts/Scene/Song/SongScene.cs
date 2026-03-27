@@ -14,12 +14,12 @@ namespace Song
     [SceneType(ESceneType.Song)]
     public partial class SongScene : SceneBase
     {
-        [SerializeField] private SongLayerController songLayerController;
-        [SerializeField] private FrontTelopLayerController frontTelopLayerController;
-        [SerializeField] private BackTelopLayerController backTelopLayerController;
-        [SerializeField] private SongPopupLayerController songPopupLayerController;
-        [SerializeField] private NotesLineController notesLineController;
-        [SerializeField] private FailFastExceptionWatcher failFastExceptionWatcher;
+        [RequiredField, SerializeField] private SongLayerController songLayerController;
+        [RequiredField, SerializeField] private FrontTelopLayerController frontTelopLayerController;
+        [RequiredField, SerializeField] private BackTelopLayerController backTelopLayerController;
+        [RequiredField, SerializeField] private SongPopupLayerController songPopupLayerController;
+        [RequiredField, SerializeField] private NotesLineController notesLineController;
+        [RequiredField, SerializeField] private FailFastExceptionWatcher failFastExceptionWatcher;
 
         [Inject] private NotesManager notesManager;
         [Inject] private NoteFactory noteFactory;

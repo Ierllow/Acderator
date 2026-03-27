@@ -1,4 +1,5 @@
-﻿using TMPro;
+﻿using Intense.Attribute;
+using TMPro;
 using UnityEngine;
 
 namespace Intense.UI
@@ -7,7 +8,7 @@ namespace Intense.UI
     [RequireComponent(typeof(TextMeshProUGUI))]
     public class TextMeshProUGUIEx : MonoBehaviour
     {
-        [SerializeField] protected TextMeshProUGUI text;
+        [RequiredField, SerializeField] protected TextMeshProUGUI text;
         [SerializeField] protected int lineSpacing;
 
         public virtual TextMeshProUGUI Text => text;

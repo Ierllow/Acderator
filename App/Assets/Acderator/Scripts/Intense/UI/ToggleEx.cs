@@ -1,6 +1,7 @@
 ﻿using System;
 using Cysharp.Threading.Tasks;
 using Cysharp.Threading.Tasks.Linq;
+using Intense.Attribute;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -12,7 +13,7 @@ namespace Intense.UI
 
     public class ToggleEx : MonoBehaviour
     {
-        [SerializeField] private Toggle toggle;
+        [RequiredField, SerializeField] private Toggle toggle;
         [SerializeField] private TextMeshProUGUI toggleText;
 
         public Toggle Toggle => toggle;
