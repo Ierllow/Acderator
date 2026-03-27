@@ -3,6 +3,7 @@ using Element.UI;
 using Intense.Attribute;
 using Intense.UI;
 using System;
+using System.Reflection;
 
 namespace Intense
 {
@@ -23,7 +24,7 @@ namespace Intense
             var fileSize = GetFileSize(newFileSize);
             if (IsDownloadSizePopupNotRun && fileSize > 0)
             {
-                PopupManager.Instance.OpenPopup(new DownloadSizeConfPopupContext { FileSize = fileSize, Size = GetFileSizeType(newFileSize).GetTextAttribute().Text });
+                PopupManager.Instance.OpenPopup(new DownloadSizeConfPopupContext { FileSize = fileSize, Size = GetFileSizeType(newFileSize).GetType().GetCustomAttribute<TextAttribute>().Text });
                 var downloadSizeConfPopup = PopupManager.Instance.CurrentOpenPopup as DownloadSizeConfPopup;
                 await UniTask.WaitUntil(() => downloadSizeConfPopup.IsClose);
                 return downloadSizeConfPopup.IsConfirm;

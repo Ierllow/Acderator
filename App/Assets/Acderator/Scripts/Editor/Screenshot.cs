@@ -1,5 +1,4 @@
-﻿#if UNITY_EDITOR
-using Cysharp.Text;
+﻿using Cysharp.Text;
 using System;
 using System.IO;
 using UnityEditor;
@@ -12,10 +11,7 @@ public class Screenshot
     private static readonly string fileName = ZString.Format("{0}{1}.png", path, DateTime.Now.ToString("yy-MM-dd_HH-mm-ss"));
 
     [MenuItem("Tools/Screenshot")]
-    public static void CaptureScreenshot()
-    {
-        ExecCaptureScreenshot();
-    }
+    public static void CaptureScreenshot() => ExecCaptureScreenshot();
 
     private static void ExecCaptureScreenshot()
     {
@@ -28,4 +24,3 @@ public class Screenshot
         Debug.Log(ZString.Format("fileName: {0}", fileName));
     }
 }
-#endif

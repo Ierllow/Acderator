@@ -6,6 +6,7 @@ namespace Intense.Attribute
     public sealed class SceneTypeAttribute : System.Attribute
     {
         public ESceneType Type { get; }
+
         public SceneTypeAttribute(ESceneType type) => Type = type;
     }
 }

@@ -1,5 +1,4 @@
-﻿#if UNITY_EDITOR
-using Cysharp.Text;
+﻿using Cysharp.Text;
 using System.Diagnostics;
 using UnityEditor;
 using UnityEngine;
@@ -105,4 +104,3 @@ public class CodeGenerators
                 UnityEngine.Debug.Log("end ExecuteMessagePackCodeGenerator");
         }
 }
-#endif

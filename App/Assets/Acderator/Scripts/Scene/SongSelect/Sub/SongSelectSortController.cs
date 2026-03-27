@@ -4,6 +4,8 @@ using Intense.Data;
 using Intense.Master;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
+using UnityEngine.UI;
 using ZLinq;
 
 namespace SongSelect
@@ -20,7 +22,7 @@ namespace SongSelect
 
         public EOrderType CurrentOrderType { get; private set; } = (EOrderType)LocalDataManager.Instance.SongSelectSort.OrderType;
 
-        public string Text => CurrentOrderType.GetTextAttribute().Text;
+        public string Text => CurrentOrderType.GetType().GetCustomAttribute<TextAttribute>().Text;
 
         public List<int> GetOrderedList(int selectedDifficulty)
         {

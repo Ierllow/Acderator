@@ -1,10 +1,12 @@
 ﻿using Cysharp.Text;
 using Cysharp.Threading.Tasks;
 using Element.UI;
+using Intense.Api;
 using Intense.Attribute;
 using Intense.UI;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Threading;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -32,9 +34,8 @@ namespace Intense.Asset
             {
                 try
                 {
-                    var targets = new List<string>();
-                    foreach (var kv in assetBundleDict) if (kv.Value == null) targets.Add(kv.Key);
-                    if (targets.Count == 0) return;
+                    var targetList = assetBundleDict.AsValueEnumerable().Where(kv => kv.Value == null).Select(kv => kv.Key).ToList();
+                    if (targetList.Count == 0) return;
 
                     if (manifestInfoDict.Count == 0)
                     {
@@ -53,7 +54,7 @@ namespace Intense.Asset
                     }
 
                     var newFileSize = 0L;
-                    foreach (var name in targets)
+                    foreach (var name in targetList)
                     {
                         if (manifestInfoDict.TryGetValue(name, out var info) && !Caching.IsVersionCached(new(info.BundleName, info.Hash)))
                             newFileSize += info.FileSize;
@@ -71,7 +72,7 @@ namespace Intense.Asset
                     var loadedSet = new HashSet<string>(allLoadedAssetBundle.AsValueEnumerable().Count());
                     foreach (var b in allLoadedAssetBundle) loadedSet.Add(b.name);
 
-                    foreach (var bundleName in targets)
+                    foreach (var bundleName in targetList)
                     {
                         if (!manifestInfoDict.TryGetValue(bundleName, out var info)) continue;
                         if (loadedSet.Contains(bundleName)) continue;
@@ -145,7 +146,7 @@ namespace Intense.Asset
         {
             if (fileSize <= 0) return default;
 
-            PopupManager.Instance.OpenPopup(new DownloadSizeConfPopupContext { FileSize = fileSize.GetFileSize(), Size = fileSize.GetFileSizeType().GetTextAttribute().Text });
+            PopupManager.Instance.OpenPopup(new DownloadSizeConfPopupContext { FileSize = fileSize.GetFileSize(), Size = fileSize.GetFileSizeType().GetType().GetCustomAttribute<TextAttribute>().Text });
             var downloadSizeConfPopup = PopupManager.Instance.CurrentOpenPopup as DownloadSizeConfPopup;
             await UniTask.WaitUntil(() => downloadSizeConfPopup.IsClose);
             return !(!downloadSizeConfPopup.IsConfirm ? EAssetBundleErrorKind.Canceled : default).EnumEquals(EAssetBundleErrorKind.None);

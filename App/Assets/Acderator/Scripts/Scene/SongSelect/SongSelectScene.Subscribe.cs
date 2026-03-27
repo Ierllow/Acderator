@@ -1,7 +1,6 @@
 using Cysharp.Threading.Tasks.Linq;
 using Intense.Master;
 using R3;
-using R3.Triggers;
 using ZLinq;
 
 namespace SongSelect

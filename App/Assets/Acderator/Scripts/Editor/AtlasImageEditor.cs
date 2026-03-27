@@ -1,5 +1,5 @@
-﻿#if UNITY_EDITOR
-using Intense.UI;
+﻿using Intense.UI;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
@@ -12,20 +12,20 @@ using UnityEngine.UI;
 [CustomEditor(typeof(AtlasImage), true), CanEditMultipleObjects]
 public class AtlasImageEditor : ImageEditor
 {
-    private SerializedProperty m_Atlas;
-    private SerializedProperty m_SpriteName;
+    private SerializedProperty atlas;
+    private SerializedProperty spriteName;
 
-    private AnimBool m_ShowSpriteName;
+    private AnimBool showSpriteName;
 
     private string[] atlasSpriteNames;
     private int spriteNameIndex = 0;
 
     protected override void OnEnable()
     {
-        m_Atlas = serializedObject.FindProperty("m_Atlas");
-        m_SpriteName = serializedObject.FindProperty("m_SpriteName");
-        m_ShowSpriteName = new AnimBool(m_Atlas.objectReferenceValue != null);
-        m_ShowSpriteName.valueChanged.AddListener(Repaint);
+        atlas = serializedObject.FindProperty("m_Atlas");
+        spriteName = serializedObject.FindProperty("m_SpriteName");
+        showSpriteName = new AnimBool(atlas.objectReferenceValue != null);
+        showSpriteName.valueChanged.AddListener(Repaint);
 
         ResetAtlasSpriteNames();
         ResetSpriteNameIndex();
@@ -34,7 +34,7 @@ public class AtlasImageEditor : ImageEditor
 
     protected override void OnDisable()
     {
-        m_ShowSpriteName.valueChanged.RemoveListener(Repaint);
+        showSpriteName.valueChanged.RemoveListener(Repaint);
         base.OnDisable();
     }
 
@@ -43,11 +43,8 @@ public class AtlasImageEditor : ImageEditor
         serializedObject.Update();
         AtlasGUI();
 
-        m_ShowSpriteName.target = m_Atlas.objectReferenceValue != null;
-        if (EditorGUILayout.BeginFadeGroup(m_ShowSpriteName.faded))
-        {
-            SpriteNameGUI();
-        }
+        showSpriteName.target = atlas.objectReferenceValue != null;
+        if (EditorGUILayout.BeginFadeGroup(showSpriteName.faded)) SpriteNameGUI();
         EditorGUILayout.EndFadeGroup();
 
         serializedObject.ApplyModifiedProperties();
@@ -58,7 +55,7 @@ public class AtlasImageEditor : ImageEditor
     protected virtual void AtlasGUI()
     {
         EditorGUI.BeginChangeCheck();
-        EditorGUILayout.PropertyField(m_Atlas);
+        EditorGUILayout.PropertyField(atlas);
 
         if (EditorGUI.EndChangeCheck())
         {
@@ -69,12 +66,9 @@ public class AtlasImageEditor : ImageEditor
 
     private void ResetSpriteNameIndex()
     {
-        if (atlasSpriteNames?.Length == 0)
-        {
-            return;
-        }
+        if (atlasSpriteNames?.Length == 0) return;
 
-        var currentName = m_SpriteName.stringValue;
+        var currentName = spriteName.stringValue;
         var tempIndex = 0;
         for (var i = 0; i < atlasSpriteNames.Length; i++)
         {
@@ -85,13 +79,13 @@ public class AtlasImageEditor : ImageEditor
             }
         }
         spriteNameIndex = tempIndex;
-        m_SpriteName.stringValue = atlasSpriteNames[spriteNameIndex];
+        spriteName.stringValue = atlasSpriteNames[spriteNameIndex];
         UpdateSourceImage();
     }
 
     private void ResetAtlasSpriteNames()
     {
-        var newAtlas = m_Atlas.objectReferenceValue as SpriteAtlas;
+        var newAtlas = atlas.objectReferenceValue as SpriteAtlas;
         if (newAtlas)
         {
             atlasSpriteNames = GetAllSprite(newAtlas).Select(x => x.name.Replace("(Clone)", "")).ToArray();
@@ -108,40 +102,38 @@ public class AtlasImageEditor : ImageEditor
 
         if (EditorGUI.EndChangeCheck())
         {
-            m_SpriteName.stringValue = atlasSpriteNames[spriteNameIndex];
+            spriteName.stringValue = atlasSpriteNames[spriteNameIndex];
             UpdateSourceImage();
         }
     }
 
-
     protected virtual void UpdateSourceImage()
     {
-        var m_Type = serializedObject.FindProperty("m_Type");
-        var m_Sprite = serializedObject.FindProperty("m_Sprite");
+        var type = serializedObject.FindProperty("m_Type");
+        var sprite = serializedObject.FindProperty("m_Sprite");
 
-        var currentAtlas = m_Atlas.objectReferenceValue as SpriteAtlas;
+        var currentAtlas = atlas.objectReferenceValue as SpriteAtlas;
 
-        if (currentAtlas == null)
-            return;
+        if (currentAtlas == null) return;
 
-        var newSprite = currentAtlas.GetSprite(m_SpriteName.stringValue);
+        var newSprite = currentAtlas.GetSprite(spriteName.stringValue);
 
-        m_Sprite.objectReferenceValue = newSprite;
+        sprite.objectReferenceValue = newSprite;
         if (newSprite)
         {
-            var oldType = (Image.Type)m_Type.enumValueIndex;
+            var oldType = (Image.Type)type.enumValueIndex;
             if (newSprite.border.SqrMagnitude() > 0)
             {
-                m_Type.enumValueIndex = (int)Image.Type.Sliced;
+                type.enumValueIndex = (int)Image.Type.Sliced;
             }
-            else if (oldType == Image.Type.Sliced)
+            else if (oldType.EnumEquals(Image.Type.Sliced))
             {
-                m_Type.enumValueIndex = (int)Image.Type.Simple;
+                type.enumValueIndex = (int)Image.Type.Simple;
             }
         }
     }
 
-    static IEnumerable<Sprite> GetAllSprite(SpriteAtlas spriteAtlas)
+    private static IEnumerable<Sprite> GetAllSprite(SpriteAtlas spriteAtlas)
     {
         var spriteArray = new Sprite[spriteAtlas.spriteCount];
 
@@ -152,4 +144,3 @@ public class AtlasImageEditor : ImageEditor
         }
     }
 }
-#endif

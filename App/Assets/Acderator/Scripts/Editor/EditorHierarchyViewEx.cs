@@ -1,5 +1,4 @@
-﻿#if UNITY_EDITOR
-using System.Linq;
+﻿using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
@@ -8,10 +7,7 @@ public class EditorHierarchyViewEx
     private const int cWidth = 16;
 
     [InitializeOnLoadMethod]
-    private static void HierarchyViewEx()
-    {
-        EditorApplication.hierarchyWindowItemOnGUI += OnGUI;
-    }
+    private static void HierarchyViewEx() => EditorApplication.hierarchyWindowItemOnGUI += OnGUI;
 
     private static void OnGUI(int instanceID, Rect selectionRect)
     {
@@ -52,4 +48,3 @@ public class EditorHierarchyViewEx
         if (isWarning) GUI.Label(pos, "!");
     }
 }
-#endif

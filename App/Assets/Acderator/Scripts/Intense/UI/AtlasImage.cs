@@ -21,12 +21,19 @@ namespace Intense.UI
 
         public virtual void SetAtlas(string spriteName, string atlasName = "") => UniTask.Void(async () =>
         {
-            if (!string.IsNullOrEmpty(atlasName))
+            if (string.IsNullOrEmpty(atlasName))
             {
-                m_Atlas = await AssetBundleManager.Instance.GetLoadedObjectAsync(atlasName) as SpriteAtlas;
+                sprite = default;
+                return;
             }
-            m_SpriteName = spriteName;
-            sprite = m_Atlas != null && !string.IsNullOrEmpty(m_SpriteName) ? m_Atlas.GetSprite(m_SpriteName) : null;
+
+            var obj = await AssetBundleManager.Instance.GetLoadedObjectAsync(atlasName);
+            if (obj is SpriteAtlas atlasSprite)
+            {
+                m_Atlas = atlasSprite;
+                m_SpriteName = spriteName;
+                sprite = m_Atlas.GetSprite(m_SpriteName);
+            }
         });
     }
 

@@ -54,7 +54,7 @@ namespace Intense.UI
         public void SetDownloadFileSize(long downloadedFileSize, long allFileSize)
         {
             if (allFileSize <= 0) return;
-            if (!progressBar.activeSelf) progressBar.SetActive(true);
+            progressBar.SetActive(!progressBar.activeSelf);
 
             var val = (int)Math.Round((double)downloadedFileSize / allFileSize * 100);
             slider.DOValue(val, 0.1f).OnUpdate(() => percent.SetTextFormat("{0}%", (int)slider.value));

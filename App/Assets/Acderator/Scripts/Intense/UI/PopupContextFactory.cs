@@ -1,6 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
 using Element.UI;
-using Intense.Api;
 using Intense.Asset;
 
 namespace Intense.UI
@@ -57,6 +56,5 @@ namespace Intense.UI
             },
             ButtonType = EButtonType.Close,
         };
-
     }
 }
