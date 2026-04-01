@@ -24,12 +24,10 @@ public static class ScriptableObjectUtils
             AssetDatabase.CreateAsset(ScriptableObject.CreateInstance(typeof(T)), filePath);
             AssetDatabase.Refresh();
 
-            Debug.Log("networkConfig.asset is created.");
+            Debug.Log(ZString.Format("{0}.asset is created.", typeof(T).Name));
             return;
         }
         Debug.LogError(ZString.Format("{0}.asset already exists.", typeof(T).Name));
     }
-
-    public static MenuItem GetScriptableObjectMenuItem<T>() where T : Object => new(ZString.Format("Tools/ScriptableObject/Create {0}", typeof(T).Name));
 #endif
 }

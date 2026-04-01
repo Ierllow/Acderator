@@ -10,7 +10,6 @@ using Intense.UI;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using Unity.Serialization;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -57,8 +56,8 @@ namespace Intense
         {
             var type = scene.GetType();
             var sceneType = type.GetCustomAttribute<SceneTypeAttribute>().Type;
-            if (sceneType.EnumEquals(ESceneType.None) || !sceneBaseDict.TryAdd(sceneType, scene))
-                throw new ParseErrorException(ZString.Format("The {0} is invalid or duplicate.", type.Name));
+            if (sceneType.EnumEquals(ESceneType.None)) throw new InvalidSceneTypeException(sceneType);
+            if (!sceneBaseDict.TryAdd(sceneType, scene)) throw new DuplicateSceneTypeException(sceneType);
         }
 
         public async UniTask ChangeSceneAsync(ESceneType sceneType, SceneContext context = default, bool sameScene = false)

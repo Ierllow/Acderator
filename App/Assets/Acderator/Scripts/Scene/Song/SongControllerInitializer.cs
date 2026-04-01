@@ -5,8 +5,6 @@ namespace Song
 {
     public class SongControllerInitializer
     {
-        public bool IsInit { get; private set; } = false;
-
         private readonly List<IController> controllerList = new();
         private readonly Dictionary<Type, object> dependencies = new();
 
@@ -29,7 +27,6 @@ namespace Song
                         break;
                 }
             }
-            IsInit = true;
         }
 
         public static SongControllerInitializerBuilder CreateBuilder() => new();

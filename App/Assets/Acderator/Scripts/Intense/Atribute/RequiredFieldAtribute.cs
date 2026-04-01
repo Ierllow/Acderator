@@ -15,6 +15,7 @@ namespace Intense.Attribute
     {
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
+            Debug.Assert(property.propertyType.EnumEquals(SerializedPropertyType.ObjectReference));
             var baseHeight = EditorGUI.GetPropertyHeight(property, label, true);
             return IsMissing(property) ? baseHeight + EditorGUIUtility.singleLineHeight * 1.2f : baseHeight;
         }
@@ -41,7 +42,7 @@ namespace Intense.Attribute
             EditorGUI.HelpBox(helpRect, ZString.Format("{0} is required.", label.text), MessageType.Error);
         }
 
-        private static bool IsMissing(SerializedProperty property) => property.propertyType == SerializedPropertyType.ObjectReference && property.objectReferenceValue == null;
+        private bool IsMissing(SerializedProperty property) => property.objectReferenceValue == null;
     }
 
     [InitializeOnLoad]

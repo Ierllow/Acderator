@@ -21,10 +21,6 @@ namespace Song
             builder.Build().InitAll();
         }
 
-        public bool TryGet<T>(out T controller) where T : class
-        {
-            controller = controllerList.AsValueEnumerable().OfType<T>().FirstOrDefault();
-            return controller != default;
-        }
+        public bool TryGet<T>(out T controller) where T : class => (controller = controllerList.AsValueEnumerable().OfType<T>().FirstOrDefault()) != default;
     }
 }

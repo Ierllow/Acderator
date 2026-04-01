@@ -26,6 +26,7 @@ namespace Title
             startButton.OnTapButtonAsObservable.SubscribeLockAwait(new(true), async (_, ct) =>
             {
                 while (!await titleAuthController.ExecuteAsync(ct, failFastExceptionWatcher)) { }
+                await SceneManager.Instance.ChangeSceneAsync(ESceneType.SongSelect, new SongSelect.SongSelectSceneContext());
             }).RegisterTo(destroyCancellationToken);
             base.Start();
         }

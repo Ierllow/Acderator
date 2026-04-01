@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Linq;
+using Unity.Entities.UniversalDelegates;
 using UnityEngine;
+using ZLinq;
 
 namespace Song
 {
@@ -25,9 +28,8 @@ namespace Song
             var typeCount = EnumExtensions.GetValues<ENoteType>().Count;
             pools = new NotePool<NoteBase>[typeCount, laneCount];
 
-            for (var lane = 0; lane < laneCount; lane++)
+            foreach (var (parent, lane) in parents.AsValueEnumerable().Select((parent, lane) => (parent, lane)))
             {
-                var parent = parents[lane];
                 pools[(int)ENoteType.Single, lane] = CreatePool<NoteBase>(notePrefabs.singleNote, parent);
                 pools[(int)ENoteType.Long, lane] = CreatePool<NoteBase>(notePrefabs.longNote, parent);
                 pools[(int)ENoteType.Flick, lane] = CreatePool<NoteBase>(notePrefabs.flickNote, parent);

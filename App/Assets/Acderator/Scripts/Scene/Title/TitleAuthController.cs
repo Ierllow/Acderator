@@ -50,7 +50,6 @@ namespace Title
             if (userDataResponse?.Status != 200) return await PopupUtils.TryOpenNetworkErrorPopup(userDataResponse);
             ScoreManager.Instance.SetScoreData(userDataResponse.Scores);
             await SoundManager.Instance.InitializeAsync();
-            await SceneManager.Instance.ChangeSceneAsync(ESceneType.SongSelect, new SongSelect.SongSelectSceneContext());
             return true;
         }
 
