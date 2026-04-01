@@ -20,7 +20,7 @@ namespace SongSelect
             [Text("ハイスコア")] HighScore,
         }
 
-        public EOrderType CurrentOrderType { get; private set; } = (EOrderType)LocalDataManager.Instance.SongSelectSort.OrderType;
+        public EOrderType CurrentOrderType { get; private set; } = (EOrderType)PlayerPrefsValues.OT;
 
         public string Text => CurrentOrderType.GetType().GetCustomAttribute<TextAttribute>().Text;
 
@@ -39,6 +39,6 @@ namespace SongSelect
 
         public void SetNextOrderType() => CurrentOrderType = FastEnum.GetValues<EOrderType>().AsValueEnumerable().ElementAtOrDefault((int)CurrentOrderType + 1);
 
-        public void SaveOrderType() => LocalDataManager.Instance.SongSelectSort.OrderType = CurrentOrderType.GetLength();
+        public void SaveOrderType() => PlayerPrefsValues.Set(EKey.OrderType, CurrentOrderType.GetLength());
     }
 }

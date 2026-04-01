@@ -1,6 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
 using Cysharp.Threading.Tasks.Linq;
-using Intense.Data;
 using Intense.Master;
 using System.Collections.Generic;
 using ZLinq;
@@ -9,8 +8,8 @@ namespace SongSelect
 {
     public class SongSelectCellListController
     {
-        public int SelectedGroup { get; private set; } = LocalDataManager.Instance.SelectSavaData.SelectedGroup;
-        public int SelectedDifficulty { get; private set; } = LocalDataManager.Instance.SelectSavaData.SelectedDifficulty;
+        public int SelectedGroup { get; private set; } = PlayerPrefsValues.SDG;
+        public int SelectedDifficulty { get; private set; } = PlayerPrefsValues.SDD;
         public List<int> SongGroupList { get; private set; } = MasterDataManager.Instance.MemoryDatabase.SongMasterTable.Select(x => x.Group).Distinct().ToList();
 
         public IUniTaskAsyncEnumerable<SongSelectCell> EverySelectedCellChangedAsAsyncEnumerable => UniTaskAsyncEnumerable.EveryValueChanged(this, x => x.selectedCell).Queue().Where(x => x != null);
@@ -36,8 +35,8 @@ namespace SongSelect
 
         public void SaveSelectedCell()
         {
-            LocalDataManager.Instance.SelectSavaData.SelectedGroup = SelectedGroup;
-            LocalDataManager.Instance.SelectSavaData.SelectedDifficulty = SelectedDifficulty;
+            PlayerPrefsValues.Set(EKey.SelectedGroup, SelectedGroup);
+            PlayerPrefsValues.Set(EKey.SelectedDifficulty, SelectedDifficulty);
         }
     }
 }

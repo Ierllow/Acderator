@@ -25,7 +25,7 @@ namespace Intense.Api
             try
             {
                 var requestBytes = MessagePackSerializer.Serialize(request.PostData);
-                var session = LocalDataManager.Instance.System.Token;
+                var session = PlayerPrefsValues.TK;
                 var url = !string.IsNullOrEmpty(session)
                     ? networkConfigObject.apiServerUrl + "/" + session + "/" + request.ApiKey
                     : networkConfigObject.apiServerUrl + "/" + request.ApiKey;

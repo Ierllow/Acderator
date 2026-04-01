@@ -17,7 +17,7 @@ namespace Title
         {
             static async UniTask loadMasterFunc(Dictionary<string, object> masterDict) => await MasterDataManager.Instance.LoadMasterAsync(masterDict);
 
-            var userid = LocalDataManager.Instance.LocalUser.UserId;
+            var userid = PlayerPrefsValues.UI;
             RequestBase request;
             if (string.IsNullOrEmpty(userid))
             {
@@ -27,7 +27,7 @@ namespace Title
             else
             {
                 request = new LoginRequest();
-                var password = LocalDataManager.Instance.LocalUser.PassWard;
+                var password = PlayerPrefsValues.PW;
                 request.PostData.Add("userid", userid);
                 request.PostData.Add("password", password);
             }
@@ -35,14 +35,14 @@ namespace Title
             if (authResponse?.Status != 200) return await PopupUtils.TryOpenNetworkErrorPopup(authResponse);
             if (authResponse is RegisterResponse rr)
             {
-                LocalDataManager.Instance.LocalUser.UserId = rr.UserId.ToString();
-                LocalDataManager.Instance.LocalUser.PassWard = rr.PassWord;
-                LocalDataManager.Instance.System.Token = rr.Token;
+                PlayerPrefsValues.Set(EKey.UserId, rr.UserId);
+                PlayerPrefsValues.Set(EKey.PassWard, rr.PassWord);
+                PlayerPrefsValues.TK = rr.Token;
                 await loadMasterFunc(rr.Master).AddWatcherTo(failFastExceptionWatcher);
             }
             else
             {
-                LocalDataManager.Instance.System.Token = (authResponse as LoginResponse).Token;
+                PlayerPrefsValues.TK = (authResponse as LoginResponse).Token;
                 await loadMasterFunc((authResponse as LoginResponse).Master).AddWatcherTo(failFastExceptionWatcher);
             }
             await LoadAssets(token).AddWatcherTo(failFastExceptionWatcher);

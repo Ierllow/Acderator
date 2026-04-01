@@ -2,7 +2,6 @@
 using Cysharp.Text;
 using Cysharp.Threading.Tasks;
 using Intense.Asset;
-using Intense.Data;
 using Intense.Master;
 using System;
 using System.Threading;
@@ -84,10 +83,9 @@ namespace Intense
             SongPreviewExPlayer ??= new CriAtomExPlayer();
             SeExPlayer ??= new CriAtomExPlayer();
 
-            await UniTask.WaitUntil(() => LocalDataManager.Instance.Option.IsInit);
-            UpdateBgmVolume(LocalDataManager.Instance.Option.BgmVolume, LocalDataManager.Instance.Option.IsMuteBgm);
-            UpdateSeVolume(LocalDataManager.Instance.Option.SeVolume, LocalDataManager.Instance.Option.IsMuteSe);
-            UpdateSongVolume(LocalDataManager.Instance.Option.SongVolume, LocalDataManager.Instance.Option.IsMuteSong);
+            UpdateBgmVolume(PlayerPrefsValues.BV, PlayerPrefsValues.BM);
+            UpdateSeVolume(PlayerPrefsValues.SV, PlayerPrefsValues.SM);
+            UpdateSongVolume(PlayerPrefsValues.SGV, PlayerPrefsValues.SOM);
 
             IsInit = true;
             await UniTask.WaitUntil(() => IsInit);
@@ -125,7 +123,6 @@ namespace Intense
 
                 StopSe();
                 SeExPlayer.SetCue(sheet.acb, mSoundCueName.CueName);
-                SeExPlayer.SetVolume(!LocalDataManager.Instance.Option.IsMuteSe ? SeExPlayer.GetParameterFloat32(CriAtomEx.Parameter.Volume) : 0f);
                 SeExPlayer.Loop(false);
                 SeExPlayer.Start();
             });
@@ -142,7 +139,6 @@ namespace Intense
 
                 StopBgm();
                 BgmExPlayer.SetCue(sheet.acb, mSoundCueName.CueName);
-                BgmExPlayer.SetVolume(!LocalDataManager.Instance.Option.IsMuteBgm ? BgmExPlayer.GetParameterFloat32(CriAtomEx.Parameter.Volume) : 0f);
                 BgmExPlayer.Loop(isLoop);
                 BgmExPlayer.Start();
             });
@@ -159,7 +155,6 @@ namespace Intense
 
                 StopSong();
                 SongExPlayer.SetCue(sheet.acb, id.ToString());
-                SongExPlayer.SetVolume(!LocalDataManager.Instance.Option.IsMuteSong ? SongExPlayer.GetParameterFloat32(CriAtomEx.Parameter.Volume) : 0f);
                 SongExPlayer.Loop(false);
                 SongExPlayer.Start();
             });
@@ -178,7 +173,6 @@ namespace Intense
                 SongPreviewExPlayer.SetFadeInTime(3000);
                 SongPreviewExPlayer.SetFadeOutTime(3000);
                 SongPreviewExPlayer.SetCue(sheet.acb, id.ToString());
-                SongPreviewExPlayer.SetVolume(!LocalDataManager.Instance.Option.IsMuteSong ? SongExPlayer.GetParameterFloat32(CriAtomEx.Parameter.Volume) : 0f);
                 SongPreviewExPlayer.SetStartTime(MasterDataManager.Instance.MemoryDatabase.SongSelectMasterTable.FindByGroup(id).StartSongTime);
                 SongPreviewExPlayer.Start();
                 var songSelectMaster = MasterDataManager.Instance.MemoryDatabase.SongSelectMasterTable.FindByGroup(id);
