@@ -20,6 +20,7 @@ namespace Song
         [RequiredField, SerializeField] private NotesLineController notesLineController;
         [RequiredField, SerializeField] private FailFastExceptionWatcher failFastExceptionWatcher;
 
+        [InjectOptional] private SongApplicationPauseHandler songApplicationPauseHandler;
         [Inject] private NotesManager notesManager;
         [Inject] private NoteFactory noteFactory;
         [Inject] private SongControllerResolver songControllerResolver;
@@ -39,15 +40,7 @@ namespace Song
 
         private void OnApplicationPause(bool pauseStatus)
         {
-            if (!sceneContext.SongMode.EnumEquals(ESongMode.Normal)) return;
-            if (SoundManager.Instance.SongExPlayer.IsPlayEnd()) return;
-            if (notesManager.AliveNoteList.Count == 0) return;
-
-            if (pauseStatus)
-            {
-                songControllerResolver.Loop.UpdateState(ESongState.Stop);
-                return;
-            }
+            if (songApplicationPauseHandler?.IsHandlePause(pauseStatus) == false) return;
             songPopupLayerController.OnOpenPausePopup(!sceneContext.IsAuto);
         }
 

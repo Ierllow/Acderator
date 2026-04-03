@@ -16,36 +16,59 @@ namespace Zenject
             this.enabled = enabled;
         }
 
-        public ConditionalBinderGeneric<T> BindInterfacesAndSelfTo<T>() => enabled ? new(container.BindInterfacesAndSelfTo<T>(), true) : new(default, false);
+        public ConditionalBinderNonGeneric BindInterfacesAndSelfTo<T>() => enabled ? new(container.BindInterfacesAndSelfTo<T>(), true) : new(default, false);
 
-        public sealed class ConditionalBinderGeneric<T>
+        public ConditionalBinderGeneric<T> Bind<T>() => enabled ? new(container.Bind<T>(), true) : new(default, false);
+    }
+
+    public sealed class ConditionalBinderNonGeneric
+    {
+        private readonly FromBinderNonGeneric binder;
+        private readonly bool enabled;
+
+        public ConditionalBinderNonGeneric(FromBinderNonGeneric binder, bool enabled)
         {
-            private readonly FromBinderNonGeneric binder;
-            private readonly bool enabled;
+            this.binder = binder;
+            this.enabled = enabled;
+        }
 
-            public ConditionalBinderGeneric(FromBinderNonGeneric binder, bool enabled)
+        public ConditionalBinderNonGeneric FromComponentInHierarchy()
+        {
+            if (enabled)
             {
-                this.binder = binder;
-                this.enabled = enabled;
+                binder.FromComponentInHierarchy();
             }
+            return this;
+        }
 
-            public ConditionalBinderGeneric<T> FromComponentInHierarchy()
+        public ConditionalBinderNonGeneric AsSingle()
+        {
+            if (enabled)
             {
-                if (enabled)
-                {
-                    binder.FromComponentInHierarchy();
-                }
-                return this;
+                binder.AsSingle();
             }
+            return this;
+        }
+    }
 
-            public ConditionalBinderGeneric<T> AsSingle()
+    public sealed class ConditionalBinderGeneric<T>
+    {
+        private readonly FromBinderGeneric<T> binder;
+        private readonly bool enabled;
+
+        public ConditionalBinderGeneric(FromBinderGeneric<T> binder, bool enabled)
+        {
+            this.binder = binder;
+            this.enabled = enabled;
+        }
+
+        public ConditionalBinderGeneric<T> AsSingle()
+        {
+            if (enabled)
             {
-                if (enabled)
-                {
-                    binder.AsSingle();
-                }
-                return this;
+                binder.AsSingle();
             }
+            return this;
         }
     }
 }

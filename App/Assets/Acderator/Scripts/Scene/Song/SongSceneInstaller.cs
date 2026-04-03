@@ -18,6 +18,7 @@ namespace Song
             Container.Bind<HpBarController>().AsSingle();
             Container.Bind<SongResultCalculator>().AsSingle();
             Container.Bind<ScoreNumController>().AsSingle();
+            Container.If(songSceneContext.SongMode.EnumEquals(ESongMode.Normal)).Bind<SongApplicationPauseHandler>().AsSingle();
             Container.BindInterfacesAndSelfTo<SongParticleController>().FromComponentInHierarchy().AsSingle();
             Container.BindInterfacesAndSelfTo<FrameRateController>().AsSingle();
             Container.BindInterfacesAndSelfTo<SongLoopController>().AsSingle();
