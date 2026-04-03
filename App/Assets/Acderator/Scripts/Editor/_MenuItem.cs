@@ -2,7 +2,7 @@ using Intense.Api;
 using Song;
 using UnityEditor;
 
-internal class ItemMenu
+public class _MenuItem
 {
     private const string ITEM_NAME_PREFIX = "Tools/ScriptableObject/Create";
 

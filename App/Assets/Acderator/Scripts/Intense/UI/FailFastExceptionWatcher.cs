@@ -12,9 +12,9 @@ namespace Intense.UI
 
         public bool IsFailed { get; private set; }
 
-        public void Init(CancellationTokenSource cancellationTokenSource)
+        public void Init(CancellationToken cancellationToken)
         {
-            this.cancellationTokenSource = cancellationTokenSource;
+            cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
             Application.logMessageReceivedThreaded += OnLog;
             AppDomain.CurrentDomain.UnhandledException += OnUnhandled;
             UniTaskScheduler.UnobservedTaskException += OnUnobservedTaskException;

@@ -5,7 +5,6 @@ using Intense.Attribute;
 using Intense.Data;
 using Intense.UI;
 using System;
-using System.Threading;
 using UnityEngine;
 using Zenject;
 
@@ -28,8 +27,7 @@ namespace Song
 
         protected override void Awake()
         {
-            var tokenSource = CancellationTokenSource.CreateLinkedTokenSource(destroyCancellationToken);
-            failFastExceptionWatcher.Init(tokenSource);
+            failFastExceptionWatcher.Init(destroyCancellationToken);
             base.Awake();
         }
 
