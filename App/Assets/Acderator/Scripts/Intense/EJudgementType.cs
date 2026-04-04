@@ -14,9 +14,9 @@ namespace Intense
 
     public static class JudgementTypeExtensions
     {
-        public static EJudgementType GetJudgmentType(this float diffSec)
+        internal static EJudgementType GetJudgmentType(this float diffSec, MasterDataManager masterDataManager)
         {
-            var zone = MasterDataManager.Instance.MemoryDatabase.SongJudgeZoneMasterTable.FirstOrDefault(x => diffSec <= x.Zone);
+            var zone = masterDataManager.MemoryDatabase.SongJudgeZoneMasterTable.FirstOrDefault(x => diffSec <= x.Zone);
             return zone == default ? EJudgementType.None : (EJudgementType)zone.Type;
         }
     }

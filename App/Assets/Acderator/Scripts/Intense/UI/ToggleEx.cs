@@ -8,8 +8,7 @@ using UnityEngine.UI;
 
 namespace Intense.UI
 {
-    [DisallowMultipleComponent]
-    [RequireComponent(typeof(Toggle))]
+    [DisallowMultipleComponent, RequireComponent(typeof(Toggle))]
 
     public class ToggleEx : MonoBehaviour
     {

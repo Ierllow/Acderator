@@ -1,18 +1,20 @@
 ﻿using Cysharp.Text;
 using Cysharp.Threading.Tasks;
-using Intense.Data;
 using Intense.UI;
 using MessagePack;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
+using Zenject;
 
 namespace Intense.Api
 {
-    internal class NetworkManager : SingletonMonoBehaviour<NetworkManager>
+    internal class NetworkManager : MonoBehaviour
     {
         [SerializeField] private NetworkConfig networkConfigObject;
+
+        [Inject] private Loading loading;
 
         public async UniTask<ResponseBase> RequestAsync(RequestBase request)
         {
@@ -21,7 +23,7 @@ namespace Intense.Api
                 return default;
             }
 
-            Loading.Instance.ShowLoading();
+            loading.ShowLoading();
             try
             {
                 var requestBytes = MessagePackSerializer.Serialize(request.PostData);
@@ -45,7 +47,7 @@ namespace Intense.Api
             }
             finally
             {
-                Loading.Instance.HideLoading();
+                loading.HideLoading();
             }
         }
     }

@@ -17,7 +17,6 @@ namespace Intense.Data
             : score < 980000 ? ERankType.Ss
             : score < 1000000 ? ERankType.Sss
             : ERankType.Exc;
-        public static int ToScorePercent(int sid) => ScoreManager.Instance.GetScore(sid) % MasterDataManager.Instance.MemoryDatabase.SongMasterTable.FindBySid(sid).Score / 10000;
         public static bool IsClear(int score) => !ToRank(score).EnumEquals(ERankType.D) || !ToRank(score).EnumEquals(ERankType.New) || !ToRank(score).EnumEquals(ERankType.None);
         public static bool IsExc(int score) => ToRank(score).EnumEquals(ERankType.Exc);
     }

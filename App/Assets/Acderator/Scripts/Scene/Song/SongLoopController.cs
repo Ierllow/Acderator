@@ -1,6 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
 using Cysharp.Threading.Tasks.Linq;
-using Intense;
 using System;
 using UnityEngine;
 using R3;
@@ -30,11 +29,10 @@ namespace Song
 
         public void UpdateState(ESongState currentState) => cachedSongState = currentState;
 
-        public void Tick()
+        public void Tick(float sec)
         {
             if (SongStateEnumEquals(ESongState.None, ESongState.Stop)) PauseTime += Time.deltaTime;
 
-            var sec = SoundManager.Instance.SongExPlayer.GetTime().ToSeconds();
             var elapsedSec = Time.timeSinceLevelLoad - PauseTime - offset;
             SongLoopUpdateSubject.OnNext(sec <= 0 ? elapsedSec : sec);
         }

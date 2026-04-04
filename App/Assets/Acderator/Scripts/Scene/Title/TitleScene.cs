@@ -26,7 +26,7 @@ namespace Title
             startButton.OnTapButtonAsObservable.SubscribeLockAwait(new(true), async (_, ct) =>
             {
                 while (!await titleAuthController.ExecuteAsync(ct, failFastExceptionWatcher)) { }
-                await SceneManager.Instance.ChangeSceneAsync(ESceneType.SongSelect, new SongSelect.SongSelectSceneContext());
+                await sceneManager.ChangeSceneAsync(ESceneType.SongSelect, new SongSelect.SongSelectSceneContext());
             }).RegisterTo(destroyCancellationToken);
             base.Start();
         }
@@ -35,7 +35,7 @@ namespace Title
         {
             versionText.SetTextFormat("Version {0}", Application.version);
             startText.DOFade(0, 1).SetEase(Ease.Flash, 1).SetLoops(-1, LoopType.Yoyo).SetLink(gameObject);
-            SceneManager.Instance.FadeInAsync().Forget();
+            sceneManager.FadeInAsync().Forget();
         }
     }
 }

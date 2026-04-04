@@ -24,34 +24,38 @@ namespace Result
         [SerializeField] private GameObject cautionTextRoot;
 
         [Inject] private ResultSceneContext sceneContext;
+        [Inject] private AssetBundleManager assetBundleManager;
+        [Inject] private MasterDataManager masterDataManager;
+        [Inject] private SoundManager soundManager;
+        [Inject] private NetworkManager networkManager;
 
         protected override void Start()
         {
             retryButton.OnTapButtonAsObservable.SubscribeLockAwait(new(true), async (_, __) => await TapRetryButton()).RegisterTo(destroyCancellationToken);
-            quitButton.OnTapButtonAsObservable.SubscribeLockAwait(new(true), async (_, ___) => await SceneManager.Instance.ChangeSceneAsync(ESceneType.SongSelect, new SongSelect.SongSelectSceneContext())).RegisterTo(destroyCancellationToken);
+            quitButton.OnTapButtonAsObservable.SubscribeLockAwait(new(true), async (_, ___) => await sceneManager.ChangeSceneAsync(ESceneType.SongSelect, new SongSelect.SongSelectSceneContext())).RegisterTo(destroyCancellationToken);
             base.Start();
         }
 
         public override void OnCreateScene() => UniTask.Void(async () =>
         {
-            sceneContext.ResultSceneBundlePathList.ForEach(AssetBundleManager.Instance.AddLoadAssets);
-            await AssetBundleManager.Instance.LoadAssetsAsync(destroyCancellationToken);
-            resultDetail.Setup(sceneContext.ResultInfo);
-            backgroundImage.SetAtlasFormat("{0}", MasterDataManager.Instance.MemoryDatabase.ResultMasterTable.First().Rid, "gameresult/bg");
+            sceneContext.ResultSceneBundlePathList.ForEach(assetBundleManager.AddLoadAssets);
+            await assetBundleManager.LoadAssetsAsync(sceneManager.CurrentSceneType, destroyCancellationToken);
+            resultDetail.Setup(masterDataManager.MemoryDatabase.SongMasterTable.FindBySid(sceneContext.ResultInfo.Sid), sceneContext.ResultInfo);
+            backgroundImage.SetAtlasFormat("{0}", masterDataManager.MemoryDatabase.ResultMasterTable.First().Rid, "gameresult/bg");
             backgroundImage.color = PaletteStore.Instance.ColorPalette.GetActiveValue((ScoreUtils.IsClear(sceneContext.ResultInfo.CurrentScore) ? ColorEntry.White : ColorEntry.LightWhite).ToEntryId()).Value;
             cautionTextRoot.SetActive(sceneContext.ResultInfo.IsAuto);
             retryButton.gameObject.SetActive(!sceneContext.ResultInfo.IsAuto);
 
-            await SceneManager.Instance.FadeInAsync();
-            SoundManager.Instance.PlayBgm(ScoreUtils.IsClear(sceneContext.ResultInfo.CurrentScore) ? EBgmType.GameResult : EBgmType.GameResultFailed);
+            await sceneManager.FadeInAsync();
+            soundManager.PlayBgm(ScoreUtils.IsClear(sceneContext.ResultInfo.CurrentScore) ? EBgmType.GameResult : EBgmType.GameResultFailed);
         });
 
         private async UniTask TapRetryButton()
         {
             var request = new ScoreBeginRequest();
             request.PostData.Add("sid", sceneContext.ResultInfo.Sid);
-            var response = await NetworkManager.Instance.RequestAsync(request) as ScoreBeginResponse;
-            await SceneManager.Instance.ChangeSceneAsync(ESceneType.Song, Song.SongSceneContext.Create(new(sceneContext.ResultInfo.Sid), sceneContext.ResultInfo.IsAuto, Song.ESongMode.Normal, response.SessionId));
+            var response = await networkManager.RequestAsync(request) as ScoreBeginResponse;
+            await sceneManager.ChangeSceneAsync(ESceneType.Song, Song.SongSceneContext.Create(new(masterDataManager.MemoryDatabase.SongMasterTable.FindBySid(sceneContext.ResultInfo.Sid)), sceneContext.ResultInfo.IsAuto, Song.ESongMode.Normal, response.SessionId));
         }
     }
 }

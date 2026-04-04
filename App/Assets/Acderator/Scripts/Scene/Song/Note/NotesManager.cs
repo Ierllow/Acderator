@@ -13,7 +13,7 @@ namespace Song
         public List<NoteBase> AliveNoteList { get; } = new();
         public LoadedChartInfo LoadedChartInfo { get; private set; } = default;
         public List<NoteSpeedChange> NoteSpeedChangeList { get; } = new();
-        public SongOption SongOption { get; private set; } = default;
+        public SongOption SongOption { get; init; } = default;
         public float CurrentNoteSpeed { get; private set; } = default;
 
         public const int MIN_NOTES_SPEED = 1;
@@ -21,11 +21,14 @@ namespace Song
         private int currentSpeedChangeIndex = 0;
         private readonly List<NoteBase>[] aliveNotesByLaneList = { new(), new(), new(), new(), };
 
-        public NotesManager(SongOption songOption) => SongOption = songOption;
+        public NotesManager(SongOption songOption)
+        {
+            SongOption = songOption;
+            CurrentNoteSpeed = songOption.NoteSpeed;
+        }
 
         public void Init(LoadedChartInfo loadedChartInfo)
         {
-            CurrentNoteSpeed = SongOption.NoteSpeed;
             LoadedChartInfo = loadedChartInfo;
             NoteSpeedChangeList.AddRange(loadedChartInfo.HeaderData.NoteSpeedChangeList);
             UpdateNoteSpeed();
@@ -37,7 +40,7 @@ namespace Song
             aliveNotesByLaneList[note.NoteData.Lane].Add(note);
         }
 
-        public bool TryRemoveNote(NoteBase note)
+        public bool RemoveNote(NoteBase note)
         {
             var removed = AliveNoteList.Remove(note);
             aliveNotesByLaneList[note.NoteData.Lane].Remove(note);

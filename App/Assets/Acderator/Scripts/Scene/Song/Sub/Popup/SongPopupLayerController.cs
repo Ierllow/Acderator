@@ -6,6 +6,7 @@ using Intense.UI;
 using R3;
 using System;
 using UnityEngine;
+using Zenject;
 
 namespace Song
 {
@@ -15,6 +16,9 @@ namespace Song
 
         [SerializeField] private PausePopup pausePopup;
         [SerializeField] private ScoreErrorPopup errorPopup;
+
+        [Inject] private PopupManager popupManager;
+        [Inject] private SceneManager sceneManager;
 
         public IUniTaskAsyncEnumerable<EPopupTapKind> ClosedPausePopupAsAsyncEnumerable => UniTaskAsyncEnumerable.EveryValueChanged(pausePopup, x => x.TapKind);
         public Observable<ESceneType> EverySceneTypeChanged => asyncSceneTypeSubject.Where(x => !x.EnumEquals(ESceneType.None));
@@ -66,9 +70,12 @@ namespace Song
             if (currentOpenPopupType.EnumEquals(EType.Error)) return;
 
             currentOpenPopupType = EType.Error;
-            if (!SceneManager.Instance.IsFadeIn) await SceneManager.Instance.FadeInAsync();
-            await PopupUtils.OpenErrorPopup();
+            var completionSource = AutoResetUniTaskCompletionSource.Create();
+            var context = PopupContextFactory.CreateErrorPopupContext(completionSource, () => sceneManager.ChangeSceneAsync(ESceneType.Title));
+            popupManager.OpenPopup(context);
+            await completionSource.Task;
         }
+
 
         private void OnOpenSaveScoreDataErrorPopup()
         {
@@ -100,8 +107,8 @@ namespace Song
 
         private void Open(PopupContext popupContext)
         {
-            PopupManager.Instance.OpenPopup(popupContext);
-            PopupManager.Instance.CurrentOpenPopup.transform.SetParent(transform);
+            popupManager.OpenPopup(popupContext);
+            popupManager.CurrentOpenPopup.transform.SetParent(transform);
         }
     }
 }

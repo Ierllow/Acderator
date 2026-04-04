@@ -6,20 +6,21 @@ using R3.Triggers;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Zenject;
 using ZLinq;
 
 namespace Intense.UI
 {
-    public class PopupManager : SingletonMonoBehaviour<PopupManager>
+    public class PopupManager : IInitializable
     {
         private readonly List<PopupBase> openedPopupList = new();
         public PopupBase CurrentOpenPopup => openedPopupList.AsValueEnumerable().LastOrDefault();
 
-        private void Start() => CurrentOpenPopup.OnDisableAsObservable().Subscribe(_ =>
+        public void Initialize() => CurrentOpenPopup.OnDisableAsObservable().Subscribe(_ =>
         {
-            Debug.Log(ZString.Format("{0} is closed", CurrentOpenPopup));
-            openedPopupList.Remove(CurrentOpenPopup);
-        }).RegisterTo(destroyCancellationToken);
+            if (openedPopupList.Remove(CurrentOpenPopup)) Debug.Log(ZString.Format("{0} is closed", CurrentOpenPopup));
+            Debug.LogWarning(ZString.Format("{0} is not opened", CurrentOpenPopup));
+        });
 
         public void OpenPopup<T>(T context) where T : PopupContext
         {
@@ -28,23 +29,23 @@ namespace Intense.UI
             switch (context)
             {
                 case CommonPopupContext commonPopupContext:
-                    popupBase = Instantiate(Resources.Load<PopupBase>(ZString.Format(path, typeof(CommonPopup).Name)));
+                    popupBase = UnityEngine.Object.Instantiate(Resources.Load<PopupBase>(ZString.Format(path, typeof(CommonPopup).Name)));
                     (popupBase as CommonPopup).Open(commonPopupContext);
                     break;
                 case WebViewPopupContext webViewPopupContext:
-                    popupBase = Instantiate(Resources.Load<PopupBase>(ZString.Format(path, typeof(WebViewPopup).Name)));
+                    popupBase = UnityEngine.Object.Instantiate(Resources.Load<PopupBase>(ZString.Format(path, typeof(WebViewPopup).Name)));
                     (popupBase as WebViewPopup).Open(webViewPopupContext);
                     break;
                 case MenuPopupContext menuPopupContext:
-                    popupBase = Instantiate(Resources.Load<PopupBase>(ZString.Format(path, typeof(MenuPopup).Name)));
+                    popupBase = UnityEngine.Object.Instantiate(Resources.Load<PopupBase>(ZString.Format(path, typeof(MenuPopup).Name)));
                     (popupBase as MenuPopup).Open(menuPopupContext);
                     break;
                 case ConfigPopupContext configPopupContext:
-                    popupBase = Instantiate(Resources.Load<PopupBase>(ZString.Format(path, typeof(ConfigPopup).Name)));
+                    popupBase = UnityEngine.Object.Instantiate(Resources.Load<PopupBase>(ZString.Format(path, typeof(ConfigPopup).Name)));
                     (popupBase as ConfigPopup).Open(configPopupContext);
                     break;
                 case DownloadSizeConfPopupContext downloadSizeConfPopupContext:
-                    popupBase = Instantiate(Resources.Load<PopupBase>(ZString.Format(path, typeof(DownloadSizeConfPopup).Name)));
+                    popupBase = UnityEngine.Object.Instantiate(Resources.Load<PopupBase>(ZString.Format(path, typeof(DownloadSizeConfPopup).Name)));
                     (popupBase as DownloadSizeConfPopup).Open(downloadSizeConfPopupContext);
                     break;
                 default:

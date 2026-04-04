@@ -4,8 +4,7 @@ using UnityEngine;
 
 namespace Intense.UI
 {
-    [DisallowMultipleComponent]
-    [RequireComponent(typeof(TextMeshProUGUI))]
+    [DisallowMultipleComponent, RequireComponent(typeof(TextMeshProUGUI))]
     public class TextMeshProUGUIEx : MonoBehaviour
     {
         [RequiredField, SerializeField] protected TextMeshProUGUI text;

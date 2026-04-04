@@ -19,7 +19,6 @@ namespace Song
             songIntroView.Show(songInfo);
             songInfoCanvas.alpha = 1f;
 
-            await SceneManager.Instance.FadeInAsync();
             await songInfoCanvas.DOFade(0f, 2f).SetDelay(5f).WithCancellation(destroyCancellationToken);
             songInfoCanvas.gameObject.SetActive(false);
             await UniTask.NextFrame();

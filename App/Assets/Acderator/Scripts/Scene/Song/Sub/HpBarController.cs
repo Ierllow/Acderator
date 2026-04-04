@@ -4,11 +4,14 @@ using Intense;
 using Intense.Master;
 using System;
 using UnityEngine;
+using Zenject;
 
 namespace Song
 {
     public class HpBarController
     {
+        [Inject] private MasterDataManager masterDataManager;
+
         private int currentHpNum;
         private decimal currentHpPercent;
         private int baseHp;
@@ -19,7 +22,7 @@ namespace Song
 
         public const int MAX_HP_PERCENT = 100;
 
-        public void Init(int sid) => baseHp = MasterDataManager.Instance.MemoryDatabase.SongMasterTable.FindBySid(sid).Hp;
+        public void Init(int sid) => baseHp = masterDataManager.MemoryDatabase.SongMasterTable.FindBySid(sid).Hp;
 
         public void UpdateHp(EJudgementType judgmentType, int noteCount)
         {
@@ -27,7 +30,7 @@ namespace Song
             if (currentHpNum >= baseHp) return;
             if (currentHpPercent >= MAX_HP_PERCENT) return;
 
-            var rate = MasterDataManager.Instance.MemoryDatabase.SongHpRateMasterTable.FindByType(judgmentType.GetLength()).Rate;
+            var rate = masterDataManager.MemoryDatabase.SongHpRateMasterTable.FindByType(judgmentType.GetLength()).Rate;
             currentHpNum += judgmentType switch
             {
                 EJudgementType.Perfect or EJudgementType.Great or EJudgementType.Good => Mathf.FloorToInt(rate / noteCount),

@@ -2,22 +2,27 @@
 using Cysharp.Threading.Tasks.Linq;
 using Intense.Master;
 using System.Collections.Generic;
+using Zenject;
 using ZLinq;
 
 namespace SongSelect
 {
-    public class SongSelectCellListController
+    public class SongSelectCellListController : IInitializable
     {
+        [Inject] private MasterDataManager masterDataManager;
+
         public int SelectedGroup { get; private set; } = PlayerPrefsValues.SDG;
         public int SelectedDifficulty { get; private set; } = PlayerPrefsValues.SDD;
-        public List<int> SongGroupList { get; private set; } = MasterDataManager.Instance.MemoryDatabase.SongMasterTable.Select(x => x.Group).Distinct().ToList();
+        public List<int> SongGroupList { get; private set; }
 
         public IUniTaskAsyncEnumerable<SongSelectCell> EverySelectedCellChangedAsAsyncEnumerable => UniTaskAsyncEnumerable.EveryValueChanged(this, x => x.selectedCell).Queue().Where(x => x != null);
-        public int SelectedCellListSid => MasterDataManager.Instance.MemoryDatabase.SongMasterTable.First(x => x.Group == SelectedGroup && x.Difficulty == SelectedDifficulty).Sid;
+        public int SelectedCellListSid => masterDataManager.MemoryDatabase.SongMasterTable.First(x => x.Group == SelectedGroup && x.Difficulty == SelectedDifficulty).Sid;
 
         public int IndexOf => SongGroupList.IndexOf(SelectedGroup);
 
         private SongSelectCell selectedCell;
+
+        public void Initialize() => SongGroupList = masterDataManager.MemoryDatabase.SongMasterTable.Select(x => x.Group).Distinct().ToList();
 
         public void UpdateSelectedCell(SongSelectCell selectedCell) => this.selectedCell = selectedCell;
 

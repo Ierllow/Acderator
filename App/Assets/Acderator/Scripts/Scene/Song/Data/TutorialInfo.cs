@@ -1,7 +1,5 @@
 ﻿using Intense.Master;
 using System.Collections.Generic;
-using System.Linq;
-using ZLinq;
 
 namespace Song
 {
@@ -10,10 +8,10 @@ namespace Song
         public TutorialMaster MTutorial { get; }
         public List<TutorialStepMaster> MTutorialStepList { get; }
 
-        public TutorialInfo(int tid)
+        public TutorialInfo(TutorialMaster mTutorial, List<TutorialStepMaster> mTutorialStepList)
         {
-            MTutorial = MasterDataManager.Instance.MemoryDatabase.TutorialMasterTable.FindByTid(tid);
-            MTutorialStepList = MasterDataManager.Instance.MemoryDatabase.TutorialStepMasterTable.All.AsValueEnumerable().ToList();
+            MTutorial = mTutorial;
+            MTutorialStepList = mTutorialStepList;
         }
     }
 }

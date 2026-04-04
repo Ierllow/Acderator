@@ -14,6 +14,6 @@ namespace Song
         public float Start_offset => mSong?.Start_offset ?? 0f;
         public int Bg => mSong?.Bg ?? 0;
 
-        public SongInfo(int sid) => mSong = MasterDataManager.Instance.MemoryDatabase.SongMasterTable.FindBySid(sid);
+        public SongInfo(SongMaster mSong) => this.mSong = mSong;
     }
 }

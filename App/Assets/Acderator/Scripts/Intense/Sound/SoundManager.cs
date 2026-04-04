@@ -6,6 +6,7 @@ using Intense.Master;
 using System;
 using System.Threading;
 using UnityEngine;
+using Zenject;
 
 namespace Intense
 {
@@ -13,27 +14,22 @@ namespace Intense
     public enum EBgmType { Stop = -1, None, Title, GameResult, GameResultFailed }
     public enum ESeType { Tap, Flick }
 
-    public class SoundManager : SingletonMonoBehaviour<SoundManager>
+    public class SoundManager : IInitializable
     {
-        public CriAtomExPlayer BgmExPlayer { get; private set; }
-        public CriAtomExPlayer SongExPlayer { get; private set; }
-        public CriAtomExPlayer SongPreviewExPlayer { get; private set; }
-        public CriAtomExPlayer SeExPlayer { get; private set; }
+        [Inject] private AssetBundleManager assetBundleManager;
+        [Inject] private MasterDataManager masterDataManager;
 
-        public bool IsInit { get; private set; } = false;
+        public CriAtomExPlayer BgmExPlayer { get; init; }
+        public CriAtomExPlayer SongExPlayer { get; init; }
+        public CriAtomExPlayer SongPreviewExPlayer { get; init; }
+        public CriAtomExPlayer SeExPlayer { get; init; }
 
-        protected override void OnDestroy()
+        public SoundManager()
         {
-            StopBgm();
-            BgmExPlayer?.Dispose();
-            StopSong();
-            SongExPlayer?.Dispose();
-            StopSongPreview();
-            SongPreviewExPlayer?.Dispose();
-            StopSe();
-            SeExPlayer?.Dispose();
-
-            base.OnDestroy();
+            BgmExPlayer = new CriAtomExPlayer();
+            SongExPlayer = new CriAtomExPlayer();
+            SongPreviewExPlayer = new CriAtomExPlayer();
+            SeExPlayer = new CriAtomExPlayer();
         }
 
         public void UpdateSounds(EBgmType bgmType)
@@ -72,23 +68,11 @@ namespace Intense
             SongPreviewExPlayer?.UpdateAll();
         }
 
-        public async UniTask InitializeAsync()
+        public void Initialize()
         {
-            if (IsInit) return;
-
-            CriAtomEx.UnregisterAcf();
-
-            BgmExPlayer ??= new CriAtomExPlayer();
-            SongExPlayer ??= new CriAtomExPlayer();
-            SongPreviewExPlayer ??= new CriAtomExPlayer();
-            SeExPlayer ??= new CriAtomExPlayer();
-
             UpdateBgmVolume(PlayerPrefsValues.BV, PlayerPrefsValues.BM);
             UpdateSeVolume(PlayerPrefsValues.SV, PlayerPrefsValues.SM);
             UpdateSongVolume(PlayerPrefsValues.SGV, PlayerPrefsValues.SOM);
-
-            IsInit = true;
-            await UniTask.WaitUntil(() => IsInit);
         }
 
         public async UniTask<CriAtomCueSheet> AddCueSheetAsync(string name, TextAsset asset)
@@ -102,7 +86,7 @@ namespace Intense
         public async UniTask<CriAtomCueSheet> GetOrAddCueSheetAsync(string name, string sheetPath)
         {
             var sheet = CriAtom.GetCueSheet(name);
-            var asset = await AssetBundleManager.Instance.GetLoadedObjectAsync(sheetPath) as TextAsset;
+            var asset = await assetBundleManager.GetLoadedObjectAsync(sheetPath) as TextAsset;
             sheet ??= await AddCueSheetAsync(name, asset);
             if (sheet == default)
             {
@@ -112,86 +96,66 @@ namespace Intense
             return sheet;
         }
 
-        public void PlaySe(ESeType type)
+        public void PlaySe(ESeType type) => UniTask.Void(async () =>
         {
-            if (!IsInit) return;
+            var mSoundCueName = masterDataManager.MemoryDatabase.SoundSheetNameMasterTable.First(x => x.Category == ESoundCategory.Se.GetLength() && x.Id == (int)type);
+            var sheet = await GetOrAddCueSheetAsync(mSoundCueName.SheetName, "sounds/song/songse");
 
-            UniTask.Void(async () =>
-            {
-                var mSoundCueName = MasterDataManager.Instance.MemoryDatabase.SoundSheetNameMasterTable.First(x => x.Category == ESoundCategory.Se.GetLength() && x.Id == (int)type);
-                var sheet = await GetOrAddCueSheetAsync(mSoundCueName.SheetName, "sounds/song/songse");
+            StopSe();
+            SeExPlayer.SetCue(sheet.acb, mSoundCueName.CueName);
+            SeExPlayer.Loop(false);
+            SeExPlayer.Start();
+        });
 
-                StopSe();
-                SeExPlayer.SetCue(sheet.acb, mSoundCueName.CueName);
-                SeExPlayer.Loop(false);
-                SeExPlayer.Start();
-            });
-        }
-
-        public void PlayBgm(EBgmType type, bool isLoop = true)
+        public void PlayBgm(EBgmType type, bool isLoop = true) => UniTask.Void(async () =>
         {
-            if (!IsInit) return;
+            var mSoundCueName = masterDataManager.MemoryDatabase.SoundSheetNameMasterTable.First(x => x.Category == ESoundCategory.Bgm.GetLength() && x.Id == (int)type);
+            var sheet = await GetOrAddCueSheetAsync(mSoundCueName.SheetName, "sounds/bgm/bgm");
 
-            UniTask.Void(async () =>
-            {
-                var mSoundCueName = MasterDataManager.Instance.MemoryDatabase.SoundSheetNameMasterTable.First(x => x.Category == ESoundCategory.Bgm.GetLength() && x.Id == (int)type);
-                var sheet = await GetOrAddCueSheetAsync(mSoundCueName.SheetName, "sounds/bgm/bgm");
+            StopBgm();
+            BgmExPlayer.SetCue(sheet.acb, mSoundCueName.CueName);
+            BgmExPlayer.Loop(isLoop);
+            BgmExPlayer.Start();
+        });
 
-                StopBgm();
-                BgmExPlayer.SetCue(sheet.acb, mSoundCueName.CueName);
-                BgmExPlayer.Loop(isLoop);
-                BgmExPlayer.Start();
-            });
-        }
-
-        public void PlaySong(int id)
+        public void PlaySong(int id) => UniTask.Void(async () =>
         {
-            if (!IsInit) return;
+            var mSoundCueName = masterDataManager.MemoryDatabase.SoundSheetNameMasterTable.First(x => x.Category == ESoundCategory.Song.GetLength());
+            var sheet = await GetOrAddCueSheetAsync(mSoundCueName.SheetName, ZString.Format("sounds/song/song_{0}", id));
 
-            UniTask.Void(async () =>
-            {
-                var mSoundCueName = MasterDataManager.Instance.MemoryDatabase.SoundSheetNameMasterTable.First(x => x.Category == ESoundCategory.Song.GetLength());
-                var sheet = await GetOrAddCueSheetAsync(mSoundCueName.SheetName, ZString.Format("sounds/song/song_{0}", id));
+            StopSong();
+            SongExPlayer.SetCue(sheet.acb, id.ToString());
+            SongExPlayer.Loop(false);
+            SongExPlayer.Start();
+        });
 
-                StopSong();
-                SongExPlayer.SetCue(sheet.acb, id.ToString());
-                SongExPlayer.Loop(false);
-                SongExPlayer.Start();
-            });
-        }
-
-        public void PlaySongPreview(int id, CancellationToken token = default)
+        public void PlaySongPreview(int id, CancellationToken token = default) => UniTask.Void(async () =>
         {
-            if (!IsInit) return;
+            var mSoundCueName = masterDataManager.MemoryDatabase.SoundSheetNameMasterTable.First(x => x.Category == ESoundCategory.Song.GetLength());
+            var sheet = await GetOrAddCueSheetAsync(mSoundCueName.SheetName, ZString.Format("sounds/song/song_{0}", id));
 
-            UniTask.Void(async () =>
+            SongPreviewExPlayer.AttachFader();
+            SongPreviewExPlayer.SetFadeInTime(3000);
+            SongPreviewExPlayer.SetFadeOutTime(3000);
+            SongPreviewExPlayer.SetCue(sheet.acb, id.ToString());
+            SongPreviewExPlayer.SetStartTime(masterDataManager.MemoryDatabase.SongSelectMasterTable.FindByGroup(id).StartSongTime);
+            SongPreviewExPlayer.Start();
+            var songSelectMaster = masterDataManager.MemoryDatabase.SongSelectMasterTable.FindByGroup(id);
+            try
             {
-                var mSoundCueName = MasterDataManager.Instance.MemoryDatabase.SoundSheetNameMasterTable.First(x => x.Category == ESoundCategory.Song.GetLength());
-                var sheet = await GetOrAddCueSheetAsync(mSoundCueName.SheetName, ZString.Format("sounds/song/song_{0}", id));
-
-                SongPreviewExPlayer.AttachFader();
-                SongPreviewExPlayer.SetFadeInTime(3000);
-                SongPreviewExPlayer.SetFadeOutTime(3000);
-                SongPreviewExPlayer.SetCue(sheet.acb, id.ToString());
-                SongPreviewExPlayer.SetStartTime(MasterDataManager.Instance.MemoryDatabase.SongSelectMasterTable.FindByGroup(id).StartSongTime);
-                SongPreviewExPlayer.Start();
-                var songSelectMaster = MasterDataManager.Instance.MemoryDatabase.SongSelectMasterTable.FindByGroup(id);
-                try
+                while (!token.IsCancellationRequested)
                 {
-                    while (!token.IsCancellationRequested)
-                    {
-                        await UniTask.WaitUntil(() => SongPreviewExPlayer.GetTime() > songSelectMaster.StartSongTime + songSelectMaster.SongTime, cancellationToken: token);
-                        await UniTask.WaitWhile(() => SongPreviewExPlayer.IsFading(), cancellationToken: token);
-                        SongPreviewExPlayer.SetFadeInStartOffset(6000);
-                        SongPreviewExPlayer.Start();
-                    }
+                    await UniTask.WaitUntil(() => SongPreviewExPlayer.GetTime() > songSelectMaster.StartSongTime + songSelectMaster.SongTime, cancellationToken: token);
+                    await UniTask.WaitWhile(() => SongPreviewExPlayer.IsFading(), cancellationToken: token);
+                    SongPreviewExPlayer.SetFadeInStartOffset(6000);
+                    SongPreviewExPlayer.Start();
                 }
-                catch (OperationCanceledException)
-                {
-                    SongPreviewExPlayer.Stop(true);
-                }
-            });
-        }
+            }
+            catch (OperationCanceledException)
+            {
+                SongPreviewExPlayer.Stop(true);
+            }
+        });
 
         public void PauseSong(bool isPause) => SongExPlayer?.Pause(isPause);
 

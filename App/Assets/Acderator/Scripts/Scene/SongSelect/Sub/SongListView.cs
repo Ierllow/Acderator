@@ -15,6 +15,7 @@ namespace SongSelect
 
         [Inject] private SongSelectCellListController songSelectCellListController;
         [Inject] private SongSelectSortController songSelectSortController;
+        [Inject] private MasterDataManager masterDataManager;
 
         public int SelectedGroup => songSelectCellListController.SelectedGroup;
         public int SelectedDifficulty => songSelectCellListController.SelectedDifficulty;
@@ -53,7 +54,7 @@ namespace SongSelect
         {
             var cellView = scroller.GetCellView(cellPrefab) as SongSelectCell;
             var group = songSelectCellListController.SongGroupList[dataIndex];
-            cellView.Setup(MasterDataManager.Instance.MemoryDatabase.SongMasterTable.FindByGroup(group), songSelectCellListController.ChangeSelectedCell);
+            cellView.Setup(masterDataManager.MemoryDatabase.SongMasterTable.FindByGroup(group), songSelectCellListController.ChangeSelectedCell);
             return cellView;
         }
 

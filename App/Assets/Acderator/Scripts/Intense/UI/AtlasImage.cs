@@ -4,11 +4,14 @@ using Intense.Asset;
 using UnityEngine;
 using UnityEngine.U2D;
 using UnityEngine.UI;
+using Zenject;
 
 namespace Intense.UI
 {
     public class AtlasImage : Image
     {
+        [Inject] private AssetBundleManager assetBundleManager;
+
         [SerializeField] protected SpriteAtlas m_Atlas;
         [SerializeField] protected string m_SpriteName;
 
@@ -27,7 +30,7 @@ namespace Intense.UI
                 return;
             }
 
-            var obj = await AssetBundleManager.Instance.GetLoadedObjectAsync(atlasName);
+            var obj = await assetBundleManager.GetLoadedObjectAsync(atlasName);
             if (obj is SpriteAtlas atlasSprite)
             {
                 m_Atlas = atlasSprite;

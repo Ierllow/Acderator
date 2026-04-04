@@ -35,7 +35,7 @@ namespace Song
             var noteType = fingerInfo.NoteBase.NoteData.NoteType.EnumEquals(ENoteType.Flick);
             if (fingerInfo.IsMissed)
             {
-                notesManager.TryRemoveNote(fingerInfo.NoteBase);
+                notesManager.RemoveNote(fingerInfo.NoteBase);
                 comboController.UpdateCombo(fingerInfo.JudgmentType);
                 judgmentCounter.AddJudgmentCount(fingerInfo.JudgmentType, (fingerInfo.MissInfo?.missLongNote ?? false) ? 2 : 1);
                 scoreController.AddScore(fingerInfo.JudgmentType);
@@ -47,7 +47,7 @@ namespace Song
                 judgmentCounter.AddJudgmentCount(fingerInfo.JudgmentType, 1);
                 scoreController.AddScore(fingerInfo.JudgmentType);
                 if (fingerInfo.NoteBase.NoteData.NoteType.EnumEquals(ENoteType.Long) && fingerInfo.FingerType.EnumEquals(EFingerType.Down)) return;
-                notesManager.TryRemoveNote(fingerInfo.NoteBase);
+                notesManager.RemoveNote(fingerInfo.NoteBase);
             }
             if (notesManager.SongOption.IsAuto) hpBarController.UpdateHp(fingerInfo.JudgmentType, notesManager.LoadedChartInfo.NoteCount);
         }

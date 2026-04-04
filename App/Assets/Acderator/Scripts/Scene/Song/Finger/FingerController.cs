@@ -25,6 +25,7 @@ namespace Song
         [SerializeField] private bool ignoreStartedOverGui = true;
 
         [Inject] private NotesManager notesManager;
+        [Inject] private MasterDataManager masterDataManager;
 
         private readonly Plane touchPlane = new();
         private float dist;
@@ -64,7 +65,7 @@ namespace Song
                     var diff = GetNoteDiffSec(EFingerType.Down, note.NoteData);
                     if (diff < 0.5f)
                     {
-                        var judgementType = diff.GetJudgmentType();
+                        var judgementType = diff.GetJudgmentType(masterDataManager);
                         note.OnJudgedNote(EFingerType.Down, judgementType);
                         fingerInfo = new FingerInfo
                         {
@@ -101,7 +102,7 @@ namespace Song
                 && note.IsTapping
                 && (note.NoteData.NoteType.EnumEquals(ENoteType.Long) || note.NoteData.NoteType.EnumEquals(ENoteType.Curve)))
             {
-                var judgementType = GetNoteDiffSec(EFingerType.Up, note.NoteData).GetJudgmentType();
+                var judgementType = GetNoteDiffSec(EFingerType.Up, note.NoteData).GetJudgmentType(masterDataManager);
                 judgementType = !judgementType.EnumEquals(EJudgementType.None) ? judgementType : EJudgementType.Miss;
 
                 note.OnJudgedNote(EFingerType.Up, judgementType);
@@ -132,7 +133,7 @@ namespace Song
 
             if (notesManager.TryGetNote(EFingerType.Up, lane, out var note))
             {
-                var judgementType = GetNoteDiffSec(EFingerType.Up, note.NoteData).GetJudgmentType();
+                var judgementType = GetNoteDiffSec(EFingerType.Up, note.NoteData).GetJudgmentType(masterDataManager);
                 judgementType = !judgementType.EnumEquals(EJudgementType.None) ? judgementType : EJudgementType.Miss;
 
                 note.OnJudgedNote(EFingerType.Up, judgementType);
@@ -154,7 +155,7 @@ namespace Song
             if (!notesManager.TryGetFlickNote(lane, out var note)) return;
 
             var diff = GetNoteDiffSec(EFingerType.Up, note.NoteData);
-            var judgementType = diff.GetJudgmentType();
+            var judgementType = diff.GetJudgmentType(masterDataManager);
             judgementType = !judgementType.EnumEquals(EJudgementType.None) ? judgementType : EJudgementType.Miss;
 
             note.OnJudgedNote(EFingerType.Up, judgementType);

@@ -8,7 +8,7 @@ using UnityEngine.UI;
 
 namespace Intense.UI
 {
-    public class Loading : SingletonMonoBehaviour<Loading>
+    public class Loading : MonoBehaviour
     {
         [SerializeField] private TextMeshProUGUI loadingText;
         [SerializeField] private GameObject loadingRoot;

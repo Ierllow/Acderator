@@ -1,16 +1,10 @@
-﻿using Cysharp.Threading.Tasks;
-using Intense.Api;
-using Intense.Master;
-using Intense.UI;
-using System;
+﻿using Intense.Master;
 using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.Networking;
 using ZLinq;
 
 namespace Intense.Data
 {
-    internal class ScoreManager : SingletonMonoBehaviour<ScoreManager>
+    internal class ScoreManager
     {
         public bool IsInit { get; private set; }
 
@@ -44,33 +38,6 @@ namespace Intense.Data
             }
         }
 
-        public async UniTask<bool> RequestUpdateScoreAsync(string sessionId, int score)
-        {
-            var request = new ScoreSubmitRequest();
-            request.PostData.Add("session_id", sessionId);
-            request.PostData.Add("sid", score);
-            var response = await NetworkManager.Instance.RequestAsync(request);
-            return response.Status == 200;
-        }
-
         public int GetScore(int sid) => ScoreDataList.AsValueEnumerable().FirstOrDefault(x => x.Sid == sid)?.ScoreNum ?? 0;
-
-#if UNITY_EDITOR
-        public async UniTask<string> RequestChart(string url)
-        {
-            Loading.Instance.ShowLoading();
-            // TODO
-            var baseUrl = Application.platform.EnumEquals(RuntimePlatform.IPhonePlayer) ? "iOS_Japanese" : "Android_Japanese";
-            using var www = UnityWebRequest.Get(baseUrl + url);
-            await www.SendWebRequest();
-            if (!string.IsNullOrEmpty(www.error))
-            {
-                Debug.LogError("www Error:" + www.error);
-                return "";
-            }
-            Loading.Instance.HideLoading();
-            return www.downloadHandler.text;
-        }
-#endif
     }
 }

@@ -3,6 +3,7 @@ using Intense;
 using Intense.UI;
 using R3;
 using UnityEngine;
+using Zenject;
 
 namespace Element
 {
@@ -10,10 +11,13 @@ namespace Element
     {
         [SerializeField] private CommonButton menuButton;
 
+        [Inject] private PopupManager popupManager;
+        [Inject] private SceneManager sceneManager;
+
         private void Start()
         {
-            var context = new MenuPopupContext { NegativeCallback = async (sceneType) => await SceneManager.Instance.ChangeSceneAsync(sceneType) };
-            menuButton.OnTapButtonAsObservable.SubscribeLock(new(true), __ => PopupManager.Instance.OpenPopup(context)).RegisterTo(destroyCancellationToken);
+            var context = new MenuPopupContext { NegativeCallback = async (sceneType) => await sceneManager.ChangeSceneAsync(sceneType) };
+            menuButton.OnTapButtonAsObservable.SubscribeLock(new(true), __ => popupManager.OpenPopup(context)).RegisterTo(destroyCancellationToken);
         }
 
         public void SetHeaderActive(bool active) => gameObject.SetActive(active);

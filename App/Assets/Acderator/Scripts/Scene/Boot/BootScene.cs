@@ -11,7 +11,7 @@ namespace Boot
         private async UniTask Start()
         {
             await UniTask.WaitUntil(() => SplashScreen.isFinished, cancellationToken: destroyCancellationToken);
-            await SceneManager.Instance.ChangeSceneAsync(ESceneType.Title);
+            await sceneManager.ChangeSceneAsync(ESceneType.Title);
         }
 
         public override void OnCreateScene() { }

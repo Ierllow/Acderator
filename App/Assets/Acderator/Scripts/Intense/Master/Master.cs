@@ -48,7 +48,7 @@ namespace Intense.Master
         public int StartSongTime { get; set; }
         public int SongTime { get; set; }
 
-        public static SongSelectMaster From(Dictionary<string, object> masterDict) => new SongSelectMaster
+        public static SongSelectMaster From(Dictionary<string, object> masterDict) => new()
         {
             Group = masterDict.TryGetValue("group", out var group) ? int.Parse(group.ToString()) : 0,
             StartSongTime = masterDict.TryGetValue("start_song_time", out var startSongTime) ? int.Parse(startSongTime.ToString()) : 0,

@@ -1,50 +1,55 @@
 ﻿using Cysharp.Threading.Tasks;
 using Element.UI;
 using Intense.Asset;
+using System;
 
 namespace Intense.UI
 {
     public static class PopupContextFactory
     {
-        public static CommonPopupContext CreateAssetErrorPopupContext(AutoResetUniTaskCompletionSource<ECommonPopupTapKind> completionSource, EAssetBundleErrorKind kind, bool titleBake = false) => new()
-        {
-            Title = "エラー",
-            Text = kind.GetErrorMessage() + "\n 再度実行しますか。",
-            PositiveText = "リトライ",
-            NegativeText = "キャンセル",
-            PositiveCallback = () => completionSource.TrySetResult(ECommonPopupTapKind.Positive),
-            NegativeCallback = () =>
+        public static CommonPopupContext CreateAssetErrorPopupContext(
+            AutoResetUniTaskCompletionSource<ECommonPopupTapKind> completionSource,
+            EAssetBundleErrorKind kind,
+            Action<PopupContext> openPopup = null,
+            Func<UniTask> moveTitleScene = null) => new()
             {
-                if (titleBake)
+                Title = "エラー",
+                Text = kind.GetErrorMessage() + "\n 再度実行しますか。",
+                PositiveText = "リトライ",
+                NegativeText = "キャンセル",
+                PositiveCallback = () => completionSource.TrySetResult(ECommonPopupTapKind.Positive),
+                NegativeCallback = () =>
                 {
-                    PopupManager.Instance.OpenPopup(new CommonPopupContext
+                    if (moveTitleScene == null)
                     {
-                        Title = "確認",
-                        Text = "タイトルに戻ります。",
-                        NegativeText = "OK",
-                        NegativeCallback = async () =>
+                        openPopup(new CommonPopupContext
                         {
-                            completionSource.TrySetResult(ECommonPopupTapKind.Negative);
-                            await SceneManager.Instance.ChangeSceneAsync(ESceneType.Title);
-                        }
-                    });
-                    return;
+                            Title = "確認",
+                            Text = "タイトルに戻ります。",
+                            NegativeText = "OK",
+                            NegativeCallback = async () =>
+                            {
+                                completionSource.TrySetResult(ECommonPopupTapKind.Negative);
+                                await moveTitleScene();
+                            }
+                        });
+                        return;
+                    }
+                    completionSource.TrySetResult(ECommonPopupTapKind.Negative);
                 }
-                completionSource.TrySetResult(ECommonPopupTapKind.Negative);
-            }
-        };
+            };
 
         public static CommonPopupContext CreateNetworkErrorPopupContext(AutoResetUniTaskCompletionSource<ECommonPopupTapKind> completionSource, string error, int errorCode) => new()
         {
             Title = "エラー",
-            Text = error + "\n エラーコード:" + "" + errorCode.ToString(),
+            Text = error + "\n エラーコード:" + errorCode,
             PositiveText = "リトライ",
             NegativeText = "閉じる",
             PositiveCallback = () => completionSource.TrySetResult(ECommonPopupTapKind.Positive),
             NegativeCallback = () => completionSource.TrySetResult(ECommonPopupTapKind.Negative)
         };
 
-        public static CommonPopupContext CreateErrorPopupContext(AutoResetUniTaskCompletionSource completionSource) => new()
+        public static CommonPopupContext CreateErrorPopupContext(AutoResetUniTaskCompletionSource completionSource, Func<UniTask> moveTitleScene) => new()
         {
             Title = "エラー",
             Text = "予期せぬエラーが発生しました。\n タイトルに戻ります。",
@@ -52,9 +57,11 @@ namespace Intense.UI
             NegativeCallback = async () =>
             {
                 completionSource.TrySetResult();
-                await SceneManager.Instance.ChangeSceneAsync(ESceneType.Title);
+                await moveTitleScene();
             },
             ButtonType = EButtonType.Close,
         };
+
+        public static DownloadSizeConfPopupContext CreateDownloadSizeConfirmPopupContext(double fileSize, string size) => new() { FileSize = fileSize, Size = size };
     }
 }

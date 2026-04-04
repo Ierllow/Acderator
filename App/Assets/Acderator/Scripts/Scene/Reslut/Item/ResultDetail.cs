@@ -6,6 +6,7 @@ using Intense.UI;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using Zenject;
 
 namespace Result
 {
@@ -23,10 +24,8 @@ namespace Result
         [SerializeField] private TextMeshProUGUI badNum;
         [SerializeField] private TextMeshProUGUI missNum;
 
-        public void Setup(ResultInfo resultInfo)
+        public void Setup(SongMaster mSong, ResultInfo resultInfo)
         {
-            var mSong = MasterDataManager.Instance.MemoryDatabase.SongMasterTable.FindBySid(resultInfo.Sid);
-
             jacket.SetAtlasFormat("{0}", mSong.Group, "song/jacket");
             songName.SetText(mSong.Name);
             composer.SetText(mSong.Composer);

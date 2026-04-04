@@ -74,7 +74,7 @@ internal static class PlayerPrefsValues
 
     public static void Set<T>(EKey key, T value)
     {
-        if (typeof(T) == typeof(T)) PlayerPrefs.SetInt(PlayerPrefsDict[key], Convert.ToInt32(value));
+        if (typeof(T) == typeof(int)) PlayerPrefs.SetInt(PlayerPrefsDict[key], Convert.ToInt32(value));
         else if (typeof(T) == typeof(string)) PlayerPrefs.SetString(PlayerPrefsDict[key], Convert.ToString(value));
         else if (typeof(T) == typeof(float)) PlayerPrefs.SetFloat(PlayerPrefsDict[key], Convert.ToSingle(value));
         return;

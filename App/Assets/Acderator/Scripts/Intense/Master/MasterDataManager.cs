@@ -3,24 +3,20 @@ using Master;
 using MessagePack.Resolvers;
 using System.Collections.Generic;
 using ZLinq;
+using UnityEngine;
+using Zenject;
 
 namespace Intense.Master
 {
-    internal class MasterDataManager : SingletonMonoBehaviour<MasterDataManager>
+    internal class MasterDataManager : IInitializable
     {
-        public bool IsInit { get; private set; } = false;
+        public MemoryDatabase MemoryDatabase { get; private set; }
 
-        internal MemoryDatabase MemoryDatabase { get; private set; }
-
-        protected override void Awake()
-        {
-            if (IsInit) return;
-            CompositeResolver.RegisterAndSetAsDefault(new[] { MasterMemoryResolver.Instance, GeneratedResolver.Instance, StandardResolver.Instance });
-            base.Awake();
-        }
+        public void Initialize() => CompositeResolver.RegisterAndSetAsDefault(new[] { MasterMemoryResolver.Instance, GeneratedResolver.Instance, StandardResolver.Instance });
 
         public async UniTask LoadMasterAsync(Dictionary<string, object> masterDict)
         {
+            var completionSource = AutoResetUniTaskCompletionSource.Create();
             var builder = new DatabaseBuilder();
             builder.Append(masterDict.TryGetValue("version", out var version) ? (version as Dictionary<string, object>).AsValueEnumerable().Select(x => VersionMaster.From((Dictionary<string, object>)x.Value)).ToList() : default);
             builder.Append(masterDict.TryGetValue("title_masters", out var titleMasters) ? (titleMasters as Dictionary<string, object>).AsValueEnumerable().Select(x => TitleMaster.From((Dictionary<string, object>)x.Value)).ToList() : default);
@@ -32,9 +28,9 @@ namespace Intense.Master
             builder.Append(masterDict.TryGetValue("result_masters", out var resultMasters) ? (resultMasters as Dictionary<string, object>).AsValueEnumerable().Select(x => ResultMaster.From((Dictionary<string, object>)x.Value)).ToList() : default);
             builder.Append(masterDict.TryGetValue("sound_sheet_name_masters", out var soundSheetNameMasters) ? (soundSheetNameMasters as Dictionary<string, object>).AsValueEnumerable().Select(x => SoundSheetNameMaster.From((Dictionary<string, object>)x.Value)).ToList() : default);
             MemoryDatabase = new(builder.Build());
+            completionSource.TrySetResult();
 
-            IsInit = true;
-            await UniTask.WaitUntil(() => IsInit);
+            await completionSource.Task;
         }
     }
 }

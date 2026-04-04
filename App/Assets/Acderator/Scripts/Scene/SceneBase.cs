@@ -6,6 +6,7 @@ using Intense.UI;
 using R3;
 using R3.Triggers;
 using UnityEngine;
+using Zenject;
 
 #region SceneContext
 public abstract class SceneContext
@@ -20,8 +21,11 @@ public abstract class SceneContext
 [SceneType(ESceneType.None)]
 public abstract class SceneBase : MonoBehaviour
 {
+    [Inject] protected SceneManager sceneManager;
+    [Inject] protected PopupManager popupManager;
+
     #region MonoBehaviour Handlers
-    protected virtual void Awake() => SceneManager.Instance.SetSceneBase(this);
+    protected virtual void Awake() => sceneManager.SetSceneBase(this);
     protected virtual void Start()
     {
         this.OnAtlasRequestedAsObservable().Subscribe().RegisterTo(destroyCancellationToken);
@@ -32,6 +36,12 @@ public abstract class SceneBase : MonoBehaviour
     #region SceneBase Handlers
     public abstract void OnCreateScene();
     public virtual void OnDeleteScene() => Destroy(gameObject);
-    protected virtual async UniTask OnErrorScene() => await PopupUtils.OpenErrorPopup();
+    protected virtual async UniTask OnErrorScene()
+    {
+        var completionSource = AutoResetUniTaskCompletionSource.Create();
+        var context = PopupContextFactory.CreateErrorPopupContext(completionSource, () => sceneManager.ChangeSceneAsync(ESceneType.Title));
+        popupManager.OpenPopup(context);
+        await completionSource.Task;
+    }
     #endregion
 }

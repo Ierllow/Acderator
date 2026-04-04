@@ -5,6 +5,7 @@ using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Zenject;
 
 namespace Element.UI
 {
@@ -22,6 +23,8 @@ namespace Element.UI
         [SerializeField] private Slider offsetSlider;
         [SerializeField] private Slider BgmSlider;
         [SerializeField] private Slider SeSlider;
+
+        [Inject] private SoundManager soundManager;
 
         private void Start()
         {
@@ -56,13 +59,13 @@ namespace Element.UI
                 case ConfigType.Bgm:
                     PlayerPrefsValues.Set(EKey.BgmVolume, BgmSlider.value);
                     PlayerPrefsValues.Set(EKey.BgmMute, BgmSlider.value == 0 ? 1 : 0);
-                    SoundManager.Instance.UpdateBgmVolume(BgmSlider.value, BgmSlider.value == 0);
-                    SoundManager.Instance.UpdateSongVolume(SeSlider.value, SeSlider.value == 0);
+                    soundManager.UpdateBgmVolume(BgmSlider.value, BgmSlider.value == 0);
+                    soundManager.UpdateSongVolume(SeSlider.value, SeSlider.value == 0);
                     BgmNum.SetTextFormat("{0}%", Math.Round(BgmSlider.value * 100));
                     break;
                 case ConfigType.Se:
                     PlayerPrefsValues.Set(EKey.SongVolume, SeSlider.value);
-                    SoundManager.Instance.UpdateSeVolume(BgmSlider.value, SeSlider.value == 0);
+                    soundManager.UpdateSeVolume(BgmSlider.value, SeSlider.value == 0);
                     SeNum.SetTextFormat("{0}%", Math.Round(SeSlider.value * 100));
                     break;
                 default:

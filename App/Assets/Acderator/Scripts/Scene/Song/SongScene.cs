@@ -1,8 +1,8 @@
 ﻿using Cysharp.Threading.Tasks;
 using Intense;
+using Intense.Api;
 using Intense.Asset;
 using Intense.Attribute;
-using Intense.Data;
 using Intense.UI;
 using System;
 using UnityEngine;
@@ -25,6 +25,9 @@ namespace Song
         [Inject] private NoteFactory noteFactory;
         [Inject] private SongControllerResolver songControllerResolver;
         [Inject] private SongSceneContext sceneContext;
+        [Inject] private AssetBundleManager assetBundleManager;
+        [Inject] private SoundManager soundManager;
+        [Inject] private NetworkManager networkManager;
 
         protected override void Awake()
         {
@@ -48,10 +51,10 @@ namespace Song
         {
             if (!sceneContext.IsRestart)
             {
-                sceneContext.SongBundlePathList.ForEach(AssetBundleManager.Instance.AddLoadAssets);
-                await AssetBundleManager.Instance.LoadAssetsAsync(destroyCancellationToken).AddWatcherTo(failFastExceptionWatcher);
+                sceneContext.SongBundlePathList.ForEach(assetBundleManager.AddLoadAssets);
+                await assetBundleManager.LoadAssetsAsync(sceneManager.CurrentSceneType, destroyCancellationToken).AddWatcherTo(failFastExceptionWatcher);
             }
-            await (sceneContext.IsRestart ? SceneManager.Instance.FadeInAsync().AddWatcherTo(failFastExceptionWatcher) : backTelopLayerController.ShowSongIntro(sceneContext.SongInfo));
+            await (sceneContext.IsRestart ? sceneManager.FadeInAsync().AddWatcherTo(failFastExceptionWatcher) : UniTask.WhenAll(backTelopLayerController.ShowSongIntro(sceneContext.SongInfo)), sceneManager.FadeInAsync());
             songLayerController.Show(sceneContext.IsAuto);
             await notesLineController.Show().AddWatcherTo(failFastExceptionWatcher);
             backTelopLayerController.SetBackgroundImage(sceneContext.SongInfo.Bg);
@@ -61,6 +64,7 @@ namespace Song
         protected override async UniTask OnErrorScene()
         {
             songControllerResolver.Loop.UpdateState(ESongState.Stop);
+            if (!sceneManager.IsFadeIn) await sceneManager.FadeInAsync();
             await songPopupLayerController.DetectedError(new AlertError());
         }
 
@@ -79,7 +83,7 @@ namespace Song
         private async UniTask OnReadySong()
         {
             var loadedChartInfo = new LoadedChartInfo();
-            var chart = await AssetBundleManager.Instance.GetLoadedObjectAsync(sceneContext.SongChartBundlePath).AddWatcherTo(failFastExceptionWatcher);
+            var chart = await assetBundleManager.GetLoadedObjectAsync(sceneContext.SongChartBundlePath).AddWatcherTo(failFastExceptionWatcher);
             if (chart is TextAsset textAsset)
             {
                 await new ChartLoader().LoadChart(textAsset.text, loadedChartInfo).AddWatcherTo(failFastExceptionWatcher);
@@ -100,18 +104,18 @@ namespace Song
 
         private void OnPlayingSong()
         {
-            if (SoundManager.Instance.SongExPlayer.GetTime().ToSeconds() > 0)
+            if (soundManager.SongExPlayer.GetTime().ToSeconds() > 0)
             {
-                SoundManager.Instance.PauseSong(false);
+                soundManager.PauseSong(false);
                 songControllerResolver.Finger?.TrySetUseTouch(!sceneContext.IsAuto);
                 return;
             }
-            SoundManager.Instance.PlaySong(sceneContext.SongInfo.Group);
+            soundManager.PlaySong(sceneContext.SongInfo.Group);
         }
 
         private void OnStopSong()
         {
-            SoundManager.Instance.PauseSong(true);
+            soundManager.PauseSong(true);
             songControllerResolver.Finger?.TrySetUseTouch(false);
         }
 
@@ -120,7 +124,7 @@ namespace Song
             songLayerController.SetPauseButtonGrayOut(true);
             songControllerResolver.Finger?.TrySetUseTouch(false);
 
-            var changeScene = UniTask.Defer(async () => SceneManager.Instance.ChangeSceneAsync(ESceneType.Result, sceneContext.ToResultSceneContext(songLayerController.CurrentScore, songLayerController.JudgeCountDict)));
+            var changeScene = UniTask.Defer(async () => sceneManager.ChangeSceneAsync(ESceneType.Result, sceneContext.ToResultSceneContext(songLayerController.CurrentScore, songLayerController.JudgeCountDict)));
             var scoreSaveError = UniTask.Defer(async () => await songPopupLayerController.DetectedError(new ScoreSaveError()));
 
             if (sceneContext.IsAuto)
@@ -138,7 +142,7 @@ namespace Song
             var noteCount = notesManager.LoadedChartInfo.NoteCount;
             await frontTelopLayerController.ShowResult(songLayerController.GetSongResult(noteCount));
 
-            var isSaved = await ScoreManager.Instance.RequestUpdateScoreAsync(sceneContext.SessionId, currentScore);
+            var isSaved = await RequestUpdateScoreAsync(sceneContext.SessionId, currentScore);
             if (!isSaved)
             {
                 await scoreSaveError;
@@ -149,7 +153,7 @@ namespace Song
 
         private void UpdateSongProgressNext()
         {
-            songControllerResolver.Loop.Tick();
+            songControllerResolver.Loop.Tick(soundManager.SongExPlayer.GetTime().ToSeconds());
             songControllerResolver.TutorialState?.ChangeState(songControllerResolver.Loop.SongStateEnumEquals(ESongState.Playing));
             songControllerResolver.TutorialState?.Tick();
             if (songControllerResolver.TutorialState?.IsCompleted ?? false) songControllerResolver.Loop.UpdateState(ESongState.End);
@@ -161,10 +165,10 @@ namespace Song
             {
                 case EPopupTapKind.Restart:
                     sceneContext.Refresh(true);
-                    await SceneManager.Instance.ChangeSceneAsync(ESceneType.Song, sceneContext, true);
+                    await sceneManager.ChangeSceneAsync(ESceneType.Song, sceneContext, true);
                     break;
                 case EPopupTapKind.Quit:
-                    await SceneManager.Instance.ChangeSceneAsync(ESceneType.SongSelect, new SongSelect.SongSelectSceneContext());
+                    await sceneManager.ChangeSceneAsync(ESceneType.SongSelect, new SongSelect.SongSelectSceneContext());
                     break;
                 case EPopupTapKind.Resume:
                     await frontTelopLayerController.CountDownStart();
@@ -188,7 +192,7 @@ namespace Song
                 frontTelopLayerController.ShowMissMask();
                 return;
             }
-            SoundManager.Instance.PlaySe(fingerInfo.IsFlick ? ESeType.Flick : ESeType.Tap);
+            soundManager.PlaySe(fingerInfo.IsFlick ? ESeType.Flick : ESeType.Tap);
         }
 
         private void OnSongLoopNext(float sec)
@@ -198,7 +202,16 @@ namespace Song
             songControllerResolver.Spawner.UpdateSpawn(sec);
             songControllerResolver.Optimizer.UpdatePositionNotes((x) => songControllerResolver.Auto?.NotifyFinger(x));
             songControllerResolver.Auto?.OnAutoFinger();
-            if (SoundManager.Instance.SongExPlayer.IsPlayEnd()) songControllerResolver.Loop.UpdateState(ESongState.End);
+            if (soundManager.SongExPlayer.IsPlayEnd()) songControllerResolver.Loop.UpdateState(ESongState.End);
+        }
+
+        private async UniTask<bool> RequestUpdateScoreAsync(string sessionId, int score)
+        {
+            var request = new ScoreSubmitRequest();
+            request.PostData.Add("session_id", sessionId);
+            request.PostData.Add("sid", score);
+            var response = await networkManager.RequestAsync(request);
+            return response.Status == 200;
         }
     }
 }

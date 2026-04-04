@@ -20,12 +20,15 @@ namespace Intense
 {
     public enum ESceneType { None, Boot, Title, SongSelect, Song, Result }
 
-    public class SceneManager : SingletonMonoBehaviour<SceneManager>
+    public class SceneManager : MonoBehaviour
     {
         [SerializeField] private Image fadeMask;
         [SerializeField] private Header header;
 
         [Inject] private ZenjectSceneLoader zenjectSceneLoader;
+        [Inject] private AssetBundleManager assetBundleManager;
+        [Inject] private SoundManager soundManager;
+        [Inject] private Loading loading;
 
         public ESceneType CurrentSceneType => sceneBaseDict.Count > 0 ? sceneBaseDict.AsValueEnumerable().LastOrDefault().Key : default;
         public bool IsFadeIn { get; private set; } = false;
@@ -38,13 +41,13 @@ namespace Intense
             {
                 IsFadeIn = true;
                 header.SetHeaderActive(CurrentSceneType.EnumEquals(ESceneType.SongSelect));
-                Loading.Instance.HideLoading();
+                loading.HideLoading();
             }
             else if (a == 1.0f)
             {
                 IsFadeIn = false;
                 header.SetHeaderActive(false);
-                Loading.Instance.ShowLoading();
+                loading.ShowLoading();
             }
         });
 
@@ -70,7 +73,7 @@ namespace Intense
 
                 if (!sameScene)
                 {
-                    await AssetBundleManager.Instance.UnloadAssetsAsync(sceneBaseDict.AsValueEnumerable().Select(x => x.Key).ToList());
+                    await assetBundleManager.UnloadAssetsAsync(sceneBaseDict.AsValueEnumerable().Select(x => x.Key).ToList());
                     await Resources.UnloadUnusedAssets();
                 }
 
@@ -79,7 +82,7 @@ namespace Intense
                 await zenjectSceneLoader.LoadSceneAsync(sceneType.ToString(), extraBindings: container => container.Bind<SceneContext>().FromInstance(context).AsSingle()).ToUniTask();
                 sceneBaseDict.GetValueOrDefault(sceneType)?.OnCreateScene();
                 Application.targetFrameRate = context.FrameRate;
-                SoundManager.Instance.UpdateSounds(context.BgmType);
+                soundManager.UpdateSounds(context.BgmType);
                 await UniTask.Yield();
                 return;
             }
@@ -88,10 +91,10 @@ namespace Intense
 
         public async UniTask ChangeSceneAdditiveAsync(ESceneType sceneType, SceneContext context = default)
         {
-            Loading.Instance.ShowLoading();
+            loading.ShowLoading();
             if (sceneBaseDict.ContainsKey(sceneType))
             {
-                Loading.Instance.HideLoading();
+                loading.HideLoading();
                 return;
             }
             await zenjectSceneLoader.LoadSceneAsync(sceneType.ToString(), LoadSceneMode.Additive, container => container.Bind<SceneContext>().FromInstance(context).AsSingle()).ToUniTask();
