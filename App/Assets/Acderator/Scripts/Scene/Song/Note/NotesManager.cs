@@ -90,11 +90,10 @@ namespace Song
 
         public void UpdateNoteSpeed()
         {
-            while (currentSpeedChangeIndex < NoteSpeedChangeList.AsValueEnumerable().Count() && CurrentBeat >= NoteSpeedChangeList.AsValueEnumerable().ElementAt(currentSpeedChangeIndex).Beat)
+            while (currentSpeedChangeIndex < NoteSpeedChangeList.AsValueEnumerable().Count() && CurrentBeat >= NoteSpeedChangeList[currentSpeedChangeIndex].Beat)
             {
-                var speedChange = NoteSpeedChangeList.AsValueEnumerable().ElementAt(currentSpeedChangeIndex);
                 var diffNoteSpeed = SongOption.NoteSpeed - MIN_NOTES_SPEED;
-                CurrentNoteSpeed = (float)speedChange.Speed + diffNoteSpeed;
+                CurrentNoteSpeed = (float)NoteSpeedChangeList[currentSpeedChangeIndex].Speed + diffNoteSpeed;
                 currentSpeedChangeIndex++;
             }
         }

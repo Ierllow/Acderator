@@ -8,9 +8,9 @@ namespace Intense.Master
     public static class MasterDataExtensions
     {
         public static ValueEnumerable<Where<FromEnumerable<TElement>, TElement>, TElement> Where<TElement>(this TableBase<TElement> source, Func<TElement, bool> predicate) => source.All.AsValueEnumerable().Where(predicate);
-        public static TElement First<TElement>(this TableBase<TElement> source) => source.All.AsValueEnumerable().First();
+        public static TElement First<TElement>(this TableBase<TElement> source) => source.All[0];
         public static TElement First<TElement>(this TableBase<TElement> source, Func<TElement, bool> predicate) => source.All.AsValueEnumerable().First(predicate);
-        public static TElement Last<TElement>(this TableBase<TElement> source) => source.All.AsValueEnumerable().Last();
+        public static TElement Last<TElement>(this TableBase<TElement> source) => source.All[^1];
         public static TElement Last<TElement>(this TableBase<TElement> source, Func<TElement, bool> predicate) => source.All.AsValueEnumerable().Last(predicate);
         public static TElement FirstOrDefault<TElement>(this TableBase<TElement> source) => source.All.AsValueEnumerable().FirstOrDefault();
         public static TElement FirstOrDefault<TElement>(this TableBase<TElement> source, Func<TElement, bool> predicate) => source.All.AsValueEnumerable().FirstOrDefault(predicate);

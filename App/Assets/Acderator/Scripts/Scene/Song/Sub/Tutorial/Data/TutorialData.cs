@@ -13,7 +13,7 @@ namespace Song
         public bool IsCompleted { get; set; }
 
         public int CompletedCount { get; set; }
-        public int TotalCount => StepList.AsValueEnumerable().Count();
+        public int TotalCount => StepList.Count;
 
         public TutorialStepMaster GetCurrentStep() => StepList.AsValueEnumerable().ElementAtOrDefault(CurrentStepIndex);
 

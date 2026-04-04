@@ -164,7 +164,7 @@ namespace Song
                 if (objNum == "00") continue;
 
                 var beat = CalculateBeat(parsedLine.MeasureNumber, i, countObj);
-                var objNumFirst = objNum.AsValueEnumerable().ElementAt(0);
+                var objNumFirst = objNum[0];
                 switch (parsedLine.DataType)
                 {
                     case ChartDataType.SingleNote when objNumFirst == '1':

@@ -31,7 +31,7 @@ namespace SongSelect
             atlas.SetAtlasFormat("{0}", group, "song/jacket");
             foreach (var (toggle, index) in toggles.AsValueEnumerable().Select((x, i) => (x, i)))
             {
-                toggle.SetToggleText(mSongList.AsValueEnumerable().ElementAt(index).Difficulty.ToString());
+                toggle.SetToggleText(mSongList[index].Difficulty.ToString());
                 toggle.Toggle.isOn = toggle.name == selectedDifficulty.ToString();
             }
             UpdateInfo(selectedDifficulty);

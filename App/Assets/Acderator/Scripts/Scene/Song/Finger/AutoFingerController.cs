@@ -15,9 +15,9 @@ namespace Song
         public void OnAutoFinger()
         {
             var aliveNotesList = notesManager.AliveNoteList;
-            for (var i = aliveNotesList.Count - 1; i >= 0; i--)
+            for (var i = 0; i < aliveNotesList.Count; i++)
             {
-                var note = aliveNotesList.AsValueEnumerable().ElementAt(i);
+                var note = aliveNotesList[i];
                 if (!note || !note.IsActive) continue;
 
                 if (IsJustNoteTiming(note, EFingerType.Down))

@@ -69,9 +69,7 @@ namespace Intense.Asset
 
                     var downloadedFileSize = 0L;
                     var allLoadedAssetBundle = AssetBundle.GetAllLoadedAssetBundles();
-                    var loadedSet = new HashSet<string>(allLoadedAssetBundle.AsValueEnumerable().Count());
-                    foreach (var b in allLoadedAssetBundle) loadedSet.Add(b.name);
-
+                    var loadedSet = allLoadedAssetBundle.AsValueEnumerable().Select(x => x.name).ToHashSet();
                     foreach (var bundleName in targetList)
                     {
                         if (!manifestInfoDict.TryGetValue(bundleName, out var info)) continue;
@@ -116,13 +114,9 @@ namespace Intense.Asset
         internal async UniTask<UnityEngine.Object> GetLoadedObjectAsync(string bundleName, string assetName = null)
         {
             var bundle = assetBundleDict.GetValueOrDefault(bundleName)?.Bundle;
-            if (bundle == null) return null;
-            var request = bundle.LoadAssetAsync(assetName ?? bundle.GetAllAssetNames()[0]);
-            await request;
-            return request.asset;
+            var request = bundle?.LoadAssetAsync(assetName ?? bundle.GetAllAssetNames()[0]);
+            return await request != null ? request.asset : default;
         }
-
-        public void ClearCache() => Caching.ClearCache();
     }
 
     static class FileSizeExtensions

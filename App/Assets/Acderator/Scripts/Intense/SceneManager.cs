@@ -27,7 +27,7 @@ namespace Intense
 
         [Inject] private ZenjectSceneLoader zenjectSceneLoader;
 
-        public ESceneType CurrentSceneType => sceneBaseDict.AsValueEnumerable().Count() > 0 ? sceneBaseDict.AsValueEnumerable().LastOrDefault().Key : default;
+        public ESceneType CurrentSceneType => sceneBaseDict.Count > 0 ? sceneBaseDict.AsValueEnumerable().LastOrDefault().Key : default;
         public bool IsFadeIn { get; private set; } = false;
 
         private readonly Dictionary<ESceneType, SceneBase> sceneBaseDict = new();

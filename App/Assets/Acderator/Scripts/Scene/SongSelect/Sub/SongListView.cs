@@ -52,7 +52,7 @@ namespace SongSelect
         public EnhancedScrollerCellView GetCellView(EnhancedScroller _, int dataIndex, int __)
         {
             var cellView = scroller.GetCellView(cellPrefab) as SongSelectCell;
-            var group = songSelectCellListController.SongGroupList.AsValueEnumerable().ElementAt(dataIndex);
+            var group = songSelectCellListController.SongGroupList[dataIndex];
             cellView.Setup(MasterDataManager.Instance.MemoryDatabase.SongMasterTable.FindByGroup(group), songSelectCellListController.ChangeSelectedCell);
             return cellView;
         }
