@@ -10,6 +10,8 @@ namespace SongSelect
 {
     public class SongListView : MonoBehaviour, IEnhancedScrollerDelegate
     {
+
+        [Inject] private MasterDataManager masterDataManager;
         [SerializeField] private EnhancedScroller scroller;
         [SerializeField] private EnhancedScrollerCellView cellPrefab;
 
@@ -53,7 +55,7 @@ namespace SongSelect
         {
             var cellView = scroller.GetCellView(cellPrefab) as SongSelectCell;
             var group = songSelectCellListController.SongGroupList.AsValueEnumerable().ElementAt(dataIndex);
-            cellView.Setup(MasterDataManager.Instance.MemoryDatabase.SongMasterTable.FindByGroup(group), songSelectCellListController.ChangeSelectedCell);
+            cellView.Setup(masterDataManager.MemoryDatabase.SongMasterTable.FindByGroup(group), songSelectCellListController.ChangeSelectedCell);
             return cellView;
         }
 

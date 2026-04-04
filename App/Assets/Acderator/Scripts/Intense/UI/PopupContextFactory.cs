@@ -1,11 +1,14 @@
 ﻿using Cysharp.Threading.Tasks;
 using Element.UI;
 using Intense.Asset;
+using Zenject;
 
 namespace Intense.UI
 {
     public static class PopupContextFactory
     {
+        [Inject] private static PopupManager popupManager;
+        [Inject] private static SceneManager sceneManager;
         public static CommonPopupContext CreateAssetErrorPopupContext(AutoResetUniTaskCompletionSource<ECommonPopupTapKind> completionSource, EAssetBundleErrorKind kind, bool titleBake = false) => new()
         {
             Title = "エラー",
@@ -17,7 +20,7 @@ namespace Intense.UI
             {
                 if (titleBake)
                 {
-                    PopupManager.Instance.OpenPopup(new CommonPopupContext
+                    popupManager.OpenPopup(new CommonPopupContext
                     {
                         Title = "確認",
                         Text = "タイトルに戻ります。",
@@ -25,7 +28,7 @@ namespace Intense.UI
                         NegativeCallback = async () =>
                         {
                             completionSource.TrySetResult(ECommonPopupTapKind.Negative);
-                            await SceneManager.Instance.ChangeSceneAsync(ESceneType.Title);
+                            await sceneManager.ChangeSceneAsync(ESceneType.Title);
                         }
                     });
                     return;
@@ -52,7 +55,7 @@ namespace Intense.UI
             NegativeCallback = async () =>
             {
                 completionSource.TrySetResult();
-                await SceneManager.Instance.ChangeSceneAsync(ESceneType.Title);
+                await sceneManager.ChangeSceneAsync(ESceneType.Title);
             },
             ButtonType = EButtonType.Close,
         };

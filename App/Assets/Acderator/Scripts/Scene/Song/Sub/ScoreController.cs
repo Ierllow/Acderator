@@ -7,11 +7,14 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using ZLinq;
+using Zenject;
 
 namespace Song
 {
     public class ScoreController
     {
+
+        [Inject] private MasterDataManager masterDataManager;
         public float CurrentScore { get; private set; } = 0f;
 
         public IUniTaskAsyncEnumerable<float> EveryUpdateScoreAsAsyncEnumerable => UniTaskAsyncEnumerable.EveryValueChanged(this, x => x.CurrentScore).Queue();
@@ -23,7 +26,7 @@ namespace Song
         public void Init(int sid, int noteCount)
         {
             this.noteCount = noteCount;
-            maxScore = MasterDataManager.Instance.MemoryDatabase.SongMasterTable.FindBySid(sid).Score;
+            maxScore = masterDataManager.MemoryDatabase.SongMasterTable.FindBySid(sid).Score;
             var perNoteScore = maxScore / noteCount;
             var remainder = maxScore % noteCount;
             ValueEnumerable.Repeat(0, noteCount).Select(i => perNoteScore + (i < remainder ? 1 : 0)).ToList().ForEach(scoreQueue.Enqueue);
@@ -38,7 +41,7 @@ namespace Song
                 default:
                     if (scoreQueue.TryDequeue(out var baseScore))
                     {
-                        var rate = MasterDataManager.Instance.MemoryDatabase.SongScoreRateMasterTable.First(x => x.Type == judgmentType.GetLength()).Rate;
+                        var rate = masterDataManager.MemoryDatabase.SongScoreRateMasterTable.First(x => x.Type == judgmentType.GetLength()).Rate;
                         CurrentScore += Mathf.RoundToInt(baseScore * rate);
                         if (CurrentScore == maxScore) CurrentScore += noteCount;
                     }

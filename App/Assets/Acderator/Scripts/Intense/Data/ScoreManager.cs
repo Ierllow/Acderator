@@ -6,12 +6,16 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
+using Zenject;
 using ZLinq;
 
 namespace Intense.Data
 {
-    internal class ScoreManager : SingletonMonoBehaviour<ScoreManager>
+    internal class ScoreManager : MonoBehaviour
     {
+        [Inject] private NetworkManager networkManager;
+        [Inject] private Loading loading;
+
         public bool IsInit { get; private set; }
 
         public List<ScoreData> ScoreDataList { get; private set; } = new();
@@ -49,7 +53,7 @@ namespace Intense.Data
             var request = new ScoreSubmitRequest();
             request.PostData.Add("session_id", sessionId);
             request.PostData.Add("sid", score);
-            var response = await NetworkManager.Instance.RequestAsync(request);
+            var response = await networkManager.RequestAsync(request);
             return response.Status == 200;
         }
 
@@ -58,7 +62,7 @@ namespace Intense.Data
 #if UNITY_EDITOR
         public async UniTask<string> RequestChart(string url)
         {
-            Loading.Instance.ShowLoading();
+            loading.ShowLoading();
             // TODO
             var baseUrl = Application.platform.EnumEquals(RuntimePlatform.IPhonePlayer) ? "iOS_Japanese" : "Android_Japanese";
             using var www = UnityWebRequest.Get(baseUrl + url);
@@ -68,7 +72,7 @@ namespace Intense.Data
                 Debug.LogError("www Error:" + www.error);
                 return "";
             }
-            Loading.Instance.HideLoading();
+            loading.HideLoading();
             return www.downloadHandler.text;
         }
 #endif

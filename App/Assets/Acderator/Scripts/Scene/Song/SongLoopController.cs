@@ -11,6 +11,7 @@ namespace Song
     public class SongLoopController : IController
     {
         [Inject] private FrameRateController frameRateController;
+        [Inject] private SoundManager soundManager;
 
         private ESongState cachedSongState;
         private float offset;
@@ -34,7 +35,7 @@ namespace Song
         {
             if (SongStateEnumEquals(ESongState.None, ESongState.Stop)) PauseTime += Time.deltaTime;
 
-            var sec = SoundManager.Instance.SongExPlayer.GetTime().ToSeconds();
+            var sec = soundManager.SongExPlayer.GetTime().ToSeconds();
             var elapsedSec = Time.timeSinceLevelLoad - PauseTime - offset;
             SongLoopUpdateSubject.OnNext(sec <= 0 ? elapsedSec : sec);
         }

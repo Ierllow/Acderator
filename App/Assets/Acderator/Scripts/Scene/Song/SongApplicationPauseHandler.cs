@@ -1,13 +1,16 @@
 using Intense;
+using Zenject;
 
 namespace Song
 {
     public sealed class SongApplicationPauseHandler
     {
+
+        [Inject] private SoundManager soundManager;
         private readonly SongControllerResolver songControllerResolver;
         private readonly NotesManager notesManager;
 
-        private bool CanPause => !SoundManager.Instance.SongExPlayer.IsPlayEnd() && notesManager.AliveNoteList.Count != 0;
+        private bool CanPause => !soundManager.SongExPlayer.IsPlayEnd() && notesManager.AliveNoteList.Count != 0;
 
         public SongApplicationPauseHandler(SongControllerResolver songControllerResolver, NotesManager notesManager)
         {

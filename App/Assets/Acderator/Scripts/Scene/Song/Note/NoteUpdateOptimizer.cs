@@ -8,6 +8,8 @@ namespace Song
 {
     public class NoteUpdateOptimizer : IController
     {
+
+        [Inject] private MasterDataManager masterDataManager;
         [Inject] private NotesManager notesManager;
 
         public void UpdatePositionNotes(Action<FingerInfo> notifyFinger)
@@ -31,7 +33,7 @@ namespace Song
             if (!noteBase.NoteData.NoteType.EnumEquals(ENoteType.Long) &&
                 !noteBase.NoteData.NoteType.EnumEquals(ENoteType.Curve)) return;
 
-            var judgmentZone = MasterDataManager.Instance.MemoryDatabase.SongJudgeZoneMasterTable.FirstOrDefault(x => x.Type <= EJudgementType.Bad.GetLength()).Zone;
+            var judgmentZone = masterDataManager.MemoryDatabase.SongJudgeZoneMasterTable.FirstOrDefault(x => x.Type <= EJudgementType.Bad.GetLength()).Zone;
             var noteDuration = noteBase.NoteData.NoteType.EnumEquals(ENoteType.Curve) ? noteBase.NoteData.CurveDuration : noteBase.NoteData.SecEnd - noteBase.NoteData.SecBegin;
             var isMissLongNoteBegin = !noteBase.IsTapping && noteBase.NoteData.SecBegin - notesManager.CurrentSec < -judgmentZone;
             if (isMissLongNoteBegin)

@@ -6,11 +6,14 @@ using Intense.UI;
 using R3;
 using System;
 using UnityEngine;
+using Zenject;
 
 namespace Song
 {
     public class SongPopupLayerController : MonoBehaviour
     {
+
+        [Inject] private PopupManager popupManager;
         private enum EType { None, Pause, Error, ScoreError, ScoreData }
 
         [SerializeField] private PausePopup pausePopup;
@@ -66,7 +69,7 @@ namespace Song
             if (currentOpenPopupType.EnumEquals(EType.Error)) return;
 
             currentOpenPopupType = EType.Error;
-            if (!SceneManager.Instance.IsFadeIn) await SceneManager.Instance.FadeInAsync();
+            if (!sceneManager.IsFadeIn) await sceneManager.FadeInAsync();
             await PopupUtils.OpenErrorPopup();
         }
 
@@ -100,8 +103,8 @@ namespace Song
 
         private void Open(PopupContext popupContext)
         {
-            PopupManager.Instance.OpenPopup(popupContext);
-            PopupManager.Instance.CurrentOpenPopup.transform.SetParent(transform);
+            popupManager.OpenPopup(popupContext);
+            popupManager.CurrentOpenPopup.transform.SetParent(transform);
         }
     }
 }

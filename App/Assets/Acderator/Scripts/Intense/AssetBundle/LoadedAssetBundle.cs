@@ -4,7 +4,7 @@ namespace Intense.Asset
 {
     internal class LoadedAssetBundle
     {
-        internal ESceneType SceneType { get; } = SceneManager.Instance.CurrentSceneType;
+        internal ESceneType SceneType { get; init; }
         internal AssetBundle Bundle { get; init; }
     }
 }

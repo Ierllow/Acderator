@@ -6,11 +6,14 @@ using Intense.UI;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using Zenject;
 
 namespace Result
 {
     public class ResultDetail : MonoBehaviour
     {
+
+        [Inject] private MasterDataManager masterDataManager;
         [SerializeField] private AtlasImage jacket;
         [SerializeField] private AtlasImage rank;
         [SerializeField] private TextMeshProUGUI songName;
@@ -25,7 +28,7 @@ namespace Result
 
         public void Setup(ResultInfo resultInfo)
         {
-            var mSong = MasterDataManager.Instance.MemoryDatabase.SongMasterTable.FindBySid(resultInfo.Sid);
+            var mSong = masterDataManager.MemoryDatabase.SongMasterTable.FindBySid(resultInfo.Sid);
 
             jacket.SetAtlasFormat("{0}", mSong.Group, "song/jacket");
             songName.SetText(mSong.Name);

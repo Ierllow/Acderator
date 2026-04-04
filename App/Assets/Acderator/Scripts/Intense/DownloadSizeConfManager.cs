@@ -4,6 +4,7 @@ using Intense.Attribute;
 using Intense.UI;
 using System;
 using System.Reflection;
+using Zenject;
 
 namespace Intense
 {
@@ -14,8 +15,10 @@ namespace Intense
         [Text("GB")] Gb,
     }
 
-    public class DownloadSizeConfManager : SingletonMonoBehaviour<DownloadSizeConfManager>
+    public class DownloadSizeConfManager : MonoBehaviour
     {
+        [Inject] private PopupManager popupManager;
+
         public bool IsDownloadSizePopupNotRun { get; private set; }
         public bool IsProgressInactive { get; private set; }
 
@@ -24,8 +27,8 @@ namespace Intense
             var fileSize = GetFileSize(newFileSize);
             if (IsDownloadSizePopupNotRun && fileSize > 0)
             {
-                PopupManager.Instance.OpenPopup(new DownloadSizeConfPopupContext { FileSize = fileSize, Size = GetFileSizeType(newFileSize).GetType().GetCustomAttribute<TextAttribute>().Text });
-                var downloadSizeConfPopup = PopupManager.Instance.CurrentOpenPopup as DownloadSizeConfPopup;
+                popupManager.OpenPopup(new DownloadSizeConfPopupContext { FileSize = fileSize, Size = GetFileSizeType(newFileSize).GetType().GetCustomAttribute<TextAttribute>().Text });
+                var downloadSizeConfPopup = popupManager.CurrentOpenPopup as DownloadSizeConfPopup;
                 await UniTask.WaitUntil(() => downloadSizeConfPopup.IsClose);
                 return downloadSizeConfPopup.IsConfirm;
             }

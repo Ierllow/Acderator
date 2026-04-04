@@ -10,7 +10,7 @@ using ZLinq;
 
 namespace Intense.UI
 {
-    public class PopupManager : SingletonMonoBehaviour<PopupManager>
+    public class PopupManager : MonoBehaviour
     {
         private readonly List<PopupBase> openedPopupList = new();
         public PopupBase CurrentOpenPopup => openedPopupList.AsValueEnumerable().LastOrDefault();

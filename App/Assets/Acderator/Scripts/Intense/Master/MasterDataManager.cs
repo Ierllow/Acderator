@@ -3,20 +3,20 @@ using Master;
 using MessagePack.Resolvers;
 using System.Collections.Generic;
 using ZLinq;
+using UnityEngine;
 
 namespace Intense.Master
 {
-    internal class MasterDataManager : SingletonMonoBehaviour<MasterDataManager>
+    internal class MasterDataManager : MonoBehaviour
     {
         public bool IsInit { get; private set; } = false;
 
-        internal MemoryDatabase MemoryDatabase { get; private set; }
+        public MemoryDatabase MemoryDatabase { get; private set; }
 
-        protected override void Awake()
+        private void Awake()
         {
             if (IsInit) return;
             CompositeResolver.RegisterAndSetAsDefault(new[] { MasterMemoryResolver.Instance, GeneratedResolver.Instance, StandardResolver.Instance });
-            base.Awake();
         }
 
         public async UniTask LoadMasterAsync(Dictionary<string, object> masterDict)

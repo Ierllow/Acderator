@@ -4,11 +4,14 @@ using Intense.UI;
 using R3;
 using System;
 using UnityEngine;
+using Zenject;
 
 namespace Element.UI
 {
     public sealed class MenuPopupContext : PopupContext
     {
+
+        [Inject] private PopupManager popupManager;
         public new Action<ESceneType> NegativeCallback { get; init; }
     }
 
@@ -26,7 +29,7 @@ namespace Element.UI
 
         private void Start()
         {
-            configButton.OnTapButtonAsObservable.SubscribeLock(gate, _ => PopupManager.Instance.OpenPopup(new ConfigPopupContext())).RegisterTo(destroyCancellationToken);
+            configButton.OnTapButtonAsObservable.SubscribeLock(gate, _ => popupManager.OpenPopup(new ConfigPopupContext())).RegisterTo(destroyCancellationToken);
             deleteAccountButton.OnTapButtonAsObservable.SubscribeLock(gate, _ => TapDeleteAccountButton()).RegisterTo(destroyCancellationToken);
             licenseButton.OnTapButtonAsObservable.SubscribeLock(gate, _ => TapLicenseButton()).RegisterTo(destroyCancellationToken);
             titleSceneButton.OnTapButtonAsObservable.SubscribeLock(gate, _ => TapTitleSceneButton()).RegisterTo(destroyCancellationToken);
@@ -58,14 +61,14 @@ namespace Element.UI
                 },
                 ButtonType = EButtonType.Both,
             };
-            PopupManager.Instance.OpenPopup(context);
+            popupManager.OpenPopup(context);
         }
 
         private async void TapLicenseButton()
         {
             var title = "権利表記";
             var url = networkConfigObject.webViewServerUrl + "/lisence.html";
-            PopupManager.Instance.OpenPopup(new WebViewPopupContext { TitleText = title, Url = url });
+            popupManager.OpenPopup(new WebViewPopupContext { TitleText = title, Url = url });
         }
 
         private void TapTitleSceneButton()

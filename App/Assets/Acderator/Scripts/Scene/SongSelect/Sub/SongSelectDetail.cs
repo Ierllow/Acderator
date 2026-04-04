@@ -9,11 +9,15 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using ZLinq;
+using Zenject;
 
 namespace SongSelect
 {
     public class SongSelectDetail : MonoBehaviour
     {
+
+        [Inject] private MasterDataManager masterDataManager;
+        [Inject] private ScoreManager scoreManager;
         [SerializeField] private AtlasImage atlas;
         [SerializeField] private AtlasImage rank;
         [SerializeField] private TextMeshProUGUI hightScore;
@@ -27,7 +31,7 @@ namespace SongSelect
 
         public void SetData(int group, int selectedDifficulty)
         {
-            mSongList = MasterDataManager.Instance.MemoryDatabase.SongMasterTable.Where(x => x.Group == group).ToList();
+            mSongList = masterDataManager.MemoryDatabase.SongMasterTable.Where(x => x.Group == group).ToList();
             atlas.SetAtlasFormat("{0}", group, "song/jacket");
             foreach (var (toggle, index) in toggles.AsValueEnumerable().Select((x, i) => (x, i)))
             {
@@ -43,9 +47,9 @@ namespace SongSelect
 
             var sid = mSongList.AsValueEnumerable().First(x => x.Difficulty == selectedDifficulty).Sid;
 
-            var getScore = ScoreManager.Instance.GetScore(sid);
+            var getScore = scoreManager.GetScore(sid);
             hightScore.SetTextFormat("{0:D7}", getScore);
-            percent.SetTextFormat("{0:F1}{1}", ScoreUtils.ToScorePercent(sid), "%");
+            percent.SetTextFormat("{0:F1}{1}", ScoreUtils.ToScorePercent(sid, scoreManager, masterDataManager), "%");
             rank.SetAtlasFormat("icon_result_rank_{0}", (int)ScoreUtils.ToRank(getScore, true), "song/rank");
         }
     }

@@ -10,10 +10,10 @@ namespace Song
         public TutorialMaster MTutorial { get; }
         public List<TutorialStepMaster> MTutorialStepList { get; }
 
-        public TutorialInfo(int tid)
+        public TutorialInfo(int tid, MasterDataManager masterDataManager)
         {
-            MTutorial = MasterDataManager.Instance.MemoryDatabase.TutorialMasterTable.FindByTid(tid);
-            MTutorialStepList = MasterDataManager.Instance.MemoryDatabase.TutorialStepMasterTable.All.AsValueEnumerable().ToList();
+            MTutorial = masterDataManager.MemoryDatabase.TutorialMasterTable.FindByTid(tid);
+            MTutorialStepList = masterDataManager.MemoryDatabase.TutorialStepMasterTable.All.AsValueEnumerable().ToList();
         }
     }
 }

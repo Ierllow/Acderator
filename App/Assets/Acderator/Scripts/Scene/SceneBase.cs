@@ -6,6 +6,7 @@ using Intense.UI;
 using R3;
 using R3.Triggers;
 using UnityEngine;
+using Zenject;
 
 #region SceneContext
 public abstract class SceneContext
@@ -20,8 +21,10 @@ public abstract class SceneContext
 [SceneType(ESceneType.None)]
 public abstract class SceneBase : MonoBehaviour
 {
+    [Inject] protected SceneManager sceneManager;
+
     #region MonoBehaviour Handlers
-    protected virtual void Awake() => SceneManager.Instance.SetSceneBase(this);
+    protected virtual void Awake() => sceneManager.SetSceneBase(this);
     protected virtual void Start()
     {
         this.OnAtlasRequestedAsObservable().Subscribe().RegisterTo(destroyCancellationToken);
