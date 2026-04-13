@@ -1,13 +1,12 @@
-﻿using Intense.Master;
-using R3;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using ZLinq;
 
 namespace Song
 {
     public class NotesManager
     {
+        private enum NoteSearchMode { Down, Up, Flick }
+
         public float CurrentSec { get; private set; } = default;
         public float CurrentBeat { get; private set; } = default;
         public List<NoteBase> AliveNoteList { get; } = new();
@@ -16,10 +15,10 @@ namespace Song
         public SongOption SongOption { get; init; } = default;
         public float CurrentNoteSpeed { get; private set; } = default;
 
-        public const int MIN_NOTES_SPEED = 1;
-
         private int currentSpeedChangeIndex = 0;
         private readonly List<NoteBase>[] aliveNotesByLaneList = { new(), new(), new(), new(), };
+
+        public const int MIN_NOTES_SPEED = 1;
 
         public NotesManager(SongOption songOption)
         {
@@ -71,29 +70,46 @@ namespace Song
 
         public bool TryGetNote(EFingerType type, int lane, out NoteBase note)
         {
-            var laneNoteList = aliveNotesByLaneList[lane];
-            var aliveNotes = laneNoteList.AsValueEnumerable().Where(x => x != null && x.IsActive);
-            note = (type.EnumEquals(EFingerType.Down) ? aliveNotes.Where(x => !x.IsTapping) : aliveNotes.Where(x => x.IsTapping))
-                .OrderBy(x => Math.Abs(x.NoteData.BeatBegin - CurrentBeat))
-                .FirstOrDefault();
-
-            return note != null;
+            var mode = type.EnumEquals(EFingerType.Down) ? NoteSearchMode.Down : NoteSearchMode.Up;
+            return TryGetNearestNote(lane, mode, out note);
         }
 
-        public bool TryGetFlickNote(int lane, out NoteBase note)
-        {
-            note = aliveNotesByLaneList[lane]
-                .AsValueEnumerable()
-                .Where(x => x != null && x.IsActive && x.NoteData.NoteType.EnumEquals(ENoteType.Flick))
-                .OrderBy(x => Math.Abs(x.NoteData.BeatBegin - CurrentBeat))
-                .FirstOrDefault();
+        public bool TryGetFlickNote(int lane, out NoteBase note) => TryGetNearestNote(lane, NoteSearchMode.Flick, out note);
 
+        private bool TryGetNearestNote(int lane, NoteSearchMode mode, out NoteBase note)
+        {
+            var laneNoteList = aliveNotesByLaneList[lane];
+            var bestDiff = float.MaxValue;
+            var bestNote = default(NoteBase);
+
+            for (var i = 0; i < laneNoteList.Count; i++)
+            {
+                var candidate = laneNoteList[i];
+                if (candidate == null || !candidate.IsActive) continue;
+
+                switch (mode)
+                {
+                    case NoteSearchMode.Down when candidate.IsTapping:
+                    case NoteSearchMode.Up when !candidate.IsTapping:
+                        continue;
+                    case NoteSearchMode.Flick when !candidate.NoteData.NoteType.EnumEquals(ENoteType.Flick):
+                        continue;
+                }
+
+                var diff = Math.Abs(candidate.NoteData.BeatBegin - CurrentBeat);
+                if (diff >= bestDiff) continue;
+
+                bestDiff = diff;
+                bestNote = candidate;
+            }
+
+            note = bestNote;
             return note != null;
         }
 
         public void UpdateNoteSpeed()
         {
-            while (currentSpeedChangeIndex < NoteSpeedChangeList.AsValueEnumerable().Count() && CurrentBeat >= NoteSpeedChangeList[currentSpeedChangeIndex].Beat)
+            while (currentSpeedChangeIndex < NoteSpeedChangeList.Count && CurrentBeat >= NoteSpeedChangeList[currentSpeedChangeIndex].Beat)
             {
                 var diffNoteSpeed = SongOption.NoteSpeed - MIN_NOTES_SPEED;
                 CurrentNoteSpeed = (float)NoteSpeedChangeList[currentSpeedChangeIndex].Speed + diffNoteSpeed;

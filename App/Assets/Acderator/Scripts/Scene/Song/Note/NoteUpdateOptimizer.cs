@@ -2,48 +2,61 @@
 using Intense.Master;
 using System;
 using Zenject;
-using ZLinq;
 
 namespace Song
 {
     public class NoteUpdateOptimizer : IController
     {
-
         [Inject] private MasterDataManager masterDataManager;
         [Inject] private NotesManager notesManager;
+
+        private float? badJudgmentZone;
+
+        private float BadJudgmentZone => badJudgmentZone ??= masterDataManager.MemoryDatabase.SongJudgeZoneMasterTable.FirstOrDefault(x => x.Type <= EJudgementType.Bad.GetLength()).Zone;
 
         public void UpdatePositionNotes(Action<FingerInfo> notifyFinger)
         {
             var notes = notesManager.AliveNoteList;
+            var currentBeat = notesManager.CurrentBeat;
+            var currentSec = notesManager.CurrentSec;
+            var currentNoteSpeed = notesManager.CurrentNoteSpeed;
+
             for (var i = notes.Count - 1; i >= 0; i--)
             {
                 var note = notes[i];
                 if (!note || !note.IsActive) continue;
 
-                var positionBeginY = note.IsTapping ? 0.0f : (note.NoteData.BeatBegin - notesManager.CurrentBeat) * notesManager.CurrentNoteSpeed;
-                var positionEndY = (note.NoteData.BeatEnd - notesManager.CurrentBeat) * notesManager.CurrentNoteSpeed;
+                var noteData = note.NoteData;
+                var positionBeginY = note.IsTapping ? 0.0f : (noteData.BeatBegin - currentBeat) * currentNoteSpeed;
+                var positionEndY = (noteData.BeatEnd - currentBeat) * currentNoteSpeed;
 
-                note.MoveNote(positionBeginY, positionEndY, notesManager.CurrentNoteSpeed);
-                CheckMiss(note, notifyFinger);
+                note.MoveNote(positionBeginY, positionEndY, currentNoteSpeed);
+                CheckMiss(note, currentSec, notifyFinger);
             }
         }
 
-        private void CheckMiss(NoteBase noteBase, Action<FingerInfo> notifyFinger)
+        private void CheckMiss(NoteBase noteBase, float currentSec, Action<FingerInfo> notifyFinger)
         {
-            if (!noteBase.NoteData.NoteType.EnumEquals(ENoteType.Long) &&
-                !noteBase.NoteData.NoteType.EnumEquals(ENoteType.Curve)) return;
+            var noteType = noteBase.NoteData.NoteType;
+            var isLong = noteType.EnumEquals(ENoteType.Long);
+            var isCurve = noteType.EnumEquals(ENoteType.Curve);
+            if (!isLong && !isCurve) return;
 
-            var judgmentZone = masterDataManager.MemoryDatabase.SongJudgeZoneMasterTable.FirstOrDefault(x => x.Type <= EJudgementType.Bad.GetLength()).Zone;
-            var noteDuration = noteBase.NoteData.NoteType.EnumEquals(ENoteType.Curve) ? noteBase.NoteData.CurveDuration : noteBase.NoteData.SecEnd - noteBase.NoteData.SecBegin;
-            var isMissLongNoteBegin = !noteBase.IsTapping && noteBase.NoteData.SecBegin - notesManager.CurrentSec < -judgmentZone;
+            var judgmentZone = BadJudgmentZone;
+            var noteData = noteBase.NoteData;
+            var noteDuration = isCurve
+                ? noteData.CurveDuration
+                : noteData.SecEnd - noteData.SecBegin;
+
+            var isMissLongNoteBegin = !noteBase.IsTapping && noteData.SecBegin - currentSec < -judgmentZone;
             if (isMissLongNoteBegin)
             {
                 EmitMiss(noteBase, notifyFinger, missLongNote: true, missEnd: true);
                 return;
             }
 
-            var isMissNote = noteBase.NoteData.SecBegin - notesManager.CurrentSec < -judgmentZone;
-            var isMissLongNoteEnd = noteBase.IsTapping && noteBase.NoteData.SecBegin + noteDuration - notesManager.CurrentSec < -judgmentZone;
+            var isMissNote = noteData.SecBegin - currentSec < -judgmentZone;
+            var isMissLongNoteEnd = noteBase.IsTapping && noteData.SecBegin + noteDuration - currentSec < -judgmentZone;
             if (isMissNote || isMissLongNoteEnd)
             {
                 EmitMiss(noteBase, notifyFinger, missLongNote: true, missEnd: false);
@@ -54,7 +67,7 @@ namespace Song
         {
             if (notesManager.RemoveNote(noteBase)) noteBase.Final();
 
-            notifyFinger.Invoke(new()
+            notifyFinger.Invoke(new FingerInfo
             {
                 NoteBase = noteBase,
                 JudgmentType = notesManager.SongOption.IsAuto ? EJudgementType.Perfect : EJudgementType.Miss,

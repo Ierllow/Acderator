@@ -2,11 +2,8 @@
 using Cysharp.Threading.Tasks.Linq;
 using Intense;
 using Intense.Master;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
-using ZLinq;
 using Zenject;
 
 namespace Song
@@ -20,6 +17,8 @@ namespace Song
         public IUniTaskAsyncEnumerable<float> EveryUpdateScoreAsAsyncEnumerable => UniTaskAsyncEnumerable.EveryValueChanged(this, x => x.CurrentScore).Queue();
 
         private readonly Queue<int> scoreQueue = new();
+        private readonly Dictionary<EJudgementType, float> rateCacheDict = new();
+
         private int noteCount = 0;
         private int maxScore = 0;
 
@@ -27,26 +26,36 @@ namespace Song
         {
             this.noteCount = noteCount;
             maxScore = masterDataManager.MemoryDatabase.SongMasterTable.FindBySid(sid).Score;
+
+            foreach (var row in masterDataManager.MemoryDatabase.SongScoreRateMasterTable.All)
+            {
+                rateCacheDict[(EJudgementType)row.Type] = row.Rate;
+            }
+
             var perNoteScore = maxScore / noteCount;
             var remainder = maxScore % noteCount;
-            ValueEnumerable.Repeat(0, noteCount).Select(i => perNoteScore + (i < remainder ? 1 : 0)).ToList().ForEach(scoreQueue.Enqueue);
+
+            for (var i = 0; i < noteCount; i++)
+            {
+                scoreQueue.Enqueue(perNoteScore + (i < remainder ? 1 : 0));
+            }
         }
 
         public void AddScore(EJudgementType judgmentType)
         {
             switch (judgmentType)
             {
-                case EJudgementType.None or EJudgementType.Miss or EJudgementType.Bad:
-                    break;
-                default:
-                    if (scoreQueue.TryDequeue(out var baseScore))
-                    {
-                        var rate = masterDataManager.MemoryDatabase.SongScoreRateMasterTable.First(x => x.Type == judgmentType.GetLength()).Rate;
-                        CurrentScore += Mathf.RoundToInt(baseScore * rate);
-                        if (CurrentScore == maxScore) CurrentScore += noteCount;
-                    }
-                    break;
+                case EJudgementType.None:
+                case EJudgementType.Miss:
+                case EJudgementType.Bad:
+                    return;
             }
+
+            if (!scoreQueue.TryDequeue(out var baseScore)) return;
+            if (!rateCacheDict.TryGetValue(judgmentType, out var rate)) return;
+
+            CurrentScore += Mathf.RoundToInt(baseScore * rate);
+            if (CurrentScore == maxScore) CurrentScore += noteCount;
         }
     }
 }
