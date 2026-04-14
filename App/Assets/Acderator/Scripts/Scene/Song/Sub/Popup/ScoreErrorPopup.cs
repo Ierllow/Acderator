@@ -13,7 +13,7 @@ namespace Song
             errorText.SetText(type switch
             {
                 ELoadResult.Unknown => "譜面情報を取得出来ませんでした。",
-                ELoadResult.Unsupported or ELoadResult.Exception => "譜面情報の読み込みに失敗しました。",
+                ELoadResult.Unsupported or ELoadResult.Exception or ELoadResult.InvalidAsset => "譜面情報の読み込みに失敗しました。",
                 _ => "",
             });
             base.Open(closeCallback);

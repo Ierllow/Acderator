@@ -1,7 +1,6 @@
 ﻿using Cysharp.Threading.Tasks;
 using Intense;
 using Intense.Api;
-using Intense.Asset;
 using Intense.Attribute;
 using Intense.UI;
 using System;
@@ -25,9 +24,9 @@ namespace Song
         [Inject] private NoteFactory noteFactory;
         [Inject] private SongControllerResolver songControllerResolver;
         [Inject] private SongSceneContext sceneContext;
-        [Inject] private AssetBundleManager assetBundleManager;
         [Inject] private SoundManager soundManager;
         [Inject] private NetworkManager networkManager;
+        [Inject] private SongAssetLoader songAssetLoader;
 
         protected override void Awake()
         {
@@ -51,8 +50,7 @@ namespace Song
         {
             if (!sceneContext.IsRestart)
             {
-                sceneContext.SongBundlePathList.ForEach(assetBundleManager.AddLoadAssets);
-                await assetBundleManager.LoadAssetsAsync(sceneManager.CurrentSceneType, destroyCancellationToken).AddWatcherTo(failFastExceptionWatcher);
+                await songAssetLoader.LoadBundles(sceneManager.CurrentSceneType, destroyCancellationToken).AddWatcherTo(failFastExceptionWatcher);
             }
             await (sceneContext.IsRestart ? sceneManager.FadeInAsync().AddWatcherTo(failFastExceptionWatcher) : UniTask.WhenAll(backTelopLayerController.ShowSongIntro(sceneContext.SongInfo)), sceneManager.FadeInAsync());
             songLayerController.Show(sceneContext.IsAuto);
@@ -82,24 +80,20 @@ namespace Song
 
         private async UniTask OnReadySong()
         {
-            var loadedChartInfo = new LoadedChartInfo();
-            var chart = await assetBundleManager.GetLoadedObjectAsync(sceneContext.SongChartBundlePath).AddWatcherTo(failFastExceptionWatcher);
-            if (chart is TextAsset textAsset)
+            var loadResult = await songAssetLoader.LoadChart().AddWatcherTo(failFastExceptionWatcher);
+            if (loadResult.IsSuccess)
             {
-                await new ChartLoader().LoadChart(textAsset.text, loadedChartInfo).AddWatcherTo(failFastExceptionWatcher);
-                if (loadedChartInfo.LoadResult.EnumEquals(ELoadResult.None))
-                {
-                    notesManager.Init(loadedChartInfo);
-                    noteFactory.Init();
-                    var offset = notesManager.GetSpawnOffset(notesLineController.LaneLength);
-                    songControllerResolver.Loop.SetOffset(offset);
-                    songControllerResolver.Spawner.Init(loadedChartInfo.NoteDataList, offset);
-                    songLayerController.Init(sceneContext.SongInfo.Sid);
-                    await backTelopLayerController.FadeIn();
-                    return;
-                }
+                notesManager.Init(loadResult.ChartInfo);
+                noteFactory.Init();
+                var offset = notesManager.GetSpawnOffset(notesLineController.LaneLength);
+                songControllerResolver.Loop.SetOffset(offset);
+                songControllerResolver.Spawner.Init(loadResult.ChartInfo.NoteDataList, offset);
+                songLayerController.Init(sceneContext.SongInfo.Sid);
+                await backTelopLayerController.FadeIn();
+                return;
+
             }
-            await songPopupLayerController.DetectedError(new ScoreLoadError(loadedChartInfo.LoadResult));
+            await songPopupLayerController.DetectedError(new ScoreLoadError(loadResult.LoadResult));
         }
 
         private void OnPlayingSong()

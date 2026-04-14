@@ -30,6 +30,7 @@ namespace Song
             Container.If(songSceneContext.SongMode.EnumEquals(ESongMode.Tutorial)).BindInterfacesAndSelfTo<SongTutorialStateController>().AsSingle();
             Container.Bind<SongControllerCollection>().AsSingle().WithArguments(songSceneContext.TutorialData);
             Container.Bind<SongControllerResolver>().AsSingle();
+            Container.Bind<SongAssetLoader>().AsSingle();
         }
     }
 
