@@ -19,18 +19,10 @@ namespace Intense
         [Inject] private AssetBundleManager assetBundleManager;
         [Inject] private MasterDataManager masterDataManager;
 
-        public CriAtomExPlayer BgmExPlayer { get; init; }
-        public CriAtomExPlayer SongExPlayer { get; init; }
-        public CriAtomExPlayer SongPreviewExPlayer { get; init; }
-        public CriAtomExPlayer SeExPlayer { get; init; }
-
-        public SoundManager()
-        {
-            BgmExPlayer = new CriAtomExPlayer();
-            SongExPlayer = new CriAtomExPlayer();
-            SongPreviewExPlayer = new CriAtomExPlayer();
-            SeExPlayer = new CriAtomExPlayer();
-        }
+        public CriAtomExPlayer BgmExPlayer { get; private set; }
+        public CriAtomExPlayer SongExPlayer { get; private set; }
+        public CriAtomExPlayer SongPreviewExPlayer { get; private set; }
+        public CriAtomExPlayer SeExPlayer { get; private set; }
 
         public void UpdateSounds(EBgmType bgmType)
         {
@@ -70,6 +62,10 @@ namespace Intense
 
         public void Initialize()
         {
+            BgmExPlayer = new CriAtomExPlayer();
+            SongExPlayer = new CriAtomExPlayer();
+            SongPreviewExPlayer = new CriAtomExPlayer();
+            SeExPlayer = new CriAtomExPlayer();
             UpdateBgmVolume(PlayerPrefsValues.BV, PlayerPrefsValues.BM);
             UpdateSeVolume(PlayerPrefsValues.SV, PlayerPrefsValues.SM);
             UpdateSongVolume(PlayerPrefsValues.SGV, PlayerPrefsValues.SOM);
