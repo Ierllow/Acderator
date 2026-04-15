@@ -1,18 +1,16 @@
-﻿using Cysharp.Text;
-using Cysharp.Threading.Tasks;
+﻿using Cysharp.Threading.Tasks;
 using Element.UI;
-using Intense;
 using Intense.Api;
 using Intense.Attribute;
 using Intense.UI;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Threading;
 using UnityEngine;
 using UnityEngine.Networking;
 using Zenject;
-using ZLinq;
 
 namespace Intense.Asset
 {
@@ -31,7 +29,7 @@ namespace Intense.Asset
         private readonly string[] assetBundleNameList = { "song/", "songselect/", "result/", "sounds/", "charts/" };
 
         internal List<string> NotExistAssetBundleName
-            => manifestInfoDict.AsValueEnumerable().Where(kv => assetBundleNameList.AsValueEnumerable().Any(kv.Key.StartsWith) && !Caching.IsVersionCached(new(kv.Value.BundleName, kv.Value.Hash))).Select(x => x.Key).ToList();
+            => manifestInfoDict.Where(kv => assetBundleNameList.Any(kv.Key.StartsWith) && !Caching.IsVersionCached(new(kv.Value.BundleName, kv.Value.Hash))).Select(x => x.Key).ToList();
 
         public async UniTask LoadAssetsAsync(ESceneType currentSceneType, CancellationToken cancellationToken)
         {
@@ -39,13 +37,13 @@ namespace Intense.Asset
             {
                 try
                 {
-                    var targetList = assetBundleDict.AsValueEnumerable().Where(kv => kv.Value == null).Select(kv => kv.Key).ToList();
+                    var targetList = assetBundleDict.Where(kv => kv.Value == null).Select(kv => kv.Key).ToList();
                     if (targetList.Count == 0) return;
 
                     if (manifestInfoDict.Count == 0)
                     {
                         loading.ShowLoading();
-                        using var request = UnityWebRequest.Get(ZString.Format("{0}/filelist.txt", networkConfigObject.assetServerUrl));
+                        using var request = UnityWebRequest.Get(string.Format("{0}/filelist.txt", networkConfigObject.assetServerUrl));
                         await request.SendWebRequest();
                         if (!request.result.EnumEquals(UnityWebRequest.Result.Success) && await TryRetryAssetErrorAsync(request.result))
                             continue;
@@ -74,7 +72,7 @@ namespace Intense.Asset
 
                     var downloadedFileSize = 0L;
                     var allLoadedAssetBundle = AssetBundle.GetAllLoadedAssetBundles();
-                    var loadedSet = allLoadedAssetBundle.AsValueEnumerable().Select(x => x.name).ToHashSet();
+                    var loadedSet = allLoadedAssetBundle.Select(x => x.name).ToHashSet();
                     foreach (var bundleName in targetList)
                     {
                         if (!manifestInfoDict.TryGetValue(bundleName, out var info)) continue;
@@ -82,7 +80,7 @@ namespace Intense.Asset
 
                         var isCached = Caching.IsVersionCached(new(info.BundleName, info.Hash));
 
-                        using var request = UnityWebRequestAssetBundle.GetAssetBundle(ZString.Format("{0}/{1}", networkConfigObject.assetServerUrl, bundleName), new CachedAssetBundle(info.BundleName, info.Hash), info.Crc);
+                        using var request = UnityWebRequestAssetBundle.GetAssetBundle(string.Format("{0}/{1}", networkConfigObject.assetServerUrl, bundleName), new CachedAssetBundle(info.BundleName, info.Hash), info.Crc);
                         await request.SendWebRequest();
                         if (!request.result.EnumEquals(UnityWebRequest.Result.Success) && await TryRetryAssetErrorAsync(request.result))
                             continue;
@@ -107,7 +105,7 @@ namespace Intense.Asset
 
         public async UniTask UnloadAssetsAsync(List<ESceneType> sceneTypes)
         {
-            var targets = assetBundleDict.AsValueEnumerable().Where(kv => kv.Value != null && sceneTypes.Contains(kv.Value.SceneType)).Select(kv => kv.Key).ToList();
+            var targets = assetBundleDict.Where(kv => kv.Value != null && sceneTypes.Contains(kv.Value.SceneType)).Select(kv => kv.Key).ToList();
             foreach (var name in targets)
             {
                 if (assetBundleDict.Remove(name, out var loaded))

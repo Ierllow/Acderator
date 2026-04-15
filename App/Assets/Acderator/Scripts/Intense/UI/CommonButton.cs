@@ -1,6 +1,4 @@
 ﻿using Coffee.UIEffects;
-using Cysharp.Text;
-using Intense.Attribute;
 using R3;
 using System;
 using TMPro;
@@ -17,7 +15,7 @@ namespace Intense.UI
     {
         [SerializeField] protected Button button;
         [SerializeField] protected TextMeshProUGUI buttonText;
-        [RequiredField, SerializeField] protected UIEffect uIEffect;
+        [SerializeField] protected UIEffect uIEffect;
         [SerializeField] protected float grayFactory = 0.4f;
 
         public virtual bool IsTapping { get; protected set; }
@@ -26,6 +24,7 @@ namespace Intense.UI
 
         protected virtual void Awake()
         {
+            if (uIEffect == null) return;
             if (!uIEffect.effectMode.EnumEquals(EffectMode.None)) uIEffect.effectMode = EffectMode.None;
             if (!uIEffect.colorMode.EnumEquals(ColorMode.Subtract)) uIEffect.colorMode = ColorMode.Subtract;
             if (!uIEffect.blurMode.EnumEquals(BlurMode.None)) uIEffect.blurMode = BlurMode.None;
@@ -39,7 +38,7 @@ namespace Intense.UI
         {
             if (uIEffect == null)
             {
-                Debug.LogWarning(ZString.Format("{0} is null", uIEffect.GetType().Name));
+                Debug.LogWarning(string.Format("{0} is null", uIEffect.GetType().Name));
                 return;
             }
             uIEffect.colorFactor = value ? grayFactory : 0f;
@@ -50,7 +49,7 @@ namespace Intense.UI
         {
             if (buttonText == null)
             {
-                Debug.LogWarning(ZString.Format("{0} is null", buttonText.GetType().Name));
+                Debug.LogWarning(string.Format("{0} is null", buttonText.GetType().Name));
                 return;
             }
             buttonText.SetText(text);

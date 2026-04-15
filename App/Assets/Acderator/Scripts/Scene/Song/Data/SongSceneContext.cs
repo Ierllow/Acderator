@@ -1,5 +1,4 @@
-﻿using Cysharp.Text;
-using Intense;
+﻿using Intense;
 using System.Collections.Generic;
 
 namespace Song
@@ -28,9 +27,9 @@ namespace Song
             SongBundlePath,
             SongChartBundlePath,
         };
-        public string SongChartBundlePath => ZString.Format("charts/{0}", SongInfo.Sid);
+        public string SongChartBundlePath => string.Format("charts/{0}", SongInfo.Sid);
 
-        public string SongBundlePath => ZString.Format("sounds/song/song_{0}", SongInfo.Group);
+        public string SongBundlePath => string.Format("sounds/song/song_{0}", SongInfo.Group);
 
         SongSceneContext() { }
 

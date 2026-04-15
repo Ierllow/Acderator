@@ -1,12 +1,10 @@
-﻿using Cysharp.Text;
-using Intense;
+﻿using Intense;
 using Intense.Data;
 using Intense.Master;
 using Intense.UI;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using Zenject;
 
 namespace Result
 {
@@ -29,13 +27,13 @@ namespace Result
             jacket.SetAtlasFormat("{0}", mSong.Group, "song/jacket");
             songName.SetText(mSong.Name);
             composer.SetText(mSong.Composer);
-            perfectNum.SetTextFormat("{0:D3}", resultInfo.JudgeCountDict.GetValueOrDefault(EJudgementType.Perfect));
-            greatNum.SetTextFormat("{0:D3}", resultInfo.JudgeCountDict.GetValueOrDefault(EJudgementType.Great));
-            goodNum.SetTextFormat("{0:D3}", resultInfo.JudgeCountDict.GetValueOrDefault(EJudgementType.Good));
-            badNum.SetTextFormat("{0:D3}", resultInfo.JudgeCountDict.GetValueOrDefault(EJudgementType.Bad));
-            missNum.SetTextFormat("{0:D3}", resultInfo.JudgeCountDict.GetValueOrDefault(EJudgementType.Miss));
-            score.SetTextFormat("{0:D7}", resultInfo.CurrentScore);
-            highScore.SetTextFormat("<color={0}>High Score</color> {1:D7}", "#C58EF1", (int)resultInfo.HighScore);
+            perfectNum.SetText("{0:D3}", resultInfo.JudgeCountDict.GetValueOrDefault(EJudgementType.Perfect));
+            greatNum.SetText("{0:D3}", resultInfo.JudgeCountDict.GetValueOrDefault(EJudgementType.Great));
+            goodNum.SetText("{0:D3}", resultInfo.JudgeCountDict.GetValueOrDefault(EJudgementType.Good));
+            badNum.SetText("{0:D3}", resultInfo.JudgeCountDict.GetValueOrDefault(EJudgementType.Bad));
+            missNum.SetText("{0:D3}", resultInfo.JudgeCountDict.GetValueOrDefault(EJudgementType.Miss));
+            score.SetText("{0:D7}", resultInfo.CurrentScore);
+            highScore.SetText(string.Format("<color={0}>High Score</color> {1:D7}", "#C58EF1", (int)resultInfo.HighScore));
             rank.SetAtlasFormat("icon_result_rank_{0}", (int)ScoreUtils.ToRank(resultInfo.CurrentScore), "song/rank");
         }
     }

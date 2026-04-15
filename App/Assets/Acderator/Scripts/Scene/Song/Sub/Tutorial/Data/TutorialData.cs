@@ -1,6 +1,6 @@
 ﻿using Intense.Master;
 using System.Collections.Generic;
-using ZLinq;
+using System.Linq;
 
 namespace Song
 {
@@ -15,7 +15,7 @@ namespace Song
         public int CompletedCount { get; set; }
         public int TotalCount => StepList.Count;
 
-        public TutorialStepMaster GetCurrentStep() => StepList.AsValueEnumerable().ElementAtOrDefault(CurrentStepIndex);
+        public TutorialStepMaster GetCurrentStep() => StepList.ElementAtOrDefault(CurrentStepIndex);
 
         public void CompleteCurrentStep()
         {

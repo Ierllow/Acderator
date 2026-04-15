@@ -24,7 +24,6 @@ You can download the exact version from the [official Download Archive here](htt
 ・[uPalette](https://github.com/Haruma-K/uPalette)  
 ・[UniTask](https://github.com/Cysharp/UniTask)  
 ・[Zenject](https://github.com/modesttree/Zenject)  
-・[ZString](https://github.com/Cysharp/ZString)  
   
 ## License  
 Acderator is under MIT [LICENSE](LICENSE).  

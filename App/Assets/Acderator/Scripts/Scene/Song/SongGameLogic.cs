@@ -2,8 +2,8 @@
 using Intense;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Zenject;
-using ZLinq;
 
 namespace Song
 {
@@ -30,7 +30,7 @@ namespace Song
         public void UpdateGameLogic(FingerInfo fingerInfo)
         {
             if (fingerInfo.NoteBase == default) return;
-            if (!notesManager.AliveNoteList.AsValueEnumerable().Any(x => x == fingerInfo.NoteBase)) return;
+            if (!notesManager.AliveNoteList.Any(x => x == fingerInfo.NoteBase)) return;
 
             var noteType = fingerInfo.NoteBase.NoteData.NoteType.EnumEquals(ENoteType.Flick);
             if (fingerInfo.IsMissed)

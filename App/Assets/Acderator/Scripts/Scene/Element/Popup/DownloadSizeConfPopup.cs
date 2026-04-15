@@ -1,5 +1,4 @@
-﻿using Cysharp.Text;
-using Cysharp.Threading.Tasks;
+﻿using Cysharp.Threading.Tasks;
 using Intense.UI;
 using TMPro;
 using UnityEngine;
@@ -22,7 +21,7 @@ namespace Element.UI
         public void Open(DownloadSizeConfPopupContext context) => UniTask.Void(async () =>
         {
             Init();
-            text.SetTextFormat("ゲームデータのダウンロードを行います \nよろしいですか(サイズ{0}{1})", context.FileSize, context.Size);
+            text.SetText(string.Format("ゲームデータのダウンロードを行います \nよろしいですか(サイズ{0}{1})", context.FileSize, context.Size));
             base.Open(closeCallback);
             await UniTask.WaitUntil(() => IsClose, cancellationToken: destroyCancellationToken);
             base.Close();

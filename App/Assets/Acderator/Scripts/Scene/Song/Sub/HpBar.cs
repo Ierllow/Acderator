@@ -1,5 +1,4 @@
-﻿using Cysharp.Text;
-using DG.Tweening;
+﻿using DG.Tweening;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -14,7 +13,7 @@ namespace Song
         public void SetHp(float currentHp)
         {
             gaugeImage.fillAmount = currentHp;
-            percent.SetText((int)(currentHp * 100));
+            percent.SetText(((int)(currentHp * 100)).ToString());
         }
 
         public void Move() => gameObject.transform.DOMoveX(170, 0.6f).SetLink(gameObject);

@@ -1,5 +1,4 @@
-﻿using Cysharp.Text;
-using DG.Tweening;
+﻿using DG.Tweening;
 using System;
 using TMPro;
 using UnityEngine;
@@ -57,7 +56,7 @@ namespace Intense.UI
             progressBar.SetActive(!progressBar.activeSelf);
 
             var val = (int)Math.Round((double)downloadedFileSize / allFileSize * 100);
-            slider.DOValue(val, 0.1f).OnUpdate(() => percent.SetTextFormat("{0}%", (int)slider.value));
+            slider.DOValue(val, 0.1f).OnUpdate(() => percent.SetText("{0}%", (int)slider.value));
         }
 
         public void ClearProgressBar()

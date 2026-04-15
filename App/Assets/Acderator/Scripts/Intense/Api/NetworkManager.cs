@@ -1,5 +1,4 @@
-﻿using Cysharp.Text;
-using Cysharp.Threading.Tasks;
+﻿using Cysharp.Threading.Tasks;
 using Intense.UI;
 using MessagePack;
 using System;
@@ -42,7 +41,7 @@ namespace Intense.Api
                 var responseBytes = www.downloadHandler.data;
                 var responseData = MessagePackSerializer.Deserialize<Dictionary<string, object>>(responseBytes);
                 var response = new ResponseBase(responseData);
-                Debug.Log(ZString.Format("status: {0}, errorResponse: {1}", response.Status, response.ErrorMessage));
+                Debug.Log(string.Format("status: {0}, errorResponse: {1}", response.Status, response.ErrorMessage));
                 return response;
             }
             finally

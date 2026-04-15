@@ -1,5 +1,4 @@
-﻿using Cysharp.Text;
-using Intense.Master;
+﻿using Intense.Master;
 using Intense.UI;
 using R3;
 using TMPro;
@@ -122,7 +121,7 @@ namespace Song
 
         private void UpdateProgressDisplay(int completedSteps, int totalSteps)
         {
-            progressText.SetTextFormat("{0}/{1}", completedSteps, totalSteps);
+            progressText.SetText("{0}/{1}", completedSteps, totalSteps);
             // progressIndicator.fillAmount = (float)completedSteps / totalSteps;
         }
 

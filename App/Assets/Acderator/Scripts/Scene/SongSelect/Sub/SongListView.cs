@@ -4,7 +4,6 @@ using Intense.Internal;
 using Intense.Master;
 using UnityEngine;
 using Zenject;
-using ZLinq;
 
 namespace SongSelect
 {
@@ -46,7 +45,7 @@ namespace SongSelect
             scroller.JumpToDataIndex(songSelectCellListController.IndexOf, loopJumpDirection: EnhancedScroller.LoopJumpDirectionEnum.Up);
         }
 
-        public int GetNumberOfCells(EnhancedScroller _) => songSelectCellListController.SongGroupList.AsValueEnumerable().Count();
+        public int GetNumberOfCells(EnhancedScroller _) => songSelectCellListController.SongGroupList.Count;
 
         public float GetCellViewSize(EnhancedScroller _, int __) => 100f;
 

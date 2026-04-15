@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
-using ZLinq;
 
 namespace Song
 {
@@ -9,10 +9,10 @@ namespace Song
     public class LoadedChartInfo
     {
         public ELoadResult LoadResult { get; set; }
-        public List<NoteData> NoteDataList { get; private set; } = new();
+        public List<NoteData> NoteDataList { get; } = new();
         public HeaderData HeaderData { get; set; }
 
-        public int NoteCount => NoteDataList.AsValueEnumerable().Select(x => x.NoteType.EnumEquals(ENoteType.Long) ? 2 : 1).Sum();
+        public int NoteCount => NoteDataList.Sum(x => x.NoteType.EnumEquals(ENoteType.Long) ? 2 : 1);
 
         public void AddNoteData(float beatBegin, float beatEnd, int lane, ENoteType noteType = ENoteType.Single) => NoteDataList.Add(new()
         {

@@ -1,4 +1,3 @@
-using Cysharp.Text;
 using System;
 using System.Reflection;
 using UnityEditor;
@@ -24,7 +23,7 @@ namespace Intense.Attribute
         {
             if (!property.propertyType.EnumEquals(SerializedPropertyType.ObjectReference))
             {
-                EditorGUI.HelpBox(position, ZString.Format("{0} must be a UnityEngine.Object reference.", label.text), MessageType.Error);
+                EditorGUI.HelpBox(position, string.Format("{0} must be a UnityEngine.Object reference.", label.text), MessageType.Error);
                 return;
             }
 
@@ -39,7 +38,7 @@ namespace Intense.Attribute
             helpRect.y += fieldRect.height + 2f;
             helpRect.height = EditorGUIUtility.singleLineHeight * 1.2f;
 
-            EditorGUI.HelpBox(helpRect, ZString.Format("{0} is required.", label.text), MessageType.Error);
+            EditorGUI.HelpBox(helpRect, string.Format("{0} is required.", label.text), MessageType.Error);
         }
 
         private bool IsMissing(SerializedProperty property) => property.objectReferenceValue == null;
@@ -71,7 +70,7 @@ namespace Intense.Attribute
                     if (!typeof(UnityEngine.Object).IsAssignableFrom(field.FieldType)) continue;
                     if (field.GetValue(behaviour) is UnityEngine.Object) continue;
 
-                    Debug.LogError(ZString.Format("Missing RequiredField: {0}/{1}/{2}.{3}", behaviour.gameObject.scene.path, behaviour.name, behaviour.GetType().Name, field.Name), behaviour);
+                    Debug.LogError(string.Format("Missing RequiredField: {0}/{1}/{2}.{3}", behaviour.gameObject.scene.path, behaviour.name, behaviour.GetType().Name, field.Name), behaviour);
                 }
             }
         }

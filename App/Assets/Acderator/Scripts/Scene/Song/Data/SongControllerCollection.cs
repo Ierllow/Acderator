@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Zenject;
-using ZLinq;
 
 namespace Song
 {
@@ -21,6 +20,6 @@ namespace Song
             builder.Build().InitAll();
         }
 
-        public bool TryGet<T>(out T controller) where T : class => (controller = controllerList.AsValueEnumerable().OfType<T>().FirstOrDefault()) != default;
+        public bool TryGet<T>(out T controller) where T : class => (controller = controllerList.OfType<T>().FirstOrDefault()) != default;
     }
 }

@@ -1,5 +1,4 @@
-﻿using Cysharp.Text;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using UnityEditor;
 using UnityEngine;
 
@@ -48,7 +47,7 @@ public class CodeGenerators
                 p.Exited += (sender, e) =>
                 {
                         var data = p.StandardOutput.ReadToEnd();
-                        UnityEngine.Debug.Log(ZString.Format("{0}", data));
+                        UnityEngine.Debug.Log(string.Format("{0}", data));
                         UnityEngine.Debug.Log("end ExecuteMasterMemoryCodeGenerator");
                         p.Dispose();
                         p = null;

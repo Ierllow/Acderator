@@ -4,9 +4,9 @@ using Intense.Data;
 using Intense.Master;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using UnityEngine.UI;
-using ZLinq;
 using Zenject;
 
 namespace SongSelect
@@ -35,7 +35,7 @@ namespace SongSelect
             {
                 EOrderType.Default => songMasterTables.Select(x => x.Group).Distinct().ToList(),
                 EOrderType.Level => songMasterTables.OrderBy(x => x.Difficulty == selectedDifficulty).Select(x => x.Group).Distinct().ToList(),
-                EOrderType.HighScore => songMasterTables.OrderBy(_ => scoreManager.ScoreDataList.AsValueEnumerable().OrderBy(x => x.ScoreNum).ToList()).Select(x => x.Group).Distinct().ToList(),
+                EOrderType.HighScore => songMasterTables.OrderBy(_ => scoreManager.ScoreDataList.OrderBy(x => x.ScoreNum).ToList()).Select(x => x.Group).Distinct().ToList(),
                 EOrderType.Name => songMasterTables.OrderBy(x => x.Name).Select(x => x.Group).Distinct().ToList(),
                 _ => default
             };
@@ -43,8 +43,7 @@ namespace SongSelect
 
         public void UpdateOrderType(EOrderType orderType) => CurrentOrderType = orderType;
 
-
-        public void SetNextOrderType() => CurrentOrderType = FastEnum.GetValues<EOrderType>().AsValueEnumerable().ElementAtOrDefault((int)CurrentOrderType + 1);
+        public void SetNextOrderType() => CurrentOrderType = FastEnum.GetValues<EOrderType>().ElementAtOrDefault((int)CurrentOrderType + 1);
 
         public void SaveOrderType() => PlayerPrefsValues.Set(EKey.OrderType, CurrentOrderType.GetLength());
     }

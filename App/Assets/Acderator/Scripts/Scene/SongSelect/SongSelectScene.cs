@@ -6,10 +6,10 @@ using Intense.Attribute;
 using Intense.Data;
 using Intense.Master;
 using Intense.UI;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
-using ZLinq;
 
 namespace SongSelect
 {

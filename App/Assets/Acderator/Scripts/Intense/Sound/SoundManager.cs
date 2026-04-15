@@ -1,5 +1,4 @@
 ﻿using CriWare;
-using Cysharp.Text;
 using Cysharp.Threading.Tasks;
 using Intense.Asset;
 using Intense.Master;
@@ -86,7 +85,7 @@ namespace Intense
             sheet ??= await AddCueSheetAsync(name, asset);
             if (sheet == default)
             {
-                Debug.LogWarning(ZString.Format("{0} dose not exist", name));
+                Debug.LogWarning(string.Format("{0} dose not exist", name));
                 return default;
             }
             return sheet;
@@ -117,7 +116,7 @@ namespace Intense
         public void PlaySong(int id) => UniTask.Void(async () =>
         {
             var mSoundCueName = masterDataManager.MemoryDatabase.SoundSheetNameMasterTable.First(x => x.Category == ESoundCategory.Song.GetLength());
-            var sheet = await GetOrAddCueSheetAsync(mSoundCueName.SheetName, ZString.Format("sounds/song/song_{0}", id));
+            var sheet = await GetOrAddCueSheetAsync(mSoundCueName.SheetName, string.Format("sounds/song/song_{0}", id));
 
             StopSong();
             SongExPlayer.SetCue(sheet.acb, id.ToString());
@@ -128,7 +127,7 @@ namespace Intense
         public void PlaySongPreview(int id, CancellationToken token = default) => UniTask.Void(async () =>
         {
             var mSoundCueName = masterDataManager.MemoryDatabase.SoundSheetNameMasterTable.First(x => x.Category == ESoundCategory.Song.GetLength());
-            var sheet = await GetOrAddCueSheetAsync(mSoundCueName.SheetName, ZString.Format("sounds/song/song_{0}", id));
+            var sheet = await GetOrAddCueSheetAsync(mSoundCueName.SheetName, string.Format("sounds/song/song_{0}", id));
 
             SongPreviewExPlayer.AttachFader();
             SongPreviewExPlayer.SetFadeInTime(3000);
@@ -149,7 +148,7 @@ namespace Intense
             }
             catch (OperationCanceledException)
             {
-                SongPreviewExPlayer.Stop(true);
+                StopSongPreview();
             }
         });
 

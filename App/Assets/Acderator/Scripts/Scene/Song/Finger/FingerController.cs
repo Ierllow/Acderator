@@ -7,9 +7,9 @@ using Lean.Touch;
 using R3;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Zenject;
-using ZLinq;
 
 namespace Song
 {
@@ -112,7 +112,7 @@ namespace Song
                     NoteBase = note,
                     JudgmentType = judgementType,
                     FingerType = EFingerType.Up,
-                    TappingNoteList = notesManager.AliveNoteList.AsValueEnumerable().Where(x => x.IsActive && x.IsTapping).ToList()
+                    TappingNoteList = notesManager.AliveNoteList.Where(x => x.IsActive && x.IsTapping).ToList()
                 };
 
                 fingerLaneDict.Remove(finger);

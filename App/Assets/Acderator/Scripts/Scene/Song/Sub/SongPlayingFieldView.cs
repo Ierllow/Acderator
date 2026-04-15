@@ -1,5 +1,4 @@
-﻿using Cysharp.Text;
-using DG.Tweening;
+﻿using DG.Tweening;
 using Intense.Data;
 using Intense.UI;
 using TMPro;
@@ -33,7 +32,7 @@ namespace Song
         public void UpdateDisplay(int currentScore) => scoreNumController.OnUpdate(currentScore, (score) =>
         {
             scoreText.enableVertexGradient = ScoreUtils.IsExc(score);
-            scoreText.SetTextFormat("{0:D7}", score);
+            scoreText.SetText("{0:D7}", score);
         });
     }
 }

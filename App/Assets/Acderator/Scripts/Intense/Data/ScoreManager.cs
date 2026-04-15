@@ -1,6 +1,6 @@
 ﻿using Intense.Master;
+using System.Linq;
 using System.Collections.Generic;
-using ZLinq;
 
 namespace Intense.Data
 {
@@ -24,7 +24,7 @@ namespace Intense.Data
 
         public void UpdateScoreData(int sid, int scoreNum)
         {
-            var target = ScoreDataList.AsValueEnumerable().FirstOrDefault(x => x.Sid == sid);
+            var target = ScoreDataList.FirstOrDefault(x => x.Sid == sid);
             if (target != default)
             {
                 if (!IsInit) return;
@@ -38,6 +38,6 @@ namespace Intense.Data
             }
         }
 
-        public int GetScore(int sid) => ScoreDataList.AsValueEnumerable().FirstOrDefault(x => x.Sid == sid)?.ScoreNum ?? 0;
+        public int GetScore(int sid) => ScoreDataList.FirstOrDefault(x => x.Sid == sid)?.ScoreNum ?? 0;
     }
 }

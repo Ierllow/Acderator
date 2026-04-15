@@ -1,5 +1,4 @@
-﻿using Cysharp.Text;
-using Cysharp.Threading.Tasks;
+﻿using Cysharp.Threading.Tasks;
 using Intense.Asset;
 using UnityEngine;
 using UnityEngine.U2D;
@@ -42,6 +41,6 @@ namespace Intense.UI
 
     public static class AtlasImageExtensions
     {
-        public static void SetAtlasFormat<T>(this AtlasImage atlasImage, string format, T arg0, string atlasName = "") => atlasImage.SetAtlas(ZString.Format(format, arg0), atlasName);
+        public static void SetAtlasFormat<T>(this AtlasImage atlasImage, string format, T arg0, string atlasName = "") => atlasImage.SetAtlas(string.Format(format, arg0), atlasName);
     }
 }

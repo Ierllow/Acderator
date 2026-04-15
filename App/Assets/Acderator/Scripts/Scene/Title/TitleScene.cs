@@ -1,5 +1,4 @@
-﻿using Cysharp.Text;
-using Cysharp.Threading.Tasks;
+﻿using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Intense;
 using Intense.Attribute;
@@ -33,7 +32,7 @@ namespace Title
 
         public override void OnCreateScene()
         {
-            versionText.SetTextFormat("Version {0}", Application.version);
+            versionText.SetText(string.Format("Version {0}", Application.version));
             startText.DOFade(0, 1).SetEase(Ease.Flash, 1).SetLoops(-1, LoopType.Yoyo).SetLink(gameObject);
             sceneManager.FadeInAsync().Forget();
         }

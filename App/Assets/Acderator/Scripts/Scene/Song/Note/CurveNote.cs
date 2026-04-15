@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using ZLinq;
 
 namespace Song
 {
@@ -24,7 +23,7 @@ namespace Song
             curvePointList = data.CurvePointList;
             curveDuration = data.CurveDuration;
 
-            if (curvePointList.AsValueEnumerable().Count() >= 2)
+            if (curvePointList.Count >= 2)
             {
                 curveLineRenderer.positionCount = curveSegments + 1;
                 curveLineRenderer.useWorldSpace = false;

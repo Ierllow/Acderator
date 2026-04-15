@@ -1,5 +1,4 @@
-﻿using Cysharp.Text;
-using Cysharp.Threading.Tasks;
+﻿using Cysharp.Threading.Tasks;
 using Cysharp.Threading.Tasks.Linq;
 using DG.Tweening;
 using Element;
@@ -10,11 +9,11 @@ using Intense.UI;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Zenject;
-using ZLinq;
 
 namespace Intense
 {
@@ -30,7 +29,7 @@ namespace Intense
         [Inject] private SoundManager soundManager;
         [Inject] private Loading loading;
 
-        public ESceneType CurrentSceneType => sceneBaseDict.Count > 0 ? sceneBaseDict.AsValueEnumerable().LastOrDefault().Key : default;
+        public ESceneType CurrentSceneType => sceneBaseDict.Count > 0 ? sceneBaseDict.LastOrDefault().Key : default;
         public bool IsFadeIn { get; private set; } = false;
 
         private readonly Dictionary<ESceneType, SceneBase> sceneBaseDict = new();
@@ -73,7 +72,7 @@ namespace Intense
 
                 if (!sameScene)
                 {
-                    await assetBundleManager.UnloadAssetsAsync(sceneBaseDict.AsValueEnumerable().Select(x => x.Key).ToList());
+                    await assetBundleManager.UnloadAssetsAsync(sceneBaseDict.Select(x => x.Key).ToList());
                     await Resources.UnloadUnusedAssets();
                 }
 
@@ -86,7 +85,7 @@ namespace Intense
                 await UniTask.Yield();
                 return;
             }
-            Debug.LogWarning(ZString.Format("{0} is the same as before.", sceneType));
+            Debug.LogWarning(string.Format("{0} is the same as before.", sceneType));
         }
 
         public async UniTask ChangeSceneAdditiveAsync(ESceneType sceneType, SceneContext context = default)

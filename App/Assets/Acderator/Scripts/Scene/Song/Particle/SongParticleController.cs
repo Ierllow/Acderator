@@ -2,8 +2,8 @@
 using Intense;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
-using ZLinq;
 
 namespace Song
 {
@@ -108,7 +108,7 @@ namespace Song
                 playingHoldParticleDict.Add(particleInfo.lane, holdParticle);
             }
             if (playingHoldParticleDict.TryGetValue(particleInfo.lane, out var playing)
-                && !particleInfo.tappingNotes.AsValueEnumerable().Any(x => x.NoteData.Lane == particleInfo.lane))
+                && !particleInfo.tappingNotes.Any(x => x.NoteData.Lane == particleInfo.lane))
             {
                 holdParticlePool.Release(playing);
                 playingHoldParticleDict.Remove(particleInfo.lane);

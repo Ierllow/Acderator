@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEngine;
-using ZLinq;
 
 namespace Song
 {
@@ -58,14 +57,14 @@ namespace Song
 
         private void LoadHeaderData(LoadedChartInfo loadedChartInfo, List<string> lineList)
         {
-            var match = lineList.AsValueEnumerable().Select(line => Regex.Match(line, @"#(...02):(.*)")).FirstOrDefault(m => m.Success);
+            var match = lineList.Select(line => Regex.Match(line, @"#(...02):(.*)")).FirstOrDefault(m => m.Success);
             beat = match?.Success == true ? Convert.ToInt32(match.Groups[2].Value) : 4;
 
-            match = lineList.AsValueEnumerable().Select(line => Regex.Match(line, @"#(BPM01):(.*)")).FirstOrDefault(m => m.Success);
+            match = lineList.Select(line => Regex.Match(line, @"#(BPM01):(.*)")).FirstOrDefault(m => m.Success);
             var tempo = match?.Success == true ? Convert.ToInt32(match.Groups[2].Value) : 120;
 
             var speedChangeList = new List<NoteSpeedChange>();
-            foreach (var line in lineList.AsValueEnumerable().Where(l => l.StartsWith("#TIL00")))
+            foreach (var line in lineList.Where(l => l.StartsWith("#TIL00")))
             {
                 match = Regex.Match(line, @"#(TIL00):(.*)");
                 if (!match.Success) continue;
@@ -73,7 +72,7 @@ namespace Song
                 var tilData = match.Groups[2].Value;
                 if (string.IsNullOrEmpty(tilData)) continue;
 
-                var changeList = tilData.Split(' ', StringSplitOptions.RemoveEmptyEntries).AsValueEnumerable().Select(rawText =>
+                var changeList = tilData.Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(rawText =>
                 {
                     var normalizedText = rawText.Replace(":", ",").Replace("\\", "").Replace("'", ",");
                     var parts = normalizedText.Split(',', StringSplitOptions.RemoveEmptyEntries);
@@ -93,7 +92,7 @@ namespace Song
 
         private void ProcessLongNoteBegins(List<string> lineList)
         {
-            foreach (var line in lineList.AsValueEnumerable().Where(l => !l.StartsWith("#0000")))
+            foreach (var line in lineList.Where(l => !l.StartsWith("#0000")))
             {
                 var parsedLine = ParseLine(line);
                 if (!parsedLine.DataType.EnumEquals(ChartDataType.LongNote)) continue;
@@ -104,7 +103,7 @@ namespace Song
                     var objNum = parsedLine.Body.Substring(i * 2, 2);
                     var beat = CalculateBeat(parsedLine.MeasureNumber, i, countObj);
 
-                    if (IsLongNoteStart(objNum.AsValueEnumerable().ElementAtOrDefault(0)))
+                    if (IsLongNoteStart(objNum.ElementAtOrDefault(0)))
                     {
                         longNoteBeginDict[parsedLine.Lane] = beat;
                     }
@@ -114,7 +113,7 @@ namespace Song
 
         private void LoadMainData(LoadedChartInfo loadedChartInfo, List<string> lineList)
         {
-            foreach (var line in lineList.AsValueEnumerable().Where(l => !l.StartsWith("#0000")))
+            foreach (var line in lineList.Where(l => !l.StartsWith("#0000")))
             {
                 var parsedLine = ParseLine(line);
                 if (parsedLine.DataType.EnumEquals(ChartDataType.Unknown))
@@ -132,11 +131,11 @@ namespace Song
             var match = Regex.Match(line, @"#([0-9]{3})([0-9A-Za-z]{2})(.*): (.*)");
             if (!match.Success) return new ParsedLine { MeasureNumber = 0, Type = "", DataType = ChartDataType.None, Lane = 0, Body = "" };
 
-            var measureNum = Convert.ToInt32(match.Groups.AsValueEnumerable().ElementAtOrDefault(1).Value);
-            var type = match.Groups.AsValueEnumerable().ElementAtOrDefault(2).Value;
-            var body = match.Groups.AsValueEnumerable().ElementAtOrDefault(4).Value;
+            var measureNum = Convert.ToInt32(match.Groups.ElementAtOrDefault(1).Value);
+            var type = match.Groups.ElementAtOrDefault(2).Value;
+            var body = match.Groups.ElementAtOrDefault(4).Value;
 
-            var dataType = type.AsValueEnumerable().FirstOrDefault() switch
+            var dataType = type.FirstOrDefault() switch
             {
                 '1' => ChartDataType.SingleNote,
                 '2' => ChartDataType.LongNote,
@@ -144,7 +143,7 @@ namespace Song
                 _ => ChartDataType.Unknown,
             };
 
-            var lane = type.AsValueEnumerable().ElementAtOrDefault(1) switch
+            var lane = type.ElementAtOrDefault(1) switch
             {
                 '4' => 1,
                 '8' => 2,

@@ -1,5 +1,4 @@
-﻿using Cysharp.Text;
-using Cysharp.Threading.Tasks;
+﻿using Cysharp.Threading.Tasks;
 using Cysharp.Threading.Tasks.Linq;
 using DG.Tweening;
 using System;
@@ -24,7 +23,7 @@ namespace Song
 
         public async UniTask ShowResult(ESongResultType resultType)
         {
-            resultText.SetText(resultType);
+            resultText.SetText(resultType.ToString());
 
             var gradient = PaletteStore.Instance.GradientPalette.GetActiveValue((resultType switch
             {
