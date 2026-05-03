@@ -1,4 +1,3 @@
-﻿using Sirenix.OdinInspector;
 using System;
 using System.Collections.Generic;
 using TMPro;
@@ -91,7 +90,6 @@ namespace Intense.UI
         [SerializeField] protected RectTransform contentRect;
         [SerializeField] protected RectTransform buttonRect;
 
-        [Button]
         protected virtual void SetContentSize()
         {
             if (popupSize == PopupSize.Custom) return;
