@@ -93,7 +93,7 @@ namespace Intense
 
         public void PlaySe(ESeType type) => UniTask.Void(async () =>
         {
-            var mSoundCueName = masterDataManager.MemoryDatabase.SoundSheetNameMasterTable.First(x => x.Category == ESoundCategory.Se.GetLength() && x.Id == (int)type);
+            var mSoundCueName = masterDataManager.MemoryDatabase.SoundSheetNameMasterTable.First(x => x.Category == (int)ESoundCategory.Se && x.Id == (int)type);
             var sheet = await GetOrAddCueSheetAsync(mSoundCueName.SheetName, "sounds/song/songse");
 
             StopSe();
@@ -104,7 +104,7 @@ namespace Intense
 
         public void PlayBgm(EBgmType type, bool isLoop = true) => UniTask.Void(async () =>
         {
-            var mSoundCueName = masterDataManager.MemoryDatabase.SoundSheetNameMasterTable.First(x => x.Category == ESoundCategory.Bgm.GetLength() && x.Id == (int)type);
+            var mSoundCueName = masterDataManager.MemoryDatabase.SoundSheetNameMasterTable.First(x => x.Category == (int)ESoundCategory.Bgm && x.Id == (int)type);
             var sheet = await GetOrAddCueSheetAsync(mSoundCueName.SheetName, "sounds/bgm/bgm");
 
             StopBgm();
@@ -115,7 +115,7 @@ namespace Intense
 
         public void PlaySong(int id) => UniTask.Void(async () =>
         {
-            var mSoundCueName = masterDataManager.MemoryDatabase.SoundSheetNameMasterTable.First(x => x.Category == ESoundCategory.Song.GetLength());
+            var mSoundCueName = masterDataManager.MemoryDatabase.SoundSheetNameMasterTable.First(x => x.Category == (int)ESoundCategory.Song);
             var sheet = await GetOrAddCueSheetAsync(mSoundCueName.SheetName, string.Format("sounds/song/song_{0}", id));
 
             StopSong();
@@ -126,7 +126,7 @@ namespace Intense
 
         public void PlaySongPreview(int id, CancellationToken token = default) => UniTask.Void(async () =>
         {
-            var mSoundCueName = masterDataManager.MemoryDatabase.SoundSheetNameMasterTable.First(x => x.Category == ESoundCategory.Song.GetLength());
+            var mSoundCueName = masterDataManager.MemoryDatabase.SoundSheetNameMasterTable.First(x => x.Category == (int)ESoundCategory.Song);
             var sheet = await GetOrAddCueSheetAsync(mSoundCueName.SheetName, string.Format("sounds/song/song_{0}", id));
 
             SongPreviewExPlayer.AttachFader();

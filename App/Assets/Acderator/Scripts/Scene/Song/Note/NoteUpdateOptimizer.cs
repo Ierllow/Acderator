@@ -12,7 +12,7 @@ namespace Song
 
         private float? badJudgmentZone;
 
-        private float BadJudgmentZone => badJudgmentZone ??= masterDataManager.MemoryDatabase.SongJudgeZoneMasterTable.FirstOrDefault(x => x.Type <= EJudgementType.Bad.GetLength()).Zone;
+        private float BadJudgmentZone => badJudgmentZone ??= masterDataManager.MemoryDatabase.SongJudgeZoneMasterTable.FirstOrDefault(x => x.Type <= (int)EJudgementType.Bad).Zone;
 
         public void UpdatePositionNotes(Action<FingerInfo> notifyFinger)
         {
@@ -38,8 +38,8 @@ namespace Song
         private void CheckMiss(NoteBase noteBase, float currentSec, Action<FingerInfo> notifyFinger)
         {
             var noteType = noteBase.NoteData.NoteType;
-            var isLong = noteType.EnumEquals(ENoteType.Long);
-            var isCurve = noteType.EnumEquals(ENoteType.Curve);
+            var isLong = noteType == ENoteType.Long;
+            var isCurve = noteType == ENoteType.Curve;
             if (!isLong && !isCurve) return;
 
             var judgmentZone = BadJudgmentZone;

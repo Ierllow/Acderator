@@ -56,7 +56,7 @@ namespace Song
                 await changeScene;
                 return;
             }
-            if (!sceneContext.SongMode.EnumEquals(ESongMode.Normal))
+            if (sceneContext.SongMode != ESongMode.Normal)
             {
                 await scoreSaveError;
                 return;
@@ -78,7 +78,7 @@ namespace Song
         private void UpdateSongProgressNext()
         {
             songControllerResolver.Loop.Tick(soundManager.SongExPlayer.GetTime().ToSeconds());
-            songControllerResolver.TutorialState?.ChangeState(songControllerResolver.Loop.SongStateEnumEquals(ESongState.Playing));
+            songControllerResolver.TutorialState?.ChangeState(songControllerResolver.Loop.CurrentState == ESongState.Playing);
             songControllerResolver.TutorialState?.Tick();
             if (songControllerResolver.TutorialState?.IsCompleted ?? false) songControllerResolver.Loop.UpdateState(ESongState.End);
         }

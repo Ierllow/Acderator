@@ -25,9 +25,9 @@ namespace Intense.UI
         protected virtual void Awake()
         {
             if (uIEffect == null) return;
-            if (!uIEffect.effectMode.EnumEquals(EffectMode.None)) uIEffect.effectMode = EffectMode.None;
-            if (!uIEffect.colorMode.EnumEquals(ColorMode.Subtract)) uIEffect.colorMode = ColorMode.Subtract;
-            if (!uIEffect.blurMode.EnumEquals(BlurMode.None)) uIEffect.blurMode = BlurMode.None;
+            if (uIEffect.effectMode != EffectMode.None) uIEffect.effectMode = EffectMode.None;
+            if (uIEffect.colorMode != ColorMode.Subtract) uIEffect.colorMode = ColorMode.Subtract;
+            if (uIEffect.blurMode != BlurMode.None) uIEffect.blurMode = BlurMode.None;
         }
 
         public void OnPointerUp(PointerEventData eventData) => IsTapping = false;

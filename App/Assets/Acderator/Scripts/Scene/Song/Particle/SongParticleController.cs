@@ -50,7 +50,7 @@ namespace Song
 
         private void UpdateParticles((EFingerType, ENoteType, EJudgementType, int, List<NoteBase>) particleInfo)
         {
-            if (particleInfo.Item3.EnumEquals(EJudgementType.None)) return;
+            if (particleInfo.Item3 == EJudgementType.None) return;
 
             var particlePosition = particleInfo.Item4 switch
             {
@@ -70,9 +70,9 @@ namespace Song
             };
 
             SpawnJudgeEffect(particlePosition, judgeParticlePosition, particleInfo.Item3).Forget();
-            if (particleInfo.Item2.EnumEquals(ENoteType.Long) || particleInfo.Item2.EnumEquals(ENoteType.Curve))
+            if (particleInfo.Item2 == ENoteType.Long || particleInfo.Item2 == ENoteType.Curve)
             {
-                if (!particleInfo.Item1.EnumEquals(EFingerType.Up))
+                if (particleInfo.Item1 != EFingerType.Up)
                     PlayHoldEffect(particleInfo, particlePosition, judgeParticlePosition).Forget();
                 else
                     StopHoldEffect(particleInfo.Item4);
@@ -100,8 +100,8 @@ namespace Song
         private async UniTask PlayHoldEffect((EFingerType fingerType, ENoteType noteType, EJudgementType judgeType, int lane, List<NoteBase> tappingNotes) particleInfo, float parentX, float childX)
         {
             if (!playingHoldParticleDict.ContainsKey(particleInfo.lane)
-                && particleInfo.fingerType.EnumEquals(EFingerType.Down)
-                && !particleInfo.judgeType.EnumEquals(EJudgementType.Miss))
+                && particleInfo.fingerType == EFingerType.Down
+                && particleInfo.judgeType != EJudgementType.Miss)
             {
                 var holdParticle = holdParticlePool.Get();
                 holdParticle.Play(parentX);

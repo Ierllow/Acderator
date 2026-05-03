@@ -10,7 +10,7 @@ namespace Song
 {
     public sealed class SongLoadResult
     {
-        public bool IsSuccess => LoadResult.EnumEquals(ELoadResult.None);
+        public bool IsSuccess => LoadResult == ELoadResult.None;
         public ELoadResult LoadResult { get; init; }
         public LoadedChartInfo ChartInfo { get; init; }
     }

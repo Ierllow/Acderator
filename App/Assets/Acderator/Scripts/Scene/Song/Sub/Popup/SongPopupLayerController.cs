@@ -21,7 +21,7 @@ namespace Song
         [Inject] private SceneManager sceneManager;
 
         public IUniTaskAsyncEnumerable<EPopupTapKind> ClosedPausePopupAsAsyncEnumerable => UniTaskAsyncEnumerable.EveryValueChanged(pausePopup, x => x.TapKind);
-        public Observable<ESceneType> EverySceneTypeChanged => asyncSceneTypeSubject.Where(x => !x.EnumEquals(ESceneType.None));
+        public Observable<ESceneType> EverySceneTypeChanged => asyncSceneTypeSubject.Where(x => x != ESceneType.None);
 
         private readonly Subject<ESceneType> asyncSceneTypeSubject = new();
 
@@ -47,7 +47,7 @@ namespace Song
 
         public void OnOpenPausePopup(bool showRestartButton)
         {
-            if (currentOpenPopupType.EnumEquals(EType.Pause)) return;
+            if (currentOpenPopupType == EType.Pause) return;
 
             currentOpenPopupType = EType.Pause;
             pausePopup.Open(showRestartButton, () => currentOpenPopupType = EType.None);
@@ -55,7 +55,7 @@ namespace Song
 
         private void OnOpenScoreErrorPopup(ELoadResult loadResult)
         {
-            if (currentOpenPopupType.EnumEquals(EType.ScoreError)) return;
+            if (currentOpenPopupType == EType.ScoreError) return;
 
             currentOpenPopupType = EType.ScoreError;
             errorPopup.Open(loadResult, () =>
@@ -67,7 +67,7 @@ namespace Song
 
         private async UniTask OnOpenErrorPopup()
         {
-            if (currentOpenPopupType.EnumEquals(EType.Error)) return;
+            if (currentOpenPopupType == EType.Error) return;
 
             currentOpenPopupType = EType.Error;
             var completionSource = AutoResetUniTaskCompletionSource.Create();
@@ -79,7 +79,7 @@ namespace Song
 
         private void OnOpenSaveScoreDataErrorPopup()
         {
-            if (currentOpenPopupType.EnumEquals(EType.ScoreData)) return;
+            if (currentOpenPopupType == EType.ScoreData) return;
 
             currentOpenPopupType = EType.ScoreData;
             var popupContext = new CommonPopupContext

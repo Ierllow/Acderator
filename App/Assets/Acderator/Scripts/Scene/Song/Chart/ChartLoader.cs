@@ -95,7 +95,7 @@ namespace Song
             foreach (var line in lineList.Where(l => !l.StartsWith("#0000")))
             {
                 var parsedLine = ParseLine(line);
-                if (!parsedLine.DataType.EnumEquals(ChartDataType.LongNote)) continue;
+                if (parsedLine.DataType != ChartDataType.LongNote) continue;
 
                 var countObj = parsedLine.Body.Length / 2;
                 for (var i = 0; i < countObj; i++)
@@ -116,7 +116,7 @@ namespace Song
             foreach (var line in lineList.Where(l => !l.StartsWith("#0000")))
             {
                 var parsedLine = ParseLine(line);
-                if (parsedLine.DataType.EnumEquals(ChartDataType.Unknown))
+                if (parsedLine.DataType == ChartDataType.Unknown)
                 {
                     loadedChartInfo.LoadResult = ELoadResult.Unsupported;
                     return;

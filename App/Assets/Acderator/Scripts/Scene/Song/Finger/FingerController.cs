@@ -81,7 +81,7 @@ namespace Song
 
         private float GetNoteDiffSec(EFingerType fingerType, NoteData noteData)
         {
-            if (noteData.NoteType.EnumEquals(ENoteType.Curve))
+            if (noteData.NoteType == ENoteType.Curve)
             {
                 var curveProgress = Mathf.Clamp01((notesManager.CurrentSec - noteData.SecBegin) / noteData.CurveDuration);
                 return notesManager.GetCurveNoteDiffSec(noteData, curveProgress);
@@ -100,10 +100,10 @@ namespace Song
                 && previousLane != lane
                 && notesManager.TryGetNote(EFingerType.Up, lane, out var note)
                 && note.IsTapping
-                && (note.NoteData.NoteType.EnumEquals(ENoteType.Long) || note.NoteData.NoteType.EnumEquals(ENoteType.Curve)))
+                && (note.NoteData.NoteType == ENoteType.Long || note.NoteData.NoteType == ENoteType.Curve))
             {
                 var judgementType = GetNoteDiffSec(EFingerType.Up, note.NoteData).GetJudgmentType(masterDataManager);
-                judgementType = !judgementType.EnumEquals(EJudgementType.None) ? judgementType : EJudgementType.Miss;
+                judgementType = judgementType != EJudgementType.None ? judgementType : EJudgementType.Miss;
 
                 note.OnJudgedNote(EFingerType.Up, judgementType);
 
@@ -134,7 +134,7 @@ namespace Song
             if (notesManager.TryGetNote(EFingerType.Up, lane, out var note))
             {
                 var judgementType = GetNoteDiffSec(EFingerType.Up, note.NoteData).GetJudgmentType(masterDataManager);
-                judgementType = !judgementType.EnumEquals(EJudgementType.None) ? judgementType : EJudgementType.Miss;
+                judgementType = judgementType != EJudgementType.None ? judgementType : EJudgementType.Miss;
 
                 note.OnJudgedNote(EFingerType.Up, judgementType);
                 fingerInfo = new FingerInfo
@@ -156,7 +156,7 @@ namespace Song
 
             var diff = GetNoteDiffSec(EFingerType.Up, note.NoteData);
             var judgementType = diff.GetJudgmentType(masterDataManager);
-            judgementType = !judgementType.EnumEquals(EJudgementType.None) ? judgementType : EJudgementType.Miss;
+            judgementType = judgementType != EJudgementType.None ? judgementType : EJudgementType.Miss;
 
             note.OnJudgedNote(EFingerType.Up, judgementType);
 

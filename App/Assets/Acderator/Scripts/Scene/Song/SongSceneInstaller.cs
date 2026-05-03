@@ -18,7 +18,7 @@ namespace Song
             Container.Bind<HpBarController>().AsSingle();
             Container.Bind<SongResultCalculator>().AsSingle();
             Container.Bind<ScoreNumController>().AsSingle();
-            Container.If(songSceneContext.SongMode.EnumEquals(ESongMode.Normal)).Bind<SongApplicationPauseHandler>().AsSingle();
+            Container.If(songSceneContext.SongMode == ESongMode.Normal).Bind<SongApplicationPauseHandler>().AsSingle();
             Container.BindInterfacesAndSelfTo<SongParticleController>().FromComponentInHierarchy().AsSingle();
             Container.BindInterfacesAndSelfTo<FrameRateController>().AsSingle();
             Container.BindInterfacesAndSelfTo<SongLoopController>().AsSingle();
@@ -26,8 +26,8 @@ namespace Song
             Container.BindInterfacesAndSelfTo<NoteSpawnController>().FromComponentInHierarchy().AsSingle();
             Container.If(songSceneContext.IsAuto).BindInterfacesAndSelfTo<AutoFingerController>().AsSingle();
             Container.If(!songSceneContext.IsAuto).BindInterfacesAndSelfTo<FingerController>().FromComponentInHierarchy().AsSingle();
-            Container.If(songSceneContext.SongMode.EnumEquals(ESongMode.Tutorial)).BindInterfacesAndSelfTo<SongTutorialLayerController>().AsSingle();
-            Container.If(songSceneContext.SongMode.EnumEquals(ESongMode.Tutorial)).BindInterfacesAndSelfTo<SongTutorialStateController>().AsSingle();
+            Container.If(songSceneContext.SongMode == ESongMode.Tutorial).BindInterfacesAndSelfTo<SongTutorialLayerController>().AsSingle();
+            Container.If(songSceneContext.SongMode == ESongMode.Tutorial).BindInterfacesAndSelfTo<SongTutorialStateController>().AsSingle();
             Container.Bind<SongControllerCollection>().AsSingle().WithArguments(songSceneContext.TutorialData);
             Container.Bind<SongControllerResolver>().AsSingle();
             Container.Bind<SongAssetLoader>().AsSingle();

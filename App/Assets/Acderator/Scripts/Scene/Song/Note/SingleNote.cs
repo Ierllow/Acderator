@@ -7,7 +7,7 @@ namespace Song
     {
         public override void OnJudgedNote(EFingerType fingerType, EJudgementType judgmentType)
         {
-            if (fingerType.EnumEquals(EFingerType.Down) && !judgmentType.EnumEquals(EJudgementType.None)) Final();
+            if (fingerType == EFingerType.Down && judgmentType != EJudgementType.None) Final();
         }
     }
 }

@@ -26,7 +26,7 @@ namespace Song
         {
             switch (fingerType)
             {
-                case EFingerType.Down when !judgmentType.EnumEquals(EJudgementType.None):
+                case EFingerType.Down when judgmentType != EJudgementType.None:
                     IsTapping = true;
                     trailSprite.color = tappingTrailColor;
                     break;

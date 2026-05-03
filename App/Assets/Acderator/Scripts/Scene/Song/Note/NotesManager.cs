@@ -54,13 +54,13 @@ namespace Song
 
         public float GetDiffSec(EFingerType fingerType, NoteData noteData)
         {
-            var noteSec = fingerType.EnumEquals(EFingerType.Down) ? noteData.SecBegin : noteData.SecEnd;
+            var noteSec =fingerType == EFingerType.Down ? noteData.SecBegin : noteData.SecEnd;
             return Math.Abs(noteSec - CurrentSec + SongOption.TapTiming * 0.1f);
         }
 
         public float GetCurveNoteDiffSec(NoteData noteData, float curveProgress)
         {
-            if (noteData.NoteType.EnumEquals(ENoteType.Curve))
+            if (noteData.NoteType == ENoteType.Curve)
             {
                 var curveTime = noteData.SecBegin + noteData.CurveDuration * curveProgress;
                 return Math.Abs(curveTime - CurrentSec + SongOption.TapTiming * 0.1f);
@@ -70,7 +70,7 @@ namespace Song
 
         public bool TryGetNote(EFingerType type, int lane, out NoteBase note)
         {
-            var mode = type.EnumEquals(EFingerType.Down) ? NoteSearchMode.Down : NoteSearchMode.Up;
+            var mode =type == EFingerType.Down ? NoteSearchMode.Down : NoteSearchMode.Up;
             return TryGetNearestNote(lane, mode, out note);
         }
 
@@ -92,7 +92,7 @@ namespace Song
                     case NoteSearchMode.Down when candidate.IsTapping:
                     case NoteSearchMode.Up when !candidate.IsTapping:
                         continue;
-                    case NoteSearchMode.Flick when !candidate.NoteData.NoteType.EnumEquals(ENoteType.Flick):
+                    case NoteSearchMode.Flick when candidate.NoteData.NoteType != ENoteType.Flick:
                         continue;
                 }
 

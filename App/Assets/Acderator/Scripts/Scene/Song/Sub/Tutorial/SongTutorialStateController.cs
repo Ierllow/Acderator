@@ -62,7 +62,7 @@ namespace Song
 
             if (hasStarted && tutorialStartTime <= 0f) tutorialStartTime = Time.time;
 
-            if (cachedTutorialState.EnumEquals(ETutorialState.Step))
+            if (cachedTutorialState == ETutorialState.Step)
             {
                 if (Time.time - tutorialStartTime >= tutorialData.GetCurrentStep().TriggerTime)
                 {

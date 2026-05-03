@@ -126,7 +126,7 @@ public class AtlasImageEditor : ImageEditor
             {
                 type.enumValueIndex = (int)Image.Type.Sliced;
             }
-            else if (oldType.EnumEquals(Image.Type.Sliced))
+            else if (oldType == Image.Type.Sliced)
             {
                 type.enumValueIndex = (int)Image.Type.Simple;
             }

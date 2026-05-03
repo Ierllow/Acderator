@@ -17,14 +17,14 @@ namespace Intense.Attribute
     {
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
-            Debug.Assert(property.propertyType.EnumEquals(SerializedPropertyType.ObjectReference));
+            Debug.Assert(property.propertyType == SerializedPropertyType.ObjectReference);
             var baseHeight = EditorGUI.GetPropertyHeight(property, label, true);
             return IsMissing(property) ? baseHeight + EditorGUIUtility.singleLineHeight * 1.2f : baseHeight;
         }
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
-            if (!property.propertyType.EnumEquals(SerializedPropertyType.ObjectReference))
+            if (property.propertyType != SerializedPropertyType.ObjectReference)
             {
                 EditorGUI.HelpBox(position, string.Format("{0} must be a UnityEngine.Object reference.", label.text), MessageType.Error);
                 return;

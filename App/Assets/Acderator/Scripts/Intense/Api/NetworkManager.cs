@@ -37,7 +37,7 @@ namespace Intense.Api
 
         public async UniTask<ResponseBase> RequestAsync(RequestBase request)
         {
-            if (Application.internetReachability.EnumEquals(NetworkReachability.NotReachable))
+            if (Application.internetReachability == NetworkReachability.NotReachable)
             {
                 return default;
             }
@@ -55,7 +55,7 @@ namespace Intense.Api
                 www.timeout = 60;
                 await www.SendWebRequest();
                 var responseBytes = www.downloadHandler.data;
-                if (!www.result.EnumEquals(UnityWebRequest.Result.Success)) return default;
+                if (www.result != UnityWebRequest.Result.Success) return default;
                 var responseData = MessagePackSerializer.Deserialize<Dictionary<string, object>>(responseBytes);
                 var response = request.CreateResponse(responseData);
                 Debug.Log(string.Format("errorCode: {0}, networkError: {1}, errorResponse: {2}", response.ErrorCode, response.NetworkError, response.ErrorMessage));

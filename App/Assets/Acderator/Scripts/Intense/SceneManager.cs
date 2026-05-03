@@ -39,7 +39,7 @@ namespace Intense
             if (a == 0.0f)
             {
                 IsFadeIn = true;
-                header.SetHeaderActive(CurrentSceneType.EnumEquals(ESceneType.SongSelect));
+                header.SetHeaderActive(CurrentSceneType == ESceneType.SongSelect);
                 loading.HideLoading();
             }
             else if (a == 1.0f)
@@ -58,13 +58,13 @@ namespace Intense
         {
             var type = scene.GetType();
             var sceneType = type.GetCustomAttribute<SceneTypeAttribute>().Type;
-            if (sceneType.EnumEquals(ESceneType.None)) throw new InvalidSceneTypeException(sceneType);
+            if (sceneType == ESceneType.None) throw new InvalidSceneTypeException(sceneType);
             if (!sceneBaseDict.TryAdd(sceneType, scene)) throw new DuplicateSceneTypeException(sceneType);
         }
 
         public async UniTask ChangeSceneAsync(ESceneType sceneType, SceneContext context = default, bool sameScene = false)
         {
-            if (!CurrentSceneType.EnumEquals(sceneType) || sameScene)
+            if (CurrentSceneType != sceneType || sameScene)
             {
                 await FadeOutAsync();
 

@@ -24,7 +24,7 @@ namespace Song
                     note.OnJudgedNote(EFingerType.Down, EJudgementType.Perfect);
                     NotifyFinger(new FingerInfo { NoteBase = note, FingerType = EFingerType.Down, JudgmentType = EJudgementType.Perfect });
                 }
-                else if (!note.NoteData.NoteType.EnumEquals(ENoteType.Single) && IsJustNoteTiming(note, EFingerType.Up))
+                else if (note.NoteData.NoteType != ENoteType.Single && IsJustNoteTiming(note, EFingerType.Up))
                 {
                     note.OnJudgedNote(EFingerType.Up, EJudgementType.Perfect);
                     NotifyFinger(new FingerInfo { NoteBase = note, FingerType = EFingerType.Up, JudgmentType = EJudgementType.Perfect });
@@ -35,13 +35,13 @@ namespace Song
         private bool IsJustNoteTiming(NoteBase noteBase, EFingerType fingerType) => noteBase.NoteData.NoteType switch
         {
             ENoteType.Single => noteBase.NoteData.SecBegin <= notesManager.CurrentSec,
-            ENoteType.Flick => fingerType.EnumEquals(EFingerType.Down)
+            ENoteType.Flick => fingerType == EFingerType.Down
                                 ? noteBase.NoteData.SecBegin <= notesManager.CurrentSec && !noteBase.IsTapping
                                 : noteBase.IsTapping,
-            ENoteType.Long => fingerType.EnumEquals(EFingerType.Down)
+            ENoteType.Long => fingerType == EFingerType.Down
                                 ? noteBase.NoteData.SecBegin <= notesManager.CurrentSec && !noteBase.IsTapping
                                 : noteBase.NoteData.SecEnd <= notesManager.CurrentSec && noteBase.IsTapping,
-            ENoteType.Curve => fingerType.EnumEquals(EFingerType.Down)
+            ENoteType.Curve => fingerType == EFingerType.Down
                                 ? noteBase.NoteData.SecBegin <= notesManager.CurrentSec && !noteBase.IsTapping
                                 : noteBase.NoteData.SecBegin + noteBase.NoteData.CurveDuration <= notesManager.CurrentSec && noteBase.IsTapping,
             _ => false,

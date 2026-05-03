@@ -34,7 +34,7 @@ namespace Intense.UI
         private void OnLog(string _, string __, LogType type)
         {
             if (cancellationTokenSource.IsCancellationRequested) return;
-            if (type.EnumEquals(LogType.Exception)) Cancel();
+            if (type == LogType.Exception) Cancel();
         }
 
         private void OnUnhandled(object sender, UnhandledExceptionEventArgs e)

@@ -76,7 +76,7 @@ namespace Title
             var completionSource = AutoResetUniTaskCompletionSource<ECommonPopupTapKind>.Create();
             var context = PopupContextFactory.CreateNetworkErrorPopupContext(completionSource, response?.ErrorMessage ?? "通信に失敗しました。", response?.ErrorCode ?? 0);
             popupManager.OpenPopup(context);
-            return (await completionSource.Task).EnumEquals(ECommonPopupTapKind.Negative);
+            return(await completionSource.Task) == ECommonPopupTapKind.Negative;
         }
 
         private async UniTask LoadAssets(CancellationToken token)

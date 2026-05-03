@@ -12,7 +12,7 @@ namespace Song
 
         public void Emit(float xParentPosition, float xChildPosition, EJudgementType type)
         {
-            if (type.EnumEquals(EJudgementType.None)) return;
+            if (type == EJudgementType.None) return;
 
             atlas.SetAtlasFormat("judgetext_{0}", (int)type, "song/particle/judgetext");
             particleSystemRenderer.material.mainTexture = atlas.mainTexture;

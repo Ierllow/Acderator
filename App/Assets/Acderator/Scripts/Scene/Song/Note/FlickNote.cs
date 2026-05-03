@@ -23,7 +23,7 @@ namespace Song
             switch (fingerType)
             {
                 case EFingerType.Down:
-                    IsTapping = !judgmentType.EnumEquals(EJudgementType.None);
+                    IsTapping = judgmentType != EJudgementType.None;
                     break;
                 case EFingerType.Up:
                     Final();

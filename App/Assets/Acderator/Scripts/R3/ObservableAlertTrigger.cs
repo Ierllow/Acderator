@@ -12,7 +12,7 @@ namespace R3.Triggers
 
         private void Awake()
         {
-            logMessageReceived = (_, __, type) => onAlert?.OnNext(type.EnumEquals(LogType.Exception));
+            logMessageReceived = (_, __, type) => onAlert?.OnNext(type == LogType.Exception);
             Application.logMessageReceived += logMessageReceived;
         }
 

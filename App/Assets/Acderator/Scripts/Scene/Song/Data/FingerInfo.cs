@@ -14,8 +14,8 @@ namespace Song
 
         public bool IsMissed => MissInfo?.afterMiss ?? false;
 
-        public bool IsFlick => NoteBase?.NoteData?.NoteType.EnumEquals(ENoteType.Flick) ?? false;
+        public bool IsFlick => NoteBase?.NoteData?.NoteType == ENoteType.Flick;
 
-        public bool IsMiss => JudgmentType.EnumEquals(EJudgementType.Miss);
+        public bool IsMiss => JudgmentType == EJudgementType.Miss;
     }
 }

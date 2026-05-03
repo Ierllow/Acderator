@@ -12,7 +12,7 @@ namespace Song
         public List<NoteData> NoteDataList { get; } = new();
         public HeaderData HeaderData { get; set; }
 
-        public int NoteCount => NoteDataList.Sum(x => x.NoteType.EnumEquals(ENoteType.Long) ? 2 : 1);
+        public int NoteCount => NoteDataList.Sum(x => x.NoteType == ENoteType.Long ? 2 : 1);
 
         public void AddNoteData(float beatBegin, float beatEnd, int lane, ENoteType noteType = ENoteType.Single) => NoteDataList.Add(new()
         {

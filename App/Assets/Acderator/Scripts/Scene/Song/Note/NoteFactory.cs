@@ -23,7 +23,7 @@ namespace Song
         public void Init()
         {
             var laneCount = parents.Length;
-            var typeCount = EnumExtensions.GetValues<ENoteType>().Count;
+            var typeCount = Enum.GetValues(typeof(ENoteType)).Length;
             pools = new NotePool<NoteBase>[typeCount, laneCount];
 
             foreach (var (parent, lane) in parents.Select((parent, lane) => (parent, lane)))

@@ -1,4 +1,3 @@
-﻿using FastEnumUtility;
 using Intense.Attribute;
 using Intense.Data;
 using Intense.Master;
@@ -43,8 +42,8 @@ namespace SongSelect
 
         public void UpdateOrderType(EOrderType orderType) => CurrentOrderType = orderType;
 
-        public void SetNextOrderType() => CurrentOrderType = FastEnum.GetValues<EOrderType>().ElementAtOrDefault((int)CurrentOrderType + 1);
+        public void SetNextOrderType() => CurrentOrderType = ((EOrderType[])Enum.GetValues(typeof(EOrderType))).ElementAtOrDefault((int)CurrentOrderType + 1);
 
-        public void SaveOrderType() => PlayerPrefsValues.Set(EKey.OrderType, CurrentOrderType.GetLength());
+        public void SaveOrderType() => PlayerPrefsValues.Set(EKey.OrderType, (int)CurrentOrderType);
     }
 }

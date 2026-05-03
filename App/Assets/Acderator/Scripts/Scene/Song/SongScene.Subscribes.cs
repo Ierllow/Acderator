@@ -43,9 +43,9 @@ namespace Song
                 songControllerResolver.Loop.UpdateState(ESongState.Stop);
                 songPopupLayerController.OnOpenPausePopup(!sceneContext.IsAuto);
             }
-            songPopupLayerController.ClosedPausePopupAsAsyncEnumerable.TakeWhile(_ => sceneContext.SongMode.EnumEquals(ESongMode.Normal)).SubscribeAwait(ClosedPausePopupSubscribeNext).RegisterTo(destroyCancellationToken);
-            songPopupLayerController.EverySceneTypeChanged.Where(s => !(s.EnumEquals(ESceneType.None) && songControllerResolver.Loop.SongStateEnumEquals(ESongState.End)) && s.EnumEquals(ESceneType.Result)).SubscribeAwait(async (s, _) => await sceneManager.ChangeSceneAsync(s, sceneContext.ToResultSceneContext(songLayerController.CurrentScore, songLayerController.JudgeCountDict))).RegisterTo(destroyCancellationToken);
-            songLayerController.OnTapPauseButtonAsObservable.TakeWhile(_ => sceneContext.SongMode.EnumEquals(ESongMode.Normal) && !songControllerResolver.Loop.SongStateEnumEquals(ESongState.End)).Subscribe(_ => PauseButtonSubscribeCallback()).RegisterTo(destroyCancellationToken);
+            songPopupLayerController.ClosedPausePopupAsAsyncEnumerable.TakeWhile(_ => sceneContext.SongMode == ESongMode.Normal).SubscribeAwait(ClosedPausePopupSubscribeNext).RegisterTo(destroyCancellationToken);
+            songPopupLayerController.EverySceneTypeChanged.Where(s => !(s == ESceneType.None && songControllerResolver.Loop.CurrentState == ESongState.End) && s == ESceneType.Result).SubscribeAwait(async (s, _) => await sceneManager.ChangeSceneAsync(s, sceneContext.ToResultSceneContext(songLayerController.CurrentScore, songLayerController.JudgeCountDict))).RegisterTo(destroyCancellationToken);
+            songLayerController.OnTapPauseButtonAsObservable.TakeWhile(_ => sceneContext.SongMode == ESongMode.Normal && songControllerResolver.Loop.CurrentState != ESongState.End).Subscribe(_ => PauseButtonSubscribeCallback()).RegisterTo(destroyCancellationToken);
             songLayerController.Subscribes(_ => !sceneContext.IsAuto, destroyCancellationToken);
             songControllerResolver.TutorialState?.TutorialEventSubject.Subscribe(songControllerResolver.Tutorial.UpdateTutorial).RegisterTo(destroyCancellationToken);
         }
@@ -55,7 +55,7 @@ namespace Song
 #if UNITY_EDITOR
             this.OnPauseStateChangedAsObservable().Subscribe((state) =>
             {
-                if (state.EnumEquals(PauseState.Paused))
+                if (state == PauseState.Paused)
                 {
                     songControllerResolver.Loop.UpdateState(ESongState.Stop);
                     songPopupLayerController.OnOpenPausePopup(sceneContext.IsAuto);

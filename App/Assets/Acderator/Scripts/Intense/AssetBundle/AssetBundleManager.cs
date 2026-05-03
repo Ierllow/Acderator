@@ -45,7 +45,7 @@ namespace Intense.Asset
                         loading.ShowLoading();
                         using var request = UnityWebRequest.Get(string.Format("{0}/filelist.txt", networkConfigObject.assetServerUrl));
                         await request.SendWebRequest();
-                        if (!request.result.EnumEquals(UnityWebRequest.Result.Success) && await TryRetryAssetErrorAsync(request.result))
+                        if (request.result != UnityWebRequest.Result.Success && await TryRetryAssetErrorAsync(request.result))
                             continue;
 
                         foreach (var line in request.downloadHandler.text.Split('\n'))
@@ -82,7 +82,7 @@ namespace Intense.Asset
 
                         using var request = UnityWebRequestAssetBundle.GetAssetBundle(string.Format("{0}/{1}", networkConfigObject.assetServerUrl, bundleName), new CachedAssetBundle(info.BundleName, info.Hash), info.Crc);
                         await request.SendWebRequest();
-                        if (!request.result.EnumEquals(UnityWebRequest.Result.Success) && await TryRetryAssetErrorAsync(request.result))
+                        if (request.result != UnityWebRequest.Result.Success && await TryRetryAssetErrorAsync(request.result))
                             continue;
 
                         assetBundleDict[bundleName] = new LoadedAssetBundle { SceneType = currentSceneType, Bundle = DownloadHandlerAssetBundle.GetContent(request) };
@@ -125,12 +125,12 @@ namespace Intense.Asset
         private async UniTask<bool> TryRetryAssetErrorAsync(UnityWebRequest.Result result)
         {
             var completionSource = AutoResetUniTaskCompletionSource<ECommonPopupTapKind>.Create();
-            var kind = result.EnumEquals(UnityWebRequest.Result.ProtocolError)
+            var kind =result == UnityWebRequest.Result.ProtocolError
                 ? EAssetBundleErrorKind.ProtocolError
                 : EAssetBundleErrorKind.ConnectionError;
             var popupContext = PopupContextFactory.CreateAssetErrorPopupContext(completionSource, kind);
             popupManager.OpenPopup(popupContext);
-            return (await completionSource.Task).EnumEquals(ECommonPopupTapKind.Positive);
+            return(await completionSource.Task) == ECommonPopupTapKind.Positive;
         }
 
         private async UniTask<bool> TryDownloadConfirmedAsync(long fileSize)

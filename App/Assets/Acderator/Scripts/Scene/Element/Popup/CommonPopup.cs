@@ -36,7 +36,7 @@ namespace Element.UI
             text.Text.SetText(context.Text);
             negativeText.SetText(context.NegativeText);
 
-            var isBoth = context.ButtonType.EnumEquals(EButtonType.Both);
+            var isBoth =context.ButtonType == EButtonType.Both;
             positiveObj.SetActive(isBoth);
             positiveText.SetText(isBoth ? context.PositiveText : "");
 
