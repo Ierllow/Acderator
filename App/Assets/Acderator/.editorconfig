@@ -69,6 +69,7 @@ dotnet_code_quality_unused_parameters = all
 
 # 抑制の設定
 dotnet_remove_unnecessary_suppression_exclusions = none
+dotnet_diagnostic.CA1031.severity = none
 
 # 改行設定
 dotnet_style_allow_multiple_blank_lines_experimental = false:warning
