@@ -1,13 +1,27 @@
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace Intense.Api
 {
-
     public class UserDataResponse : ResponseBase
     {
-        public Dictionary<string, object> Scores => responseDate.TryGetValue("scores", out var userData) ? (Dictionary<string, object>)userData : default;
+        public Dictionary<string, object> Scores
+        {
+            get
+            {
+                if (Body.TryGetDictionary("scores", out var oldFormatScores)) return oldFormatScores;
 
-        public UserDataResponse(Dictionary<string, object> responseDate) : base(responseDate) { }
+                var scores = new Dictionary<string, object>();
+                foreach (var item in Body.GetList("scores"))
+                {
+                    if (!item.TryConvertDictionary(out var scoreData)) continue;
+                    if (!scoreData.TryGetInt("score_id", out var scoreId)) continue;
+                    if (!scoreData.TryGetInt("score", out var score)) continue;
+                    scores[scoreId.ToString()] = score;
+                }
+                return scores;
+            }
+        }
+
+        public UserDataResponse(Dictionary<string, object> responseData) : base(responseData) { }
     }
 }

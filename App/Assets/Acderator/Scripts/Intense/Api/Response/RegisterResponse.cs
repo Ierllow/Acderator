@@ -1,15 +1,13 @@
-﻿using System.Collections.Generic;
-using UnityEditor;
+using System.Collections.Generic;
 
 namespace Intense.Api
 {
     public class RegisterResponse : ResponseBase
     {
-        public string Token => responseDate.TryGetValue("token", out var token) ? (string)token : string.Empty;
-        public int UserId => responseDate.TryGetValue("userid", out var userid) ? (int)userid : 0;
-        public string PassWord => responseDate.TryGetValue("password", out var password) ? (string)password : string.Empty;
-        public Dictionary<string, object> Master => Header?.TryGetValue("master", out var master) ?? false ? master as Dictionary<string, object> : default;
+        public string Token => Body.TryGetString("token", out var token) ? token : string.Empty;
+        public int UserId => Body.TryGetInt("userid", out var userid) ? userid : 0;
+        public string Password => Body.TryGetString("password", out var password) && !string.IsNullOrEmpty(password) ? password : UserId.ToString();
 
-        public RegisterResponse(Dictionary<string, object> responseDate) : base(responseDate) { }
+        public RegisterResponse(Dictionary<string, object> responseData) : base(responseData) { }
     }
 }

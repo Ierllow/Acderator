@@ -1,9 +1,10 @@
 ﻿using Cysharp.Threading.Tasks;
 using Master;
+using Intense.Api;
 using MessagePack.Resolvers;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 using Zenject;
 
 namespace Intense.Master
@@ -18,19 +19,51 @@ namespace Intense.Master
         {
             var completionSource = AutoResetUniTaskCompletionSource.Create();
             var builder = new DatabaseBuilder();
-            builder.Append(masterDict.TryGetValue("version", out var version) ? (version as Dictionary<string, object>).Select(x => VersionMaster.From((Dictionary<string, object>)x.Value)).ToList() : default);
-            builder.Append(masterDict.TryGetValue("title_masters", out var titleMasters) ? (titleMasters as Dictionary<string, object>).Select(x => TitleMaster.From((Dictionary<string, object>)x.Value)).ToList() : default);
-            builder.Append(masterDict.TryGetValue("song_masters", out var songMasters) ? (songMasters as Dictionary<string, object>).Select(x => SongMaster.From((Dictionary<string, object>)x.Value)).ToList() : default);
-            builder.Append(masterDict.TryGetValue("song_select_masters", out var songSelectMasters) ? (songSelectMasters as Dictionary<string, object>).Select(x => SongSelectMaster.From((Dictionary<string, object>)x.Value)).ToList() : default);
-            builder.Append(masterDict.TryGetValue("song_score_rate_masters", out var songScoreRateMasters) ? (songScoreRateMasters as Dictionary<string, object>).Select(x => SongScoreRateMaster.From((Dictionary<string, object>)x.Value)).ToList() : default);
-            builder.Append(masterDict.TryGetValue("song_judge_zone_masters", out var songJudgeZoneMasters) ? (songJudgeZoneMasters as Dictionary<string, object>).Select(x => SongJudgeZoneMaster.From((Dictionary<string, object>)x.Value)).ToList() : default);
-            builder.Append(masterDict.TryGetValue("song_hp_rate_masters", out var songHpRateMasters) ? (songHpRateMasters as Dictionary<string, object>).Select(x => SongHpRateMaster.From((Dictionary<string, object>)x.Value)).ToList() : default);
-            builder.Append(masterDict.TryGetValue("result_masters", out var resultMasters) ? (resultMasters as Dictionary<string, object>).Select(x => ResultMaster.From((Dictionary<string, object>)x.Value)).ToList() : default);
-            builder.Append(masterDict.TryGetValue("sound_sheet_name_masters", out var soundSheetNameMasters) ? (soundSheetNameMasters as Dictionary<string, object>).Select(x => SoundSheetNameMaster.From((Dictionary<string, object>)x.Value)).ToList() : default);
+            var baseScore = FirstInt(masterDict, "base_score_masters", "score");
+            var baseHp = FirstInt(masterDict, "base_hp_masters", "hp");
+
+            builder.Append(SetVersion(masterDict));
+            builder.Append(ReadMasters(masterDict, "title_masters", TitleMaster.From));
+            builder.Append(ReadMasters(masterDict, "song_masters", x =>
+            {
+                if (!x.ContainsKey("score")) x["score"] = baseScore;
+                if (!x.ContainsKey("hp")) x["hp"] = baseHp;
+                return SongMaster.From(x);
+            }));
+            builder.Append(ReadMasters(masterDict, "song_select_masters", SongSelectMaster.From));
+            builder.Append(ReadMasters(masterDict, "score_rate_masters", x => SongScoreRateMaster.From(RenameKey(x, "r_type", "type"))));
+            builder.Append(ReadMasters(masterDict, "judge_zone_masters", x => SongJudgeZoneMaster.From(RenameKey(x, "j_type", "type"))));
+            builder.Append(ReadMasters(masterDict, "hp_rate_masters", x => SongHpRateMaster.From(RenameKey(x, "j_type", "type"))));
+            builder.Append(ReadMasters(masterDict, "result_masters", ResultMaster.From));
+            builder.Append(ReadMasters(masterDict, "sound_sheet_masters", SoundSheetNameMaster.From));
             MemoryDatabase = new(builder.Build());
             completionSource.TrySetResult();
 
             await completionSource.Task;
         }
+
+        private static List<VersionMaster> SetVersion(Dictionary<string, object> masterDict)
+        {
+            if (!masterDict.TryGetString("version_master", out var version)) return new();
+
+            PlayerPrefsValues.MV = version;
+            return new()
+            {
+                new()
+                {
+                    Version = int.TryParse(version, out var versionNumber) ? versionNumber : 0,
+                },
+            };
+        }
+
+        private static List<T> ReadMasters<T>(Dictionary<string, object> masterDict, string key, Func<Dictionary<string, object>, T> create) where T : class => masterDict.GetList(key).Select(x => x.TryConvertDictionary(out var dictionary) ? create(dictionary) : default).Where(x => x != null).ToList();
+
+        private static Dictionary<string, object> RenameKey(Dictionary<string, object> dictionary, string from, string to)
+        {
+            if (dictionary.TryGetValue(from, out var value) && !dictionary.ContainsKey(to)) dictionary[to] = value;
+            return dictionary;
+        }
+
+        private static int FirstInt(Dictionary<string, object> masterDict, string listKey, string valueKey) => masterDict.GetList(listKey).Select(x => x.TryConvertDictionary(out var dictionary) && dictionary.TryGetInt(valueKey, out var value) ? value : 0).FirstOrDefault();
     }
 }

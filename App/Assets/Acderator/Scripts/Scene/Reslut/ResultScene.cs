@@ -53,8 +53,9 @@ namespace Result
         private async UniTask TapRetryButton()
         {
             var request = new ScoreBeginRequest();
-            request.PostData.Add("sid", sceneContext.ResultInfo.Sid);
+            request.PostData.Add("score_id", sceneContext.ResultInfo.Sid);
             var response = await networkManager.RequestAsync(request) as ScoreBeginResponse;
+            if (!(response?.IsSuccess ?? false)) return;
             await sceneManager.ChangeSceneAsync(ESceneType.Song, Song.SongSceneContext.Create(new(masterDataManager.MemoryDatabase.SongMasterTable.FindBySid(sceneContext.ResultInfo.Sid)), sceneContext.ResultInfo.IsAuto, Song.ESongMode.Normal, response.SessionId));
         }
     }

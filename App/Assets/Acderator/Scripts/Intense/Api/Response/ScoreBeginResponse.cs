@@ -1,11 +1,11 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 namespace Intense.Api
 {
     public class ScoreBeginResponse : ResponseBase
     {
-        public string SessionId => responseDate.TryGetValue("session_id", out var sessionId) ? (string)sessionId : string.Empty;
+        public string SessionId => Body.TryGetString("session_id", out var sessionId) ? sessionId : string.Empty;
 
-        public ScoreBeginResponse(Dictionary<string, object> responseDate) : base(responseDate) { }
+        public ScoreBeginResponse(Dictionary<string, object> responseData) : base(responseData) { }
     }
 }

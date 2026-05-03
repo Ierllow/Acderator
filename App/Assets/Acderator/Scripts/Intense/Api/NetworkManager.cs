@@ -9,6 +9,26 @@ using Zenject;
 
 namespace Intense.Api
 {
+    public enum NetworkError
+    {
+        None = 0,
+        BadRequest,
+        Unauthorized,
+        Forbidden,
+        NotFound,
+        Conflict,
+        PreconditionFailed,
+        Maintenance,
+        UnsupportedMediaType,
+        TooManyRequests,
+        PayloadTooLarge,
+        InvalidRequestFormat,
+        ResponseFailure,
+        DataFailure,
+        ResourceFailure,
+        ServiceFailure,
+    }
+
     internal class NetworkManager : MonoBehaviour
     {
         [SerializeField] private NetworkConfig networkConfigObject;
@@ -25,23 +45,20 @@ namespace Intense.Api
             loading.ShowLoading();
             try
             {
-                var requestBytes = MessagePackSerializer.Serialize(request.PostData);
                 var session = PlayerPrefsValues.TK;
-                var url = !string.IsNullOrEmpty(session)
-                    ? networkConfigObject.apiServerUrl + "/" + session + "/" + request.ApiKey
-                    : networkConfigObject.apiServerUrl + "/" + request.ApiKey;
+                var url = string.Format("{0}/{1}", networkConfigObject.apiServerUrl, request.ApiKey);
 
-                using var www = new UnityWebRequest(url, UnityWebRequest.kHttpVerbPOST);
-                www.SetRequestHeader("Content-Type", "application/x-msgpack");
-                www.uploadHandler = new UploadHandlerRaw(requestBytes);
+                using var www = new UnityWebRequest(url, request.HttpMethod);
+                www.SetApiRequestHeaders(session, PlayerPrefsValues.MV);
+                if (request.HttpMethod != UnityWebRequest.kHttpVerbGET) www.uploadHandler = new UploadHandlerRaw(MessagePackSerializer.Serialize(request.PostData));
                 www.downloadHandler = new DownloadHandlerBuffer();
                 www.timeout = 60;
                 await www.SendWebRequest();
-                if (!www.result.EnumEquals(UnityWebRequest.Result.Success)) return default;
                 var responseBytes = www.downloadHandler.data;
+                if (!www.result.EnumEquals(UnityWebRequest.Result.Success)) return default;
                 var responseData = MessagePackSerializer.Deserialize<Dictionary<string, object>>(responseBytes);
-                var response = new ResponseBase(responseData);
-                Debug.Log(string.Format("status: {0}, errorResponse: {1}", response.Status, response.ErrorMessage));
+                var response = request.CreateResponse(responseData);
+                Debug.Log(string.Format("errorCode: {0}, networkError: {1}, errorResponse: {2}", response.ErrorCode, response.NetworkError, response.ErrorMessage));
                 return response;
             }
             finally

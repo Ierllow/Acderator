@@ -71,6 +71,7 @@ internal static class PlayerPrefsValues
     public static readonly int SDD = PlayerPrefs.GetInt(SelectedDifficulty, 1);
     public static readonly int OT = PlayerPrefs.GetInt(OrderType, 0);
     internal static string TK { get; set; }
+    internal static string MV { get; set; } = string.Empty;
 
     public static void Set<T>(EKey key, T value)
     {

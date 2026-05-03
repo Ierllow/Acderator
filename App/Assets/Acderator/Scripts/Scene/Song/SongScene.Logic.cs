@@ -133,9 +133,9 @@ namespace Song
         {
             var request = new ScoreSubmitRequest();
             request.PostData.Add("session_id", sessionId);
-            request.PostData.Add("sid", score);
+            request.PostData.Add("score", score);
             var response = await networkManager.RequestAsync(request);
-            return response.Status == 200;
+            return response?.IsSuccess ?? false;
         }
     }
 }

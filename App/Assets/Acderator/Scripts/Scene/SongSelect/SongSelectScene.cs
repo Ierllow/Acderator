@@ -70,8 +70,9 @@ namespace SongSelect
         private async UniTask TapDecideButton()
         {
             var request = new ScoreBeginRequest();
-            request.PostData.Add("sid", songListView.SelectedCellListSid);
+            request.PostData.Add("score_id", songListView.SelectedCellListSid);
             var response = await networkManager.RequestAsync(request) as ScoreBeginResponse;
+            if (!(response?.IsSuccess ?? false)) return;
 
             var groupList = masterDataManager.MemoryDatabase.SongMasterTable.Select(x => x.Group).ToList();
             await sceneManager.ChangeSceneAsync(ESceneType.Song, sceneContext.ToSongSceneContext(masterDataManager.MemoryDatabase.SongMasterTable.FindBySid(songListView.SelectedCellListSid), autoButton.IsOn, response.SessionId));

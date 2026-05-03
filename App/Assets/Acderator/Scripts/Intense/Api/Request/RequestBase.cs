@@ -6,6 +6,8 @@ namespace Intense.Api
     {
         public abstract string ApiKey { get; }
 
+        public virtual string HttpMethod => UnityEngine.Networking.UnityWebRequest.kHttpVerbPOST;
+
         public virtual Dictionary<string, object> PostData { get; } = new();
     }
 }

@@ -1,20 +1,20 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 namespace Intense.Api
 {
     public class ResponseBase
     {
-        protected readonly Dictionary<string, object> responseDate;
+        protected readonly Dictionary<string, object> responseData;
 
-        protected Dictionary<string, object> Header => responseDate.TryGetValue("header", out var header) ? header as Dictionary<string, object> : default;
+        protected Dictionary<string, object> Header => responseData.TryGetDictionary("header", out var header) ? header : default;
+        protected Dictionary<string, object> Body => responseData.TryGetDictionary("body", out var body) ? body : default;
+        public int ErrorCode => Header.TryGetInt("code", out var code) ? code : -1;
+        public string ErrorMessage => Header.TryGetString("message", out var message) ? message : string.Empty;
+        public Dictionary<string, object> Master => Header.TryGetDictionary("master", out var master) ? master : default;
 
-        public int Status => Header?.TryGetValue("status", out var status) ?? false ? (int)status : 0;
+        public NetworkError NetworkError => ErrorCode.GetNetworkError();
+        public bool IsSuccess => NetworkError == NetworkError.None;
 
-        public string ErrorMessage => responseDate.TryGetValue("error", out var error) ? (string)error : string.Empty;
-
-        public ResponseBase(Dictionary<string, object> responseDate)
-        {
-            this.responseDate = responseDate;
-        }
+        public ResponseBase(Dictionary<string, object> responseData) => this.responseData = responseData;
     }
 }
