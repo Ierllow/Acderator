@@ -1,14 +1,12 @@
-﻿using Cysharp.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using Cysharp.Threading.Tasks.Linq;
 using Intense;
 using Intense.Master;
-using Lean.Common;
-using Lean.Touch;
 using R3;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using Zenject;
 
 namespace Song
@@ -17,48 +15,65 @@ namespace Song
 
     public class FingerController : MonoBehaviour, IFingeController
     {
-        [SerializeField] private LeanTouch leanTouch;
-        [SerializeField] private LeanSelectable requiredSelectable;
+        private readonly struct TouchState
+        {
+            public TouchState(Vector2 startScreenPosition, int lane)
+            {
+                StartScreenPosition = startScreenPosition;
+                Lane = lane;
+            }
+
+            public Vector2 StartScreenPosition { get; }
+            public int Lane { get; }
+
+            public TouchState WithLane(int lane) => new(StartScreenPosition, lane);
+        }
+
         [SerializeField] private Camera choose;
         [SerializeField] private Transform hitPlane;
         [SerializeField] private bool ignoreIsOverGui;
         [SerializeField] private bool ignoreStartedOverGui = true;
+        [SerializeField] private float swipeThreshold = 50f;
 
         [Inject] private NotesManager notesManager;
         [Inject] private MasterDataManager masterDataManager;
+        [Inject] private PointerInput pointerInput;
 
-        private readonly Plane touchPlane = new();
         private float dist;
-        private readonly Dictionary<LeanFinger, int> fingerLaneDict = new();
+        private bool useTouch;
+        private readonly Dictionary<int, TouchState> touchStateDict = new();
 
         public Subject<(FingerInfo, int)> FingerInfoSubject { get; } = new();
 
-        public IUniTaskAsyncEnumerable<bool> EveryUseTouchChanged => UniTaskAsyncEnumerable.EveryValueChanged(this, x => x.leanTouch.UseTouch).Where(x => !x);
+        public IUniTaskAsyncEnumerable<bool> EveryUseTouchChanged => UniTaskAsyncEnumerable.EveryValueChanged(this, x => x.useTouch).Where(x => !x);
+
+        private void Start() => UniTaskAsyncEnumerable.EveryUpdate().Subscribe(_ => UpdatePointerInput()).RegisterTo(destroyCancellationToken);
 
         public void Init()
         {
-            touchPlane.SetNormalAndPosition(hitPlane.transform.forward, hitPlane.transform.position);
             dist = Vector3.Distance(choose.transform.position, hitPlane.position);
-
-            LeanTouch.OnFingerDown += FingerDown;
-            LeanTouch.OnFingerUpdate += FingerUpdate;
-            LeanTouch.OnFingerUp += FingerUp;
-            LeanTouch.OnFingerSwipe += FingerSwipe;
-
+            pointerInput.SetCallbacks(FingerDown, FingerUpdate, FingerUp);
             TrySetUseTouch(true);
         }
 
-        private void FingerDown(LeanFinger finger)
+        private void UpdatePointerInput()
         {
-            if (ignoreStartedOverGui && finger.StartedOverGui) return;
-            if (ignoreIsOverGui && finger.IsOverGui) return;
-            if (requiredSelectable != null && !requiredSelectable) return;
+            if (!useTouch) return;
 
-            var touchInPlane = finger.GetWorldPosition(dist, choose);
+            pointerInput.Update();
+        }
+
+        private void FingerDown(int pointerId, Vector2 screenPosition)
+        {
+            var isOverGui = IsPointerOverGui(pointerId);
+            if (ignoreStartedOverGui && isOverGui) return;
+            if (ignoreIsOverGui && isOverGui) return;
+
+            var touchInPlane = GetWorldPosition(screenPosition);
             var fingerInfo = new FingerInfo { FingerType = EFingerType.Down };
             if (TryGetTouchLane(touchInPlane.x, touchInPlane.y, out var lane))
             {
-                fingerLaneDict[finger] = lane;
+                touchStateDict[pointerId] = new TouchState(screenPosition, lane);
 
                 if (notesManager.TryGetNote(EFingerType.Down, lane, out var note))
                 {
@@ -89,15 +104,16 @@ namespace Song
             return notesManager.GetDiffSec(fingerType, noteData);
         }
 
-        private void FingerUpdate(LeanFinger finger)
+        private void FingerUpdate(int pointerId, Vector2 screenPosition)
         {
-            if (!fingerLaneDict.TryGetValue(finger, out var previousLane)) return;
+            if (!touchStateDict.TryGetValue(pointerId, out var touchState)) return;
+            if (ignoreIsOverGui && IsPointerOverGui(pointerId)) return;
 
             var fingerInfo = new FingerInfo { FingerType = EFingerType.Down };
-            var touchInPlane = finger.GetWorldPosition(dist, choose);
+            var touchInPlane = GetWorldPosition(screenPosition);
 
             if (TryGetTouchLane(touchInPlane.x, touchInPlane.y, out var lane)
-                && previousLane != lane
+                && touchState.Lane != lane
                 && notesManager.TryGetNote(EFingerType.Up, lane, out var note)
                 && note.IsTapping
                 && (note.NoteData.NoteType == ENoteType.Long || note.NoteData.NoteType == ENoteType.Curve))
@@ -112,23 +128,30 @@ namespace Song
                     NoteBase = note,
                     JudgmentType = judgementType,
                     FingerType = EFingerType.Up,
-                    TappingNoteList = notesManager.AliveNoteList.Where(x => x.IsActive && x.IsTapping).ToList()
+                    TappingNoteList = CreateTappingNoteList()
                 };
 
-                fingerLaneDict.Remove(finger);
+                touchStateDict.Remove(pointerId);
             }
             else
             {
-                fingerLaneDict[finger] = lane;
+                touchStateDict[pointerId] = touchState.WithLane(lane);
             }
 
             NotifyFinger(fingerInfo, lane);
         }
 
-        private void FingerUp(LeanFinger finger)
+        private void FingerUp(int pointerId, Vector2 screenPosition)
         {
-            if (!fingerLaneDict.TryGetValue(finger, out var lane)) return;
+            if (!touchStateDict.TryGetValue(pointerId, out var touchState)) return;
 
+            if ((touchState.StartScreenPosition - screenPosition).sqrMagnitude > swipeThreshold * swipeThreshold)
+            {
+                FingerSwipe(pointerId);
+                if (!touchStateDict.TryGetValue(pointerId, out touchState)) return;
+            }
+
+            var lane = touchState.Lane;
             var fingerInfo = new FingerInfo { FingerType = EFingerType.Up };
 
             if (notesManager.TryGetNote(EFingerType.Up, lane, out var note))
@@ -145,13 +168,15 @@ namespace Song
                 };
             }
 
-            fingerLaneDict.Remove(finger);
+            touchStateDict.Remove(pointerId);
             NotifyFinger(fingerInfo, lane);
         }
 
-        private void FingerSwipe(LeanFinger finger)
+        private void FingerSwipe(int pointerId)
         {
-            if (!fingerLaneDict.TryGetValue(finger, out var lane)) return;
+            if (!touchStateDict.TryGetValue(pointerId, out var touchState)) return;
+
+            var lane = touchState.Lane;
             if (!notesManager.TryGetFlickNote(lane, out var note)) return;
 
             var diff = GetNoteDiffSec(EFingerType.Up, note.NoteData);
@@ -167,7 +192,23 @@ namespace Song
                 FingerType = EFingerType.Up
             }, lane);
 
-            fingerLaneDict.Remove(finger);
+            touchStateDict.Remove(pointerId);
+        }
+
+        private Vector3 GetWorldPosition(Vector2 screenPosition) => choose.ScreenToWorldPoint(new Vector3(screenPosition.x, screenPosition.y, dist));
+
+        private static bool IsPointerOverGui(int pointerId) => EventSystem.current != null && EventSystem.current.IsPointerOverGameObject(pointerId);
+
+        private List<NoteBase> CreateTappingNoteList()
+        {
+            var aliveNotes = notesManager.AliveNoteList;
+            var tappingNotes = new List<NoteBase>(aliveNotes.Count);
+            for (var i = 0; i < aliveNotes.Count; i++)
+            {
+                var note = aliveNotes[i];
+                if (note.IsActive && note.IsTapping) tappingNotes.Add(note);
+            }
+            return tappingNotes;
         }
 
         private bool TryGetTouchLane(float positionX, float positionY, out int lane)
@@ -182,14 +223,71 @@ namespace Song
 
         public void NotifyFinger(FingerInfo fingerInfo, int lane) => FingerInfoSubject.OnNext((fingerInfo, lane));
 
-        public bool TrySetUseTouch(bool useTouch) => leanTouch.UseTouch != useTouch && (leanTouch.UseTouch = useTouch) || Application.isEditor && (leanTouch.UseMouse = useTouch) && (leanTouch.UseTouch = useTouch) == useTouch;
-
-        private void OnDestroy()
+        public bool TrySetUseTouch(bool useTouch)
         {
-            LeanTouch.OnFingerDown -= FingerDown;
-            LeanTouch.OnFingerUpdate -= FingerUpdate;
-            LeanTouch.OnFingerUp -= FingerUp;
-            LeanTouch.OnFingerSwipe -= FingerSwipe;
+            if (this.useTouch == useTouch) return false;
+
+            this.useTouch = useTouch;
+            if (!useTouch) touchStateDict.Clear();
+            return true;
+        }
+    }
+
+    internal sealed class PointerInput
+    {
+        private const int MousePointerId = -1;
+
+        private Action<int, Vector2> fingerDown;
+        private Action<int, Vector2> fingerUpdate;
+        private Action<int, Vector2> fingerUp;
+
+        public void SetCallbacks(Action<int, Vector2> fingerDown, Action<int, Vector2> fingerUpdate, Action<int, Vector2> fingerUp)
+        {
+            this.fingerDown = fingerDown;
+            this.fingerUpdate = fingerUpdate;
+            this.fingerUp = fingerUp;
+        }
+
+        public void Update()
+        {
+            var touchCount = Input.touchCount;
+            if (Input.touchSupported && touchCount > 0)
+            {
+                UpdateTouches(touchCount);
+                return;
+            }
+
+            if (Application.isEditor) UpdateMouse();
+        }
+
+        private void UpdateTouches(int touchCount)
+        {
+            for (var i = 0; i < touchCount; i++)
+            {
+                var touch = Input.GetTouch(i);
+                switch (touch.phase)
+                {
+                    case TouchPhase.Began:
+                        fingerDown(touch.fingerId, touch.position);
+                        break;
+                    case TouchPhase.Moved:
+                    case TouchPhase.Stationary:
+                        fingerUpdate(touch.fingerId, touch.position);
+                        break;
+                    case TouchPhase.Ended:
+                    case TouchPhase.Canceled:
+                        fingerUp(touch.fingerId, touch.position);
+                        break;
+                }
+            }
+        }
+
+        private void UpdateMouse()
+        {
+            var screenPosition = (Vector2)Input.mousePosition;
+            if (Input.GetMouseButtonDown(0)) fingerDown(MousePointerId, screenPosition);
+            else if (Input.GetMouseButton(0)) fingerUpdate(MousePointerId, screenPosition);
+            else if (Input.GetMouseButtonUp(0)) fingerUp(MousePointerId, screenPosition);
         }
     }
 }

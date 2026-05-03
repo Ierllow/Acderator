@@ -25,6 +25,7 @@ namespace Song
             Container.BindInterfacesAndSelfTo<NoteUpdateOptimizer>().AsSingle();
             Container.BindInterfacesAndSelfTo<NoteSpawnController>().FromComponentInHierarchy().AsSingle();
             Container.If(songSceneContext.IsAuto).BindInterfacesAndSelfTo<AutoFingerController>().AsSingle();
+            Container.If(!songSceneContext.IsAuto).Bind<PointerInput>().AsSingle();
             Container.If(!songSceneContext.IsAuto).BindInterfacesAndSelfTo<FingerController>().FromComponentInHierarchy().AsSingle();
             Container.If(songSceneContext.SongMode == ESongMode.Tutorial).BindInterfacesAndSelfTo<SongTutorialLayerController>().AsSingle();
             Container.If(songSceneContext.SongMode == ESongMode.Tutorial).BindInterfacesAndSelfTo<SongTutorialStateController>().AsSingle();
