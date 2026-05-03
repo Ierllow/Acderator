@@ -1,6 +1,8 @@
 using System;
+#if UNITY_EDITOR
 using System.Reflection;
 using UnityEditor;
+#endif
 using UnityEngine;
 
 namespace Intense.Attribute
@@ -9,6 +11,7 @@ namespace Intense.Attribute
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = false, Inherited = true)]
     public sealed class RequiredFieldAttribute : PropertyAttribute { }
 
+#if UNITY_EDITOR
     [CustomPropertyDrawer(typeof(RequiredFieldAttribute))]
     public sealed class RequiredFieldDrawer : PropertyDrawer
     {
@@ -75,4 +78,5 @@ namespace Intense.Attribute
             }
         }
     }
+#endif
 }

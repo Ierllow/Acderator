@@ -4,7 +4,9 @@ using Intense.Master;
 using R3;
 using R3.Triggers;
 using System;
+#if UNITY_EDITOR
 using UnityEditor;
+#endif
 
 namespace Song
 {
