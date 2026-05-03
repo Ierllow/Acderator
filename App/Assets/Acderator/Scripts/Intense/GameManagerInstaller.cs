@@ -22,6 +22,7 @@ namespace Intense
         {
             Container.Bind<SceneManager>().FromInstance(sceneManager).AsSingle().NonLazy();
             Container.Bind<Loading>().FromComponentInHierarchy().AsSingle().NonLazy();
+            Container.Bind<IApiSession>().To<ApiSession>().AsSingle().NonLazy();
             Container.Bind<NetworkManager>().FromInstance(networkManager).AsSingle().NonLazy();
             Container.Bind<MasterDataManager>().AsSingle().NonLazy();
             Container.Bind<ScoreManager>().AsSingle().NonLazy();

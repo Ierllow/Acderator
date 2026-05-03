@@ -23,7 +23,7 @@ namespace SongSelect
         [Inject] private MasterDataManager masterDataManager;
         [Inject] private ScoreManager scoreManager;
 
-        public EOrderType CurrentOrderType { get; private set; } = (EOrderType)PlayerPrefsValues.OT;
+        public EOrderType CurrentOrderType { get; private set; } = (EOrderType)PlayerPrefsValues.OrderType;
 
         public string Text => CurrentOrderType.GetType().GetCustomAttribute<TextAttribute>().Text;
 
@@ -44,6 +44,6 @@ namespace SongSelect
 
         public void SetNextOrderType() => CurrentOrderType = ((EOrderType[])Enum.GetValues(typeof(EOrderType))).ElementAtOrDefault((int)CurrentOrderType + 1);
 
-        public void SaveOrderType() => PlayerPrefsValues.Set(EKey.OrderType, (int)CurrentOrderType);
+        public void SaveOrderType() => PlayerPrefsValues.Set(PlayerPrefsKey.OrderType, (int)CurrentOrderType);
     }
 }

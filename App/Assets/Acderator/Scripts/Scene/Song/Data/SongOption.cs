@@ -2,8 +2,8 @@
 {
     public class SongOption
     {
-        public float NoteSpeed { get; } = PlayerPrefsValues.NS;
-        public float TapTiming { get; } = PlayerPrefsValues.TN;
+        public float NoteSpeed { get; } = PlayerPrefsValues.NoteSpeed;
+        public float TapTiming { get; } = PlayerPrefsValues.TapTiming;
         public bool IsAuto { get; init; }
     }
 }

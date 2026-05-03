@@ -65,9 +65,9 @@ namespace Intense
             SongExPlayer = new CriAtomExPlayer();
             SongPreviewExPlayer = new CriAtomExPlayer();
             SeExPlayer = new CriAtomExPlayer();
-            UpdateBgmVolume(PlayerPrefsValues.BV, PlayerPrefsValues.BM);
-            UpdateSeVolume(PlayerPrefsValues.SV, PlayerPrefsValues.SM);
-            UpdateSongVolume(PlayerPrefsValues.SGV, PlayerPrefsValues.SOM);
+            UpdateBgmVolume(PlayerPrefsValues.BgmVolume, PlayerPrefsValues.IsBgmMuted);
+            UpdateSeVolume(PlayerPrefsValues.SeVolume, PlayerPrefsValues.IsSeMuted);
+            UpdateSongVolume(PlayerPrefsValues.SongVolume, PlayerPrefsValues.IsSongMuted);
         }
 
         public async UniTask<CriAtomCueSheet> AddCueSheetAsync(string name, TextAsset asset)

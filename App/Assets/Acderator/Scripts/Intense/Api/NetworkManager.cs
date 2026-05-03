@@ -29,11 +29,24 @@ namespace Intense.Api
         ServiceFailure,
     }
 
+    internal interface IApiSession
+    {
+        string Token { get; set; }
+        string MasterVersion { get; set; }
+    }
+
+    internal class ApiSession : IApiSession
+    {
+        public string Token { get; set; } = string.Empty;
+        public string MasterVersion { get; set; } = string.Empty;
+    }
+
     internal class NetworkManager : MonoBehaviour
     {
         [SerializeField] private NetworkConfig networkConfigObject;
 
         [Inject] private Loading loading;
+        [Inject] private IApiSession apiSession;
 
         public async UniTask<ResponseBase> RequestAsync(RequestBase request)
         {
@@ -45,11 +58,11 @@ namespace Intense.Api
             loading.ShowLoading();
             try
             {
-                var session = PlayerPrefsValues.TK;
+                var sessionToken = apiSession.Token;
                 var url = string.Format("{0}/{1}", networkConfigObject.apiServerUrl, request.ApiKey);
 
                 using var www = new UnityWebRequest(url, request.HttpMethod);
-                www.SetApiRequestHeaders(session, PlayerPrefsValues.MV);
+                www.SetApiRequestHeaders(sessionToken, apiSession.MasterVersion);
                 if (request.HttpMethod != UnityWebRequest.kHttpVerbGET) www.uploadHandler = new UploadHandlerRaw(MessagePackSerializer.Serialize(request.PostData));
                 www.downloadHandler = new DownloadHandlerBuffer();
                 www.timeout = 60;

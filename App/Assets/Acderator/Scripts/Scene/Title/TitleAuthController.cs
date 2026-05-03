@@ -19,6 +19,7 @@ namespace Title
         [Inject] private ScoreManager scoreManager;
         [Inject] private AssetBundleManager assetBundleManager;
         [Inject] private PopupManager popupManager;
+        [Inject] private IApiSession apiSession;
 
         public async UniTask<bool> ExecuteAsync(CancellationToken token, FailFastExceptionWatcher failFastExceptionWatcher)
         {
@@ -28,13 +29,13 @@ namespace Title
 
             if (authResponse is RegisterResponse registerResponse)
             {
-                PlayerPrefsValues.Set(EKey.UserId, registerResponse.UserId);
-                PlayerPrefsValues.Set(EKey.PassWard, registerResponse.Password);
-                PlayerPrefsValues.TK = registerResponse.Token;
+                PlayerPrefsValues.Set(PlayerPrefsKey.UserId, registerResponse.UserId);
+                PlayerPrefsValues.Set(PlayerPrefsKey.Password, registerResponse.Password);
+                apiSession.Token = registerResponse.Token;
             }
             else
             {
-                PlayerPrefsValues.TK = (authResponse as LoginResponse)?.Token;
+                apiSession.Token = (authResponse as LoginResponse)?.Token;
             }
 
             await LoadAssets(token).AddWatcherTo(failFastExceptionWatcher);
@@ -46,7 +47,7 @@ namespace Title
 
         private static RequestBase CreateAuthRequest()
         {
-            var userid = PlayerPrefsValues.UI;
+            var userid = PlayerPrefsValues.UserId;
             if (string.IsNullOrEmpty(userid))
             {
                 var request = new RegisterRequest();
@@ -57,7 +58,7 @@ namespace Title
             {
                 var request = new LoginRequest();
                 request.PostData.Add("userid", userid);
-                request.PostData.Add("password", PlayerPrefsValues.PW);
+                request.PostData.Add("password", PlayerPrefsValues.Password);
                 return request;
             }
         }

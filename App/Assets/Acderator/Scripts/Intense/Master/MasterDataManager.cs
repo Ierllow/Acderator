@@ -11,6 +11,8 @@ namespace Intense.Master
 {
     internal class MasterDataManager : IInitializable
     {
+        [Inject] private IApiSession apiSession;
+
         public MemoryDatabase MemoryDatabase { get; private set; }
 
         public void Initialize() => CompositeResolver.RegisterAndSetAsDefault(new[] { MasterMemoryResolver.Instance, GeneratedResolver.Instance, StandardResolver.Instance });
@@ -42,11 +44,11 @@ namespace Intense.Master
             await completionSource.Task;
         }
 
-        private static List<VersionMaster> SetVersion(Dictionary<string, object> masterDict)
+        private List<VersionMaster> SetVersion(Dictionary<string, object> masterDict)
         {
             if (!masterDict.TryGetString("version_master", out var version)) return new();
 
-            PlayerPrefsValues.MV = version;
+            apiSession.MasterVersion = version;
             return new()
             {
                 new()

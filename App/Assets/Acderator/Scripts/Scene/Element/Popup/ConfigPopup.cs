@@ -27,13 +27,13 @@ namespace Element.UI
 
         private void Start()
         {
-            noteSppedSlider.value = PlayerPrefsValues.NS / 10;
+            noteSppedSlider.value = PlayerPrefsValues.NoteSpeed / 10;
             noteSpeedNum.SetText(Math.Round(noteSppedSlider.value * 10).ToString());
-            offsetSlider.value = PlayerPrefsValues.TN;
+            offsetSlider.value = PlayerPrefsValues.TapTiming;
             tapTimingNum.SetText(Math.Round(offsetSlider.value * 10).ToString());
-            BgmSlider.value = PlayerPrefsValues.BV;
+            BgmSlider.value = PlayerPrefsValues.BgmVolume;
             BgmNum.SetText(string.Format("{0}%", Math.Round(BgmSlider.value * 100)));
-            SeSlider.value = PlayerPrefsValues.SV;
+            SeSlider.value = PlayerPrefsValues.SeVolume;
             SeNum.SetText(string.Format("{0}%", Math.Round(SeSlider.value * 100)));
         }
 
@@ -48,23 +48,24 @@ namespace Element.UI
             switch ((ConfigType)num)
             {
                 case ConfigType.NoteSpeed:
-                    PlayerPrefsValues.Set(EKey.NoteSpeedConfig, noteSppedSlider.value * 10);
+                    PlayerPrefsValues.Set(PlayerPrefsKey.NoteSpeedConfig, noteSppedSlider.value * 10);
                     noteSpeedNum.SetText(Math.Round(noteSppedSlider.value * 10).ToString());
                     break;
                 case ConfigType.Offset:
-                    PlayerPrefsValues.Set(EKey.TapTimingNum, offsetSlider.value);
+                    PlayerPrefsValues.Set(PlayerPrefsKey.TapTimingNum, offsetSlider.value);
                     tapTimingNum.SetText(Math.Round(offsetSlider.value * 10).ToString());
                     break;
                 case ConfigType.Bgm:
-                    PlayerPrefsValues.Set(EKey.BgmVolume, BgmSlider.value);
-                    PlayerPrefsValues.Set(EKey.BgmMute, BgmSlider.value == 0 ? 1 : 0);
+                    PlayerPrefsValues.Set(PlayerPrefsKey.BgmVolume, BgmSlider.value);
+                    PlayerPrefsValues.Set(PlayerPrefsKey.BgmMute, BgmSlider.value == 0);
                     soundManager.UpdateBgmVolume(BgmSlider.value, BgmSlider.value == 0);
                     soundManager.UpdateSongVolume(SeSlider.value, SeSlider.value == 0);
                     BgmNum.SetText(string.Format("{0}%", Math.Round(BgmSlider.value * 100)));
                     break;
                 case ConfigType.Se:
-                    PlayerPrefsValues.Set(EKey.SongVolume, SeSlider.value);
-                    soundManager.UpdateSeVolume(BgmSlider.value, SeSlider.value == 0);
+                    PlayerPrefsValues.Set(PlayerPrefsKey.SeVolume, SeSlider.value);
+                    PlayerPrefsValues.Set(PlayerPrefsKey.SeMute, SeSlider.value == 0);
+                    soundManager.UpdateSeVolume(SeSlider.value, SeSlider.value == 0);
                     SeNum.SetText(string.Format("{0}%", Math.Round(SeSlider.value * 100)));
                     break;
                 default:

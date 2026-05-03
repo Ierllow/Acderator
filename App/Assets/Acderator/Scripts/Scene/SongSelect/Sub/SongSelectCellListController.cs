@@ -11,8 +11,8 @@ namespace SongSelect
     {
         [Inject] private MasterDataManager masterDataManager;
 
-        public int SelectedGroup { get; private set; } = PlayerPrefsValues.SDG;
-        public int SelectedDifficulty { get; private set; } = PlayerPrefsValues.SDD;
+        public int SelectedGroup { get; private set; } = PlayerPrefsValues.SelectedGroup;
+        public int SelectedDifficulty { get; private set; } = PlayerPrefsValues.SelectedDifficulty;
         public List<int> SongGroupList { get; private set; }
 
         public IUniTaskAsyncEnumerable<SongSelectCell> EverySelectedCellChangedAsAsyncEnumerable => UniTaskAsyncEnumerable.EveryValueChanged(this, x => x.selectedCell).Queue().Where(x => x != null);
@@ -40,8 +40,8 @@ namespace SongSelect
 
         public void SaveSelectedCell()
         {
-            PlayerPrefsValues.Set(EKey.SelectedGroup, SelectedGroup);
-            PlayerPrefsValues.Set(EKey.SelectedDifficulty, SelectedDifficulty);
+            PlayerPrefsValues.Set(PlayerPrefsKey.SelectedGroup, SelectedGroup);
+            PlayerPrefsValues.Set(PlayerPrefsKey.SelectedDifficulty, SelectedDifficulty);
         }
     }
 }
