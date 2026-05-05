@@ -26,7 +26,7 @@ namespace Song
             songControllerResolver.Loop.EverySongStateChanged.SubscribeAwait(ChangeStateNext).RegisterTo(destroyCancellationToken);
             songControllerResolver.Loop.SongLoopUpdateSubject.Subscribe(OnSongLoopNext).RegisterTo(destroyCancellationToken);
             songControllerResolver.Spawner.NoteFactorySubject.Select(noteFactory.SpawnNote).Where(x => x != default).Subscribe(notesManager.AddAliveNote).RegisterTo(destroyCancellationToken);
-            songControllerResolver.Loop.SongSecondsZeroWhere.Skip(1).Subscribe(_ => songControllerResolver.Loop.UpdateState(ESongState.Playing)).RegisterTo(destroyCancellationToken);
+            songControllerResolver.Loop.SongSecondsZeroWhere.Skip(1).Where(_ => sceneContext.SongMode != ESongMode.Tutorial).Subscribe(_ => songControllerResolver.Loop.UpdateState(ESongState.Playing)).RegisterTo(destroyCancellationToken);
         }
 
         private void StartFingerSubscribes()
@@ -46,8 +46,24 @@ namespace Song
             songPopupLayerController.ClosedPausePopupAsAsyncEnumerable.TakeWhile(_ => sceneContext.SongMode == ESongMode.Normal).SubscribeAwait(ClosedPausePopupSubscribeNext).RegisterTo(destroyCancellationToken);
             songPopupLayerController.EverySceneTypeChanged.Where(s => !(s == ESceneType.None && songControllerResolver.Loop.CurrentState == ESongState.End) && s == ESceneType.Result).SubscribeAwait(async (s, _) => await sceneManager.ChangeSceneAsync(s, sceneContext.ToResultSceneContext(songLayerController.CurrentScore, songLayerController.JudgeCountDict))).RegisterTo(destroyCancellationToken);
             songLayerController.OnTapPauseButtonAsObservable.TakeWhile(_ => sceneContext.SongMode == ESongMode.Normal && songControllerResolver.Loop.CurrentState != ESongState.End).Subscribe(_ => PauseButtonSubscribeCallback()).RegisterTo(destroyCancellationToken);
+            songLayerController.OnTapPauseButtonAsObservable.TakeWhile(_ => sceneContext.SongMode == ESongMode.Tutorial && songControllerResolver.Loop.CurrentState != ESongState.End).Where(_ => songControllerResolver.Loop.CurrentState != ESongState.Playing).SubscribeAwait(async (_, _) => await ConfirmSkipTutorial()).RegisterTo(destroyCancellationToken);
             songLayerController.Subscribes(_ => !sceneContext.IsAuto, destroyCancellationToken);
-            songControllerResolver.TutorialState?.TutorialEventSubject.Subscribe(songControllerResolver.Tutorial.UpdateTutorial).RegisterTo(destroyCancellationToken);
+            songControllerResolver.TutorialState?.TutorialEventSubject.Subscribe(TutorialEventSubscribeNext).RegisterTo(destroyCancellationToken);
+            songControllerResolver.Tutorial?.TutorialIntroCompletedSubject.Subscribe(_ => songControllerResolver.Loop.UpdateState(ESongState.Playing)).RegisterTo(destroyCancellationToken);
+            songControllerResolver.Tutorial?.TutorialStepCompletedSubject.Subscribe(_ => TutorialStepCompletedSubscribeNext()).RegisterTo(destroyCancellationToken);
+            songControllerResolver.Tutorial?.TutorialCompletedReactiveProperty.Skip(1).Subscribe(_ => songControllerResolver.Loop.UpdateState(ESongState.End)).RegisterTo(destroyCancellationToken);
+        }
+
+        private void TutorialEventSubscribeNext(TutorialEvent tutorialEvent)
+        {
+            if (tutorialEvent.Type is ETutorialEventType.ShowIntro or ETutorialEventType.ShowStep or ETutorialEventType.ShowComplete) songControllerResolver.Loop.UpdateState(ESongState.Stop);
+            songControllerResolver.Tutorial.UpdateTutorial(tutorialEvent);
+        }
+
+        private void TutorialStepCompletedSubscribeNext()
+        {
+            songControllerResolver.TutorialState.CompleteCurrentStep();
+            if (!songControllerResolver.TutorialState.IsCompleted) songControllerResolver.Loop.UpdateState(ESongState.Playing);
         }
 
         private void StartPauseSubscribes()

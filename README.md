@@ -11,7 +11,6 @@ This project was made with Unity 6000.0.64f1.
 You can download the exact version from the [official Download Archive here](https://unity.com/releases/editor/archive).  
   
 ### Project status  
-- [ ] Add Tutorial Mode  
 - [ ] Update ConfigPopup UI  
 - [ ] Add Account Linking  
    

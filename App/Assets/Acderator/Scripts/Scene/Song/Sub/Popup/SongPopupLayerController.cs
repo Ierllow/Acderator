@@ -12,7 +12,7 @@ namespace Song
 {
     public class SongPopupLayerController : MonoBehaviour
     {
-        private enum EType { None, Pause, Error, ScoreError, ScoreData }
+        private enum EType { None, Pause, Error, ScoreError, ScoreData, TutorialSkip }
 
         [SerializeField] private PausePopup pausePopup;
         [SerializeField] private ScoreErrorPopup errorPopup;
@@ -51,6 +51,30 @@ namespace Song
 
             currentOpenPopupType = EType.Pause;
             pausePopup.Open(showRestartButton, () => currentOpenPopupType = EType.None);
+        }
+
+        public async UniTask<bool> OpenTutorialSkipConfirm()
+        {
+            if (currentOpenPopupType == EType.TutorialSkip) return false;
+
+            currentOpenPopupType = EType.TutorialSkip;
+            var completionSource = AutoResetUniTaskCompletionSource<ECommonPopupTapKind>.Create();
+            void Complete(ECommonPopupTapKind tapKind)
+            {
+                currentOpenPopupType = EType.None;
+                completionSource.TrySetResult(tapKind);
+            }
+            Open(new CommonPopupContext
+            {
+                Title = "確認",
+                Text = "チュートリアルをスキップしますか？",
+                PositiveText = "OK",
+                NegativeText = "キャンセル",
+                PositiveCallback = () => Complete(ECommonPopupTapKind.Positive),
+                NegativeCallback = () => Complete(ECommonPopupTapKind.Negative),
+                ButtonType = EButtonType.Both,
+            });
+            return await completionSource.Task == ECommonPopupTapKind.Positive;
         }
 
         private void OnOpenScoreErrorPopup(ELoadResult loadResult)

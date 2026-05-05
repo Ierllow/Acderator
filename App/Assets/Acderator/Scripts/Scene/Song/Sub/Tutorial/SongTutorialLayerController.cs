@@ -1,32 +1,34 @@
-﻿using Intense.Master;
-using Intense.UI;
+using DG.Tweening;
+using Intense.Master;
+using System;
 using R3;
-using TMPro;
 using UnityEngine;
 
 namespace Song
 {
     public class SongTutorialLayerController : MonoBehaviour, IController
     {
-        [SerializeField] private GameObject tutorialOverlay;
-        [SerializeField] private TextMeshProUGUI hintText;
-        [SerializeField] private GameObject arrowIndicator;
-        [SerializeField] private GameObject highlightArea;
-        [SerializeField] private CommonButton skipButton;
-        [SerializeField] private CommonButton nextButton;
-        [SerializeField] private GameObject progressIndicator;
-        [SerializeField] private TextMeshProUGUI progressText;
-        [SerializeField] private TextMeshProUGUI titleText;
-        [SerializeField] private TextMeshProUGUI descriptionText;
+        private enum TutorialLayerState { Hidden, Intro, WaitingForTap, Fading }
 
-        private (TutorialStepMaster, bool) currentStepTutoriaTuple = default;
+        private const float FadeOutDuration = 0.35f;
+
+        [SerializeField] private TutorialTextView tutorialTextView;
+        [SerializeField] private GameObject tutorialOverlay;
+        [SerializeField] private CanvasGroup bodyCanvasGroup;
+
+        private TutorialStepMaster currentStep;
+        private TutorialLayerState currentState = TutorialLayerState.Hidden;
+        private Tween fadeTween;
 
         public readonly ReactiveProperty<Unit> TutorialCompletedReactiveProperty = new(default);
+        public readonly Subject<Unit> TutorialIntroCompletedSubject = new();
+        public readonly Subject<Unit> TutorialStepCompletedSubject = new();
 
-        private void Awake()
+        private bool CanAdvanceByTap(bool canAdvance) => canAdvance && currentState is TutorialLayerState.Intro or TutorialLayerState.WaitingForTap;
+
+        public void AdvanceByTapIfPossible(bool canAdvance)
         {
-            skipButton.OnTapButtonAsObservable.SubscribeLock(new(), _ => SkipCurrentStep()).RegisterTo(destroyCancellationToken);
-            nextButton.OnTapButtonAsObservable.SubscribeLock(new(), _ => CompleteCurrentStep()).RegisterTo(destroyCancellationToken);
+            if (CanAdvanceByTap(canAdvance) && IsAdvanceTapStarted()) CompleteCurrentStep();
         }
 
         public void UpdateTutorial(TutorialEvent tutorialEvent)
@@ -37,17 +39,10 @@ namespace Song
                     ShowTutorialIntro((TutorialMaster)tutorialEvent.Data);
                     break;
                 case ETutorialEventType.ShowStep:
-                    ShowTutorialStep(((TutorialStepMaster, bool))tutorialEvent.Data);
+                    ShowTutorialStep((TutorialStepMaster)tutorialEvent.Data);
                     break;
                 case ETutorialEventType.ShowComplete:
                     ShowTutorialComplete();
-                    break;
-                case ETutorialEventType.Hide:
-                    Hide();
-                    break;
-                case ETutorialEventType.UpdateProgress:
-                    var (completed, total) = ((int, int))tutorialEvent.Data;
-                    UpdateProgressDisplay(completed, total);
                     break;
                 default:
                     break;
@@ -56,96 +51,78 @@ namespace Song
 
         private void ShowTutorialIntro(TutorialMaster tutorial)
         {
+            currentStep = default;
+            currentState = TutorialLayerState.Intro;
             tutorialOverlay.SetActive(true);
-
-            titleText.SetText(tutorial.Title);
-            descriptionText.SetText(tutorial.Description);
-
-            skipButton.gameObject.SetActive(false);
-            nextButton.gameObject.SetActive(false);
+            ShowBody();
+            tutorialTextView.ShowIntro(tutorial);
         }
 
-        private void ShowTutorialStep((TutorialStepMaster, bool) tutorialStepTuple)
+        private void ShowTutorialStep(TutorialStepMaster tutorialStep)
         {
-            currentStepTutoriaTuple = tutorialStepTuple;
-
+            currentStep = tutorialStep;
+            currentState = TutorialLayerState.WaitingForTap;
             tutorialOverlay.SetActive(true);
-
-            hintText.SetText(tutorialStepTuple.Item1.Description);
-            hintText.transform.localPosition = new Vector3(tutorialStepTuple.Item1.HintPositionX, tutorialStepTuple.Item1.HintPositionY, hintText.transform.localPosition.z);
-
-            skipButton.gameObject.SetActive(tutorialStepTuple.Item1.IsSkippable);
-            nextButton.gameObject.SetActive(tutorialStepTuple.Item1.IsSkippable);
+            ShowBody();
+            tutorialTextView.ShowStep(tutorialStep);
         }
 
         private void ShowTutorialComplete()
         {
-            titleText.SetText("チュートリアル完了！");
-            descriptionText.SetText("お疲れさまでした。基本操作をマスターしました！");
-
-            skipButton.gameObject.SetActive(false);
-            nextButton.gameObject.SetActive(true);
+            currentStep = default;
+            currentState = TutorialLayerState.WaitingForTap;
+            tutorialOverlay.SetActive(true);
+            ShowBody();
+            tutorialTextView.ShowComplete();
         }
 
         public void Hide()
         {
+            currentState = TutorialLayerState.Hidden;
+            fadeTween?.Kill();
             tutorialOverlay.SetActive(false);
-            arrowIndicator.SetActive(false);
-            highlightArea.SetActive(false);
+            bodyCanvasGroup.alpha = 0f;
+            bodyCanvasGroup.blocksRaycasts = false;
         }
 
         public void CompleteCurrentStep()
         {
-            Hide();
-            if (currentStepTutoriaTuple.Item2)
+            switch (currentState)
             {
-                TutorialCompletedReactiveProperty.Value = new();
+                case TutorialLayerState.Intro:
+                    FadeOut(() => TutorialIntroCompletedSubject.OnNext(Unit.Default));
+                    break;
+                case TutorialLayerState.WaitingForTap when currentStep == default:
+                    CompleteTutorial();
+                    break;
+                case TutorialLayerState.WaitingForTap:
+                    FadeOut(() => TutorialStepCompletedSubject.OnNext(Unit.Default));
+                    break;
+                default:
+                    break;
             }
         }
 
-        public void SkipCurrentStep()
+        public void CompleteTutorial() => FadeOut(() => TutorialCompletedReactiveProperty.Value = new());
+
+        private static bool IsAdvanceTapStarted() => Input.touchCount > 0 ? Input.GetTouch(0).phase == TouchPhase.Began : Input.GetMouseButtonDown(0);
+
+        private void FadeOut(Action onComplete)
         {
-            if (currentStepTutoriaTuple.Item1.IsSkippable)
+            currentState = TutorialLayerState.Fading;
+            fadeTween?.Kill();
+            fadeTween = bodyCanvasGroup.DOFade(0f, FadeOutDuration).SetLink(gameObject).OnComplete(() =>
             {
-                currentStepTutoriaTuple.Item2 = true;
                 Hide();
-                TutorialCompletedReactiveProperty.Value = new();
-            }
+                onComplete?.Invoke();
+            });
         }
 
-        public void CompleteTutorial()
+        private void ShowBody()
         {
-            Hide();
-            TutorialCompletedReactiveProperty.Value = new();
-        }
-
-        private void UpdateProgressDisplay(int completedSteps, int totalSteps)
-        {
-            progressText.SetText("{0}/{1}", completedSteps, totalSteps);
-            // progressIndicator.fillAmount = (float)completedSteps / totalSteps;
-        }
-
-        public void ShowArrow(Vector2 startPos, Vector2 endPos)
-        {
-            arrowIndicator.SetActive(true);
-
-            var direction = (endPos - startPos).normalized;
-            var angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-
-            arrowIndicator.transform.position = startPos;
-            arrowIndicator.transform.rotation = Quaternion.Euler(0, 0, angle);
-        }
-
-        public void HighlightArea(RectTransform area)
-        {
-            highlightArea.SetActive(true);
-            highlightArea.transform.position = area.position;
-            //highlightArea.transform.sizeDelta = area.sizeDelta;
-        }
-
-        public void StopTutorial()
-        {
-            Hide();
+            fadeTween?.Kill();
+            bodyCanvasGroup.alpha = 1f;
+            bodyCanvasGroup.blocksRaycasts = true;
         }
     }
 }

@@ -47,8 +47,6 @@ namespace Song
 
         public IUniTaskAsyncEnumerable<bool> EveryUseTouchChanged => UniTaskAsyncEnumerable.EveryValueChanged(this, x => x.useTouch).Where(x => !x);
 
-        private void Start() => UniTaskAsyncEnumerable.EveryUpdate().Subscribe(_ => UpdatePointerInput()).RegisterTo(destroyCancellationToken);
-
         public void Init()
         {
             dist = Vector3.Distance(choose.transform.position, hitPlane.position);
@@ -56,7 +54,7 @@ namespace Song
             TrySetUseTouch(true);
         }
 
-        private void UpdatePointerInput()
+        public void UpdatePointerInput()
         {
             if (!useTouch) return;
 

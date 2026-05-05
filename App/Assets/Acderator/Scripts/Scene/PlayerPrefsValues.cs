@@ -17,6 +17,8 @@ internal enum PlayerPrefsKey
     SelectedGroup,
     SelectedDifficulty,
     OrderType,
+    TutorialCompleted,
+    TutorialCompletedNeedsFullDownload,
 }
 
 internal static class PlayerPrefsValues
@@ -35,6 +37,8 @@ internal static class PlayerPrefsValues
     private const string SelectedGroupKey = "SelectedGroup";
     private const string SelectedDifficultyKey = "SelectedDifficulty";
     private const string OrderTypeKey = "OrderType";
+    private const string TutorialCompletedKey = "TutorialCompleted";
+    private const string TutorialCompletedNeedsFullDownloadKey = "TutorialCompletedNeedsFullDownload";
 
     public static string UserName => PlayerPrefs.GetString(UserNameKey, string.Empty);
     public static string UserId => PlayerPrefs.GetString(UserIdKey, string.Empty);
@@ -50,6 +54,8 @@ internal static class PlayerPrefsValues
     public static int SelectedGroup => PlayerPrefs.GetInt(SelectedGroupKey, 1);
     public static int SelectedDifficulty => PlayerPrefs.GetInt(SelectedDifficultyKey, 1);
     public static int OrderType => PlayerPrefs.GetInt(OrderTypeKey, 0);
+    public static bool IsTutorialCompleted => GetBool(TutorialCompletedKey);
+    public static bool IsTutorialCompletedNeedsFullDownload => GetBool(TutorialCompletedNeedsFullDownloadKey);
 
     public static void Set(PlayerPrefsKey key, int value) => PlayerPrefs.SetInt(GetKey(key), value);
 
@@ -77,6 +83,8 @@ internal static class PlayerPrefsValues
         PlayerPrefsKey.SelectedGroup => SelectedGroupKey,
         PlayerPrefsKey.SelectedDifficulty => SelectedDifficultyKey,
         PlayerPrefsKey.OrderType => OrderTypeKey,
+        PlayerPrefsKey.TutorialCompleted => TutorialCompletedKey,
+        PlayerPrefsKey.TutorialCompletedNeedsFullDownload => TutorialCompletedNeedsFullDownloadKey,
         _ => throw new ArgumentOutOfRangeException(nameof(key), key, null),
     };
 }

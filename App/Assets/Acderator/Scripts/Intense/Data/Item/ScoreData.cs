@@ -4,6 +4,6 @@
     public class ScoreData
     {
         public int Sid { get; init; }
-        public int ScoreNum { get; set; }
+        public int ScoreNum { get; init; }
     }
 }

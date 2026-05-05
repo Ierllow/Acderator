@@ -20,6 +20,8 @@ namespace Intense
 
     public class SceneManager : MonoBehaviour
     {
+        private sealed class DefaultSceneContext : SceneContext { }
+
         [SerializeField] private Image fadeMask;
         [SerializeField] private Header header;
 
@@ -63,6 +65,7 @@ namespace Intense
 
         public async UniTask ChangeSceneAsync(ESceneType sceneType, SceneContext context = default, bool sameScene = false)
         {
+            context ??= new DefaultSceneContext();
             if (CurrentSceneType != sceneType || sameScene)
             {
                 await FadeOutAsync();

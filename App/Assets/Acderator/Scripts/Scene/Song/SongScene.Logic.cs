@@ -20,6 +20,7 @@ namespace Song
                 songControllerResolver.Spawner.Init(loadResult.ChartInfo.NoteDataList, offset);
                 songLayerController.Init(sceneContext.SongInfo.Sid);
                 await backTelopLayerController.FadeIn();
+                songControllerResolver.TutorialState?.ShowIntro();
                 return;
 
             }
@@ -56,6 +57,13 @@ namespace Song
                 await changeScene;
                 return;
             }
+            if (sceneContext.SongMode == ESongMode.Tutorial)
+            {
+                PlayerPrefsValues.Set(PlayerPrefsKey.TutorialCompleted, true);
+                PlayerPrefsValues.Set(PlayerPrefsKey.TutorialCompletedNeedsFullDownload, true);
+                await sceneManager.ChangeSceneAsync(ESceneType.Title);
+                return;
+            }
             if (sceneContext.SongMode != ESongMode.Normal)
             {
                 await scoreSaveError;
@@ -77,10 +85,11 @@ namespace Song
 
         private void UpdateSongProgressNext()
         {
+            songControllerResolver.Finger?.UpdatePointerInput();
             songControllerResolver.Loop.Tick(soundManager.SongExPlayer.GetTime().ToSeconds());
             songControllerResolver.TutorialState?.ChangeState(songControllerResolver.Loop.CurrentState == ESongState.Playing);
             songControllerResolver.TutorialState?.Tick();
-            if (songControllerResolver.TutorialState?.IsCompleted ?? false) songControllerResolver.Loop.UpdateState(ESongState.End);
+            songControllerResolver.Tutorial?.AdvanceByTapIfPossible(songControllerResolver.Loop.CurrentState != ESongState.Playing);
         }
 
         private async UniTask ClosedPausePopupSubscribeNext(EPopupTapKind popupTapKind)
@@ -127,6 +136,18 @@ namespace Song
             songControllerResolver.Optimizer.UpdatePositionNotes((x) => songControllerResolver.Auto?.NotifyFinger(x));
             songControllerResolver.Auto?.OnAutoFinger();
             if (soundManager.SongExPlayer.IsPlayEnd()) songControllerResolver.Loop.UpdateState(ESongState.End);
+        }
+
+        private async UniTask ConfirmSkipTutorial()
+        {
+            var isPlaying = songControllerResolver.Loop.CurrentState == ESongState.Playing;
+            songControllerResolver.Loop.UpdateState(ESongState.Stop);
+            if (await songPopupLayerController.OpenTutorialSkipConfirm())
+            {
+                songControllerResolver.Tutorial.CompleteTutorial();
+                return;
+            }
+            if (isPlaying) songControllerResolver.Loop.UpdateState(ESongState.Playing);
         }
 
         private async UniTask<bool> RequestUpdateScoreAsync(string sessionId, int score)

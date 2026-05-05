@@ -8,6 +8,7 @@ namespace Title
         public override void InstallBindings()
         {
             Container.Bind<TitleAuthController>().AsSingle();
+            Container.Bind<Song.TutorialSceneContextBuilder>().AsSingle();
         }
     }
 }

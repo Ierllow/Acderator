@@ -29,6 +29,7 @@ namespace SongSelect
         [Inject] private AssetBundleManager assetBundleManager;
         [Inject] private NetworkManager networkManager;
         [Inject] private ScoreManager scoreManager;
+        [Inject] private Song.TutorialSceneContextBuilder tutorialSceneContextBuilder;
 
         protected override void Start()
         {
@@ -69,13 +70,19 @@ namespace SongSelect
 
         private async UniTask TapDecideButton()
         {
+            var selectedSong = masterDataManager.MemoryDatabase.SongMasterTable.FindBySid(songListView.SelectedCellListSid);
             var request = new ScoreBeginRequest();
             request.PostData.Add("score_id", songListView.SelectedCellListSid);
             var response = await networkManager.RequestAsync(request) as ScoreBeginResponse;
             if (!(response?.IsSuccess ?? false)) return;
 
-            var groupList = masterDataManager.MemoryDatabase.SongMasterTable.Select(x => x.Group).ToList();
-            await sceneManager.ChangeSceneAsync(ESceneType.Song, sceneContext.ToSongSceneContext(masterDataManager.MemoryDatabase.SongMasterTable.FindBySid(songListView.SelectedCellListSid), autoButton.IsOn, response.SessionId));
+            if (!PlayerPrefsValues.IsTutorialCompleted && !autoButton.IsOn && tutorialSceneContextBuilder.TryBuild(selectedSong, response.SessionId, out var tutorialSceneContext))
+            {
+                await sceneManager.ChangeSceneAsync(ESceneType.Song, tutorialSceneContext);
+                return;
+            }
+
+            await sceneManager.ChangeSceneAsync(ESceneType.Song, sceneContext.ToSongSceneContext(selectedSong, autoButton.IsOn, response.SessionId));
         }
 
         private void TapOrderButton()

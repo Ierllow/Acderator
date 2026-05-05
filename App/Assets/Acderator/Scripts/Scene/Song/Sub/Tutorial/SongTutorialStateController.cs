@@ -1,11 +1,10 @@
 ﻿using Intense.Master;
 using R3;
-using System;
 using UnityEngine;
 
 namespace Song
 {
-    public enum ETutorialEventType { ShowIntro, ShowStep, ShowComplete, Hide, UpdateProgress }
+    public enum ETutorialEventType { ShowIntro, ShowStep, ShowComplete }
 
     public class TutorialEvent
     {
@@ -19,19 +18,16 @@ namespace Song
         }
 
         public static TutorialEvent ShowIntro(TutorialMaster tutorial) => new(ETutorialEventType.ShowIntro, tutorial);
-        public static TutorialEvent ShowStep((TutorialStepMaster, bool) step) => new(ETutorialEventType.ShowStep, step);
+        public static TutorialEvent ShowStep(TutorialStepMaster step) => new(ETutorialEventType.ShowStep, step);
         public static TutorialEvent ShowComplete() => new(ETutorialEventType.ShowComplete);
-        public static TutorialEvent Hide() => new(ETutorialEventType.Hide);
-        public static TutorialEvent UpdateProgress((int, int) progress) => new(ETutorialEventType.UpdateProgress, progress);
     }
 
     public class SongTutorialStateController : ITutorialController
     {
         private ETutorialState cachedTutorialState;
         private TutorialData tutorialData;
-        private float tutorialStartTime;
-        private bool isRunning = false;
-        private bool hasStarted = false;
+        private float tutorialElapsedTime;
+        private bool isRunning;
 
         public bool IsCompleted => tutorialData.IsCompleted;
 
@@ -43,70 +39,59 @@ namespace Song
         {
             this.tutorialData = tutorialData;
             UpdateState(ETutorialState.Intro);
-            ShowIntro();
         }
 
-        public void ChangeState(bool isPlaying)
-        {
-            if (isPlaying && !hasStarted)
-            {
-                hasStarted = true;
-                tutorialStartTime = 0f;
-            }
-            isRunning = isPlaying;
-        }
+        public void ChangeState(bool isPlaying) => isRunning = isPlaying;
 
         public void Tick()
         {
             if (!isRunning) return;
 
-            if (hasStarted && tutorialStartTime <= 0f) tutorialStartTime = Time.time;
+            tutorialElapsedTime += Time.deltaTime;
 
-            if (cachedTutorialState == ETutorialState.Step)
+            switch (cachedTutorialState)
             {
-                if (Time.time - tutorialStartTime >= tutorialData.GetCurrentStep().TriggerTime)
-                {
+                case ETutorialState.Intro:
                     UpdateState(ETutorialState.Step);
-                    ShowCurrentStep();
-                }
+                    break;
+                case ETutorialState.Step:
+                    TickStep();
+                    break;
+                default:
+                    break;
             }
         }
 
         public void CompleteCurrentStep()
         {
             tutorialData.CompleteCurrentStep();
-            UpdateProgressDisplay();
             if (tutorialData.IsCompleted)
             {
                 UpdateState(ETutorialState.Complete);
                 ShowComplete();
                 return;
             }
-            ShowCurrentStep();
+            UpdateState(ETutorialState.Step);
         }
 
-        public void SkipCurrentStep()
+        private void TickStep()
         {
             var currentStep = tutorialData.GetCurrentStep();
-            if (currentStep.IsSkippable)
+            if (currentStep == default)
             {
-                tutorialData.SkipCurrentStep();
-                UpdateProgressDisplay();
-
-                if (tutorialData.IsCompleted)
-                {
-                    UpdateState(ETutorialState.Complete);
-                    ShowComplete();
-                    return;
-                }
-                ShowCurrentStep();
+                UpdateState(ETutorialState.Complete);
+                ShowComplete();
+                return;
             }
+
+            if (tutorialElapsedTime < currentStep.TriggerTime) return;
+
+            ShowCurrentStep();
+            UpdateState(ETutorialState.None);
         }
 
-        private void ShowIntro() => TutorialEventSubject.OnNext(TutorialEvent.ShowIntro(tutorialData.TutorialMaster));
-        private void ShowCurrentStep() => TutorialEventSubject.OnNext(TutorialEvent.ShowStep((tutorialData.GetCurrentStep(), false)));
+        public void ShowIntro() => TutorialEventSubject.OnNext(TutorialEvent.ShowIntro(tutorialData.TutorialMaster));
+        private void ShowCurrentStep() => TutorialEventSubject.OnNext(TutorialEvent.ShowStep(tutorialData.GetCurrentStep()));
         private void ShowComplete() => TutorialEventSubject.OnNext(TutorialEvent.ShowComplete());
-        public void Hide() => TutorialEventSubject.OnNext(TutorialEvent.Hide());
-        private void UpdateProgressDisplay() => TutorialEventSubject.OnNext(TutorialEvent.UpdateProgress((tutorialData.CompletedCount, tutorialData.TotalCount)));
     }
 }

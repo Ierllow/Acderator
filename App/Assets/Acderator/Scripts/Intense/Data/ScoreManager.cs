@@ -8,18 +8,16 @@ namespace Intense.Data
     {
         public bool IsInit { get; private set; }
 
-        public List<ScoreData> ScoreDataList { get; private set; } = new();
+        public List<ScoreData> ScoreDataList { get; } = new();
 
         public void SetScoreData(Dictionary<string, object> dataDict)
         {
-            if (IsInit) return;
             foreach (var (key, value) in dataDict)
             {
                 var sid = int.Parse(key);
                 var score = int.Parse(value.ToString());
                 UpdateScoreData(sid, score);
             }
-            IsInit = true;
         }
 
         public void UpdateScoreData(int sid, int scoreNum)
@@ -27,10 +25,8 @@ namespace Intense.Data
             var target = ScoreDataList.FirstOrDefault(x => x.Sid == sid);
             if (target != default)
             {
-                if (!IsInit) return;
                 if (target.ScoreNum >= scoreNum) return;
-
-                target.ScoreNum = scoreNum;
+                ScoreDataList[ScoreDataList.IndexOf(target)] = new() { Sid = sid, ScoreNum = scoreNum };
             }
             else
             {

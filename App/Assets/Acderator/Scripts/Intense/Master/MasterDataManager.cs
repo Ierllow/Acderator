@@ -38,6 +38,8 @@ namespace Intense.Master
             builder.Append(ReadMasters(masterDict, "hp_rate_masters", x => SongHpRateMaster.From(RenameKey(x, "j_type", "type"))));
             builder.Append(ReadMasters(masterDict, "result_masters", ResultMaster.From));
             builder.Append(ReadMasters(masterDict, "sound_sheet_masters", SoundSheetNameMaster.From));
+            builder.Append(ReadMasters(masterDict, "tutorial_step_masters", TutorialStepMaster.From));
+            builder.Append(ReadMasters(masterDict, "tutorial_masters", TutorialMaster.From));
             MemoryDatabase = new(builder.Build());
             completionSource.TrySetResult();
 

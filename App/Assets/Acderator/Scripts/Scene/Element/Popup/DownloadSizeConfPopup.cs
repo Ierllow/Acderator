@@ -20,7 +20,6 @@ namespace Element.UI
 
         public void Open(DownloadSizeConfPopupContext context) => UniTask.Void(async () =>
         {
-            Init();
             text.SetText(string.Format("ゲームデータのダウンロードを行います \nよろしいですか(サイズ{0}{1})", context.FileSize, context.Size));
             base.Open(closeCallback);
             await UniTask.WaitUntil(() => IsClose, cancellationToken: destroyCancellationToken);
@@ -34,12 +33,6 @@ namespace Element.UI
         }
 
         public void OnTapCancel() => IsClose = true;
-
-        public void Init()
-        {
-            IsConfirm = false;
-            IsClose = false;
-        }
 
         protected override void FinishClosePopupScale()
         {

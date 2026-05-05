@@ -17,10 +17,20 @@ namespace Song
 
         public bool IsAuto => SongOption?.IsAuto ?? false;
 
-        public List<string> SongBundlePathList => new()
+        public List<string> SongBundlePathList => SongMode == ESongMode.Tutorial ? TutorialBundlePathList : NormalBundlePathList;
+
+        private List<string> NormalBundlePathList => new()
         {
             "song/rank",
             "song/difficulty",
+            "song/bg",
+            "sounds/song/songse",
+            "song/particle/judgetext",
+            SongBundlePath,
+            SongChartBundlePath,
+        };
+        private List<string> TutorialBundlePathList => new()
+        {
             "song/bg",
             "sounds/song/songse",
             "song/particle/judgetext",
