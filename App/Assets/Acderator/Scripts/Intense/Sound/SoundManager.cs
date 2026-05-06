@@ -1,4 +1,4 @@
-﻿using CriWare;
+using CriWare;
 using Cysharp.Threading.Tasks;
 using Intense.Asset;
 using Intense.Master;

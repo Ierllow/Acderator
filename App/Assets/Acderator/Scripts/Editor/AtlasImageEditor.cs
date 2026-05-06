@@ -1,5 +1,4 @@
-﻿using Intense.UI;
-using System;
+using Intense.UI;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
@@ -112,9 +111,7 @@ public class AtlasImageEditor : ImageEditor
         var type = serializedObject.FindProperty("m_Type");
         var sprite = serializedObject.FindProperty("m_Sprite");
 
-        var currentAtlas = atlas.objectReferenceValue as SpriteAtlas;
-
-        if (currentAtlas == null) return;
+        if (atlas.objectReferenceValue is not SpriteAtlas currentAtlas) return;
 
         var newSprite = currentAtlas.GetSprite(spriteName.stringValue);
 

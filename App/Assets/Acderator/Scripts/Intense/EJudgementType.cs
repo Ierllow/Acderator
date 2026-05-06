@@ -1,4 +1,4 @@
-﻿using Intense.Master;
+using Intense.Master;
 
 namespace Intense
 {

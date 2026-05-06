@@ -1,4 +1,4 @@
-﻿using Intense.Master;
+using Intense.Master;
 using R3;
 using UnityEngine;
 

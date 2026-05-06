@@ -1,4 +1,4 @@
-﻿using DG.Tweening;
+using DG.Tweening;
 using Intense.Data;
 using Intense.UI;
 using TMPro;

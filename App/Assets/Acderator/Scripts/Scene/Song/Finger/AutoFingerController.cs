@@ -1,6 +1,5 @@
-﻿using Intense;
+using Intense;
 using R3;
-using System;
 using Zenject;
 
 namespace Song

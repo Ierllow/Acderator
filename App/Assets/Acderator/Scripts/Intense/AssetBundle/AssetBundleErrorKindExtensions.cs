@@ -1,4 +1,4 @@
-﻿namespace Intense.Asset
+namespace Intense.Asset
 {
     public static class AssetBundleErrorKindExtensions
     {

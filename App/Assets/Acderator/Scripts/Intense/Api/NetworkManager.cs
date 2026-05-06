@@ -1,7 +1,6 @@
-﻿using Cysharp.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using Intense.UI;
 using MessagePack;
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;

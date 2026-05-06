@@ -1,4 +1,4 @@
-﻿using Intense;
+using Intense;
 using Intense.Data;
 using System.Collections.Generic;
 

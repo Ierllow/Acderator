@@ -1,4 +1,4 @@
-﻿using Intense;
+using Intense;
 using System.Collections.Generic;
 
 namespace Song

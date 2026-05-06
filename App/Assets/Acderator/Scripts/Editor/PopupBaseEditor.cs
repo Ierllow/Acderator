@@ -18,8 +18,7 @@ public class PopupBaseEditor : Editor
 
         foreach (var targetObject in targets)
         {
-            var popupBase = targetObject as PopupBase;
-            if (popupBase == null) continue;
+            if (targetObject is not PopupBase popupBase) continue;
 
             Undo.RegisterFullObjectHierarchyUndo(popupBase.gameObject, "Set Content Size");
             InvokeSetContentSize(popupBase);

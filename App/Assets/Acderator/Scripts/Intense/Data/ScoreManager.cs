@@ -1,6 +1,6 @@
-﻿using Intense.Master;
-using System.Linq;
+using Intense.Master;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Intense.Data
 {

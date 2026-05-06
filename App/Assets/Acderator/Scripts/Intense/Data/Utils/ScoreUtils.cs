@@ -1,4 +1,4 @@
-﻿namespace Intense.Data
+namespace Intense.Data
 {
     public enum ERankType { None, New, D, C, B, A, S, Ss, Sss, Exc }
 

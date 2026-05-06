@@ -1,4 +1,3 @@
-﻿using System;
 using Intense;
 using Intense.UI;
 using UnityEngine;

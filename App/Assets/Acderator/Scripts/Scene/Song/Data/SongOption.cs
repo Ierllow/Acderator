@@ -1,4 +1,4 @@
-﻿namespace Song
+namespace Song
 {
     public class SongOption
     {

@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
@@ -11,8 +11,7 @@ public class EditorHierarchyViewEx
 
     private static void OnGUI(int instanceID, Rect selectionRect)
     {
-        var obj = EditorUtility.EntityIdToObject(instanceID) as GameObject;
-        if (obj == null) return;
+        if (EditorUtility.EntityIdToObject(instanceID) is not GameObject obj) return;
 
         var pos = selectionRect;
         pos.x = pos.xMax - cWidth;

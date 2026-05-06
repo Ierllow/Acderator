@@ -1,4 +1,4 @@
-﻿using Intense.Attribute;
+using Intense.Attribute;
 using TMPro;
 using UnityEngine;
 

@@ -1,4 +1,4 @@
-﻿using EnhancedUI.EnhancedScroller;
+using EnhancedUI.EnhancedScroller;
 using Intense.Master;
 using Intense.UI;
 using System;

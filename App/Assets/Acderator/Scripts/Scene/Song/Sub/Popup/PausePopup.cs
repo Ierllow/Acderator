@@ -1,4 +1,4 @@
-﻿using Intense.UI;
+using Intense.UI;
 using R3;
 using System;
 using UnityEngine;

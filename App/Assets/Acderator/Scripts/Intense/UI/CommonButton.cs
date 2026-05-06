@@ -1,11 +1,10 @@
-﻿using Coffee.UIEffects;
+using Coffee.UIEffects;
+using ColorMode = Coffee.UIEffects.ColorMode;
 using R3;
-using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-using ColorMode = Coffee.UIEffects.ColorMode;
 
 namespace Intense.UI
 {

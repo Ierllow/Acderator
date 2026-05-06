@@ -1,4 +1,4 @@
-﻿using Intense.UI;
+using Intense.UI;
 using TMPro;
 using UnityEngine;
 

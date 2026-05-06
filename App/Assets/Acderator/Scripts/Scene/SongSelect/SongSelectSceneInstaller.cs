@@ -1,4 +1,4 @@
-﻿using Intense.Internal;
+using Intense.Internal;
 using Zenject;
 
 namespace SongSelect

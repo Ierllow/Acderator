@@ -1,4 +1,4 @@
-﻿using Intense;
+using Intense;
 using Intense.Api;
 using Intense.UI;
 using R3;

@@ -1,4 +1,4 @@
-﻿using Intense.Master;
+using Intense.Master;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -23,6 +23,5 @@ namespace Song
             CompletedCount++;
             CurrentStepIndex++;
         }
-
     }
 }

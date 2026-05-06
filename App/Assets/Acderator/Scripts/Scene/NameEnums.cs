@@ -9,16 +9,11 @@ public enum ColorTheme
 
     public static class ColorThemeExtensions
     {
-        public static string ToThemeId(this ColorTheme theme)
+        public static string ToThemeId(this ColorTheme theme) => theme switch
         {
-            switch (theme)
-            {
-                case ColorTheme.Default:
-                    return "4a669972-2591-4c38-a9d2-e39bbd662904";
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(theme), theme, null);
-            }
-        }
+            ColorTheme.Default => "4a669972-2591-4c38-a9d2-e39bbd662904",
+            _ => throw new ArgumentOutOfRangeException(nameof(theme), theme, null),
+        };
     }
 
     public enum ColorEntry
@@ -29,18 +24,12 @@ public enum ColorTheme
 
     public static class ColorEntryExtensions
     {
-        public static string ToEntryId(this ColorEntry entry)
+        public static string ToEntryId(this ColorEntry entry) => entry switch
         {
-            switch (entry)
-            {
-                case ColorEntry.LightWhite:
-                    return "961a5454-79e6-4eac-9b64-403cc4fa557b";
-                case ColorEntry.White:
-                    return "7774e83a-9894-4521-b48c-378821c933ff";
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(entry), entry, null);
-            }
-        }
+            ColorEntry.LightWhite => "961a5454-79e6-4eac-9b64-403cc4fa557b",
+            ColorEntry.White => "7774e83a-9894-4521-b48c-378821c933ff",
+            _ => throw new ArgumentOutOfRangeException(nameof(entry), entry, null),
+        };
     }
 
     public enum GradientTheme
@@ -50,16 +39,11 @@ public enum ColorTheme
 
     public static class GradientThemeExtensions
     {
-        public static string ToThemeId(this GradientTheme theme)
+        public static string ToThemeId(this GradientTheme theme) => theme switch
         {
-            switch (theme)
-            {
-                case GradientTheme.Default:
-                    return "69c39b37-a72c-4ea3-b33d-46a623c2fa6c";
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(theme), theme, null);
-            }
-        }
+            GradientTheme.Default => "69c39b37-a72c-4ea3-b33d-46a623c2fa6c",
+            _ => throw new ArgumentOutOfRangeException(nameof(theme), theme, null),
+        };
     }
 
     public enum GradientEntry
@@ -71,20 +55,13 @@ public enum ColorTheme
 
     public static class GradientEntryExtensions
     {
-        public static string ToEntryId(this GradientEntry entry)
+        public static string ToEntryId(this GradientEntry entry) => entry switch
         {
-            switch (entry)
-            {
-                case GradientEntry.Exc:
-                    return "8ca02421-58ec-47b3-8cf7-89e70d3bc65d";
-                case GradientEntry.Clear:
-                    return "fc650475-e8f8-4ec7-91fb-d81e7e97934f";
-                case GradientEntry.Failed:
-                    return "ed740ee4-c50c-4a12-b62c-9bca9b158a16";
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(entry), entry, null);
-            }
-        }
+            GradientEntry.Exc => "8ca02421-58ec-47b3-8cf7-89e70d3bc65d",
+            GradientEntry.Clear => "fc650475-e8f8-4ec7-91fb-d81e7e97934f",
+            GradientEntry.Failed => "ed740ee4-c50c-4a12-b62c-9bca9b158a16",
+            _ => throw new ArgumentOutOfRangeException(nameof(entry), entry, null),
+        };
     }
 
     public enum CharacterStyleTheme
@@ -94,16 +71,11 @@ public enum ColorTheme
 
     public static class CharacterStyleThemeExtensions
     {
-        public static string ToThemeId(this CharacterStyleTheme theme)
+        public static string ToThemeId(this CharacterStyleTheme theme) => theme switch
         {
-            switch (theme)
-            {
-                case CharacterStyleTheme.Default:
-                    return "37dfcba0-1f0d-43e6-9bc8-290c48fd17b5";
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(theme), theme, null);
-            }
-        }
+            CharacterStyleTheme.Default => "37dfcba0-1f0d-43e6-9bc8-290c48fd17b5",
+            _ => throw new ArgumentOutOfRangeException(nameof(theme), theme, null),
+        };
     }
 
     public enum CharacterStyleEntry
@@ -112,14 +84,10 @@ public enum ColorTheme
 
     public static class CharacterStyleEntryExtensions
     {
-        public static string ToEntryId(this CharacterStyleEntry entry)
+        public static string ToEntryId(this CharacterStyleEntry entry) => entry switch
         {
-            switch (entry)
-            {
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(entry), entry, null);
-            }
-        }
+            _ => throw new ArgumentOutOfRangeException(nameof(entry), entry, null),
+        };
     }
 
     public enum CharacterStyleTMPTheme
@@ -129,16 +97,11 @@ public enum ColorTheme
 
     public static class CharacterStyleTMPThemeExtensions
     {
-        public static string ToThemeId(this CharacterStyleTMPTheme theme)
+        public static string ToThemeId(this CharacterStyleTMPTheme theme) => theme switch
         {
-            switch (theme)
-            {
-                case CharacterStyleTMPTheme.Default:
-                    return "a357cca1-a77e-4e3d-b592-06ebcf0da609";
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(theme), theme, null);
-            }
-        }
+            CharacterStyleTMPTheme.Default => "a357cca1-a77e-4e3d-b592-06ebcf0da609",
+            _ => throw new ArgumentOutOfRangeException(nameof(theme), theme, null),
+        };
     }
 
     public enum CharacterStyleTMPEntry
@@ -147,13 +110,9 @@ public enum ColorTheme
 
     public static class CharacterStyleTMPEntryExtensions
     {
-        public static string ToEntryId(this CharacterStyleTMPEntry entry)
+        public static string ToEntryId(this CharacterStyleTMPEntry entry) => entry switch
         {
-            switch (entry)
-            {
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(entry), entry, null);
-            }
-        }
+            _ => throw new ArgumentOutOfRangeException(nameof(entry), entry, null),
+        };
     }
 }

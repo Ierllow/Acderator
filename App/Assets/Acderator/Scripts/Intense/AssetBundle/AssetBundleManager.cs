@@ -1,4 +1,4 @@
-﻿using Cysharp.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using Element.UI;
 using Intense.Api;
 using Intense.Attribute;
@@ -130,7 +130,7 @@ namespace Intense.Asset
                 : EAssetBundleErrorKind.ConnectionError;
             var popupContext = PopupContextFactory.CreateAssetErrorPopupContext(completionSource, kind);
             popupManager.OpenPopup(popupContext);
-            return(await completionSource.Task) == ECommonPopupTapKind.Positive;
+            return await completionSource.Task == ECommonPopupTapKind.Positive;
         }
 
         private async UniTask<bool> TryDownloadConfirmedAsync(long fileSize)

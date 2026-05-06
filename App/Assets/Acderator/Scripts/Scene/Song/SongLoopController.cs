@@ -1,8 +1,7 @@
 using Cysharp.Threading.Tasks;
 using Cysharp.Threading.Tasks.Linq;
-using System;
-using UnityEngine;
 using R3;
+using UnityEngine;
 using Zenject;
 
 namespace Song

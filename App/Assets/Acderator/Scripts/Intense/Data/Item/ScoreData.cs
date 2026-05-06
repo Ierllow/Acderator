@@ -1,4 +1,4 @@
-﻿namespace Intense.Data
+namespace Intense.Data
 {
     [System.Serializable]
     public class ScoreData

@@ -1,7 +1,7 @@
-﻿using System;
 using Cysharp.Threading.Tasks;
 using Cysharp.Threading.Tasks.Linq;
 using Intense.Attribute;
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;

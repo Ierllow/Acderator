@@ -1,4 +1,4 @@
-﻿using Intense;
+using Intense;
 using Intense.UI;
 using System;
 using TMPro;

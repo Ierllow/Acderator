@@ -1,4 +1,4 @@
-﻿using Cysharp.Threading.Tasks.Linq;
+using Cysharp.Threading.Tasks.Linq;
 using Element.UI;
 using R3;
 using R3.Triggers;

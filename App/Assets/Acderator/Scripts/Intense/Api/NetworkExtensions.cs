@@ -1,6 +1,6 @@
+using MessagePack;
 using System.Collections.Generic;
 using System.Linq;
-using MessagePack;
 using UnityEngine.Networking;
 
 namespace Intense.Api

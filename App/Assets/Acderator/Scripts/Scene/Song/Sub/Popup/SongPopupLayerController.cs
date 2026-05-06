@@ -1,10 +1,9 @@
-﻿using Cysharp.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using Cysharp.Threading.Tasks.Linq;
 using Element.UI;
 using Intense;
 using Intense.UI;
 using R3;
-using System;
 using UnityEngine;
 using Zenject;
 
@@ -99,7 +98,6 @@ namespace Song
             popupManager.OpenPopup(context);
             await completionSource.Task;
         }
-
 
         private void OnOpenSaveScoreDataErrorPopup()
         {

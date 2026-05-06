@@ -22,6 +22,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           lfs: true
+          fetch-depth: 0
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v5
@@ -32,14 +33,19 @@ jobs:
         run: dotnet format whitespace --folder --verify-no-changes --include Assets/Acderator
         working-directory: App
 
-      - name: Check C# style
-        if: ${{ hashFiles('App/Assembly-CSharp.csproj') != '' }}
-        run: dotnet format style Assembly-CSharp.csproj --verify-no-changes --severity warn --include Assets/Acderator --no-restore
-        working-directory: App
-
-      - name: Check C# analyzers
-        if: ${{ hashFiles('App/Assembly-CSharp.csproj') != '' }}
-        run: dotnet format analyzers Assembly-CSharp.csproj --verify-no-changes --severity warn --include Assets/Acderator --no-restore
+      - name: Check C# files have no final newline
+        run: |
+          failed=0
+          while IFS= read -r file; do
+            if [ -s "$file" ]; then
+              last_byte="$(tail -c 1 "$file" | od -An -t x1 | tr -d ' \n')"
+              if [ "$last_byte" = "0a" ] || [ "$last_byte" = "0d" ]; then
+                echo "::error file=$file::C# files must not end with a newline."
+                failed=1
+              fi
+            fi
+          done < <(git ls-files 'Assets/Acderator' 'Program.cs' | grep '\.cs$')
+          exit "$failed"
         working-directory: App
 
   unity-tests:
@@ -50,15 +56,18 @@ jobs:
         uses: actions/checkout@v4
         with:
           lfs: true
+          fetch-depth: 0
 
       - name: Free disk space
         run: |
+          uname -a
+          command -v docker || true
+          docker --version || true
           df -h
           sudo rm -rf /usr/share/dotnet
           sudo rm -rf /usr/local/lib/android
           sudo rm -rf /opt/ghc
           sudo rm -rf "$AGENT_TOOLSDIRECTORY"
-          docker system prune -af
           df -h
 
       - name: Cache Library
@@ -79,6 +88,23 @@ jobs:
           projectPath: App
           githubToken: ${{ secrets.GITHUB_TOKEN }}
           checkName: Unity Test Results
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        if: always()
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Check C# coding rules
+        if: always()
+        run: |
+          base_sha="${{ github.event.pull_request.base.sha || github.event.before }}"
+          if [ -z "$base_sha" ] || echo "$base_sha" | grep -q '^0*$'; then
+            base_sha="HEAD~1"
+          fi
+          mapfile -t files < <(git -C .. diff --name-only --diff-filter=ACM "$base_sha" HEAD -- 'App/Assets/Acderator/**/*.cs' 'App/Assets/Acderator/*.cs' | grep -v '^App/Assets/Acderator/Scripts/Intense/Master/' | sed 's#^App/##')
+          dotnet run --project CodingRuleChecker.csproj -- "${files[@]}"
+        working-directory: App
 
       - name: Upload test results
         uses: actions/upload-artifact@v4
@@ -103,12 +129,14 @@ jobs:
 
       - name: Free disk space
         run: |
+          uname -a
+          command -v docker || true
+          docker --version || true
           df -h
           sudo rm -rf /usr/share/dotnet
           sudo rm -rf /usr/local/lib/android
           sudo rm -rf /opt/ghc
           sudo rm -rf "$AGENT_TOOLSDIRECTORY"
-          docker system prune -af
           df -h
 
       - name: Cache Library

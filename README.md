@@ -1,28 +1,72 @@
 # Acderator
-Acderator is a rhythm game made with Unity.  
-View [Acderator](App/Assets/Acderator) for more information.  
-  
-## Getting started  
-### Installation  
-coming soon...  
-  
-### Building  
-This project was made with Unity 6000.0.64f1.   
-You can download the exact version from the [official Download Archive here](https://unity.com/releases/editor/archive).  
-  
-### Project status  
-- [ ] Update ConfigPopup UI  
-- [ ] Add Account Linking  
-   
+
+Acderator is a rhythm game made with Unity.
+
+View [Acderator](App/Assets/Acderator) for more information.
+
+## Getting Started
+
+### Requirements
+
+- Unity 6000.3.0f1
+- .NET SDK 8.x
+
+You can download the Unity Editor from the [official Download Archive](https://unity.com/releases/editor/archive).
+
+### Installation
+
+Coming soon.
+
+### Building
+
+Open the `App` directory with Unity 6000.3.0f1 and build from Unity Editor.
+
+## Development
+
+Run local checks from the `App` directory.
+
+```bash
+dotnet run --project CodingRuleChecker.csproj
+dotnet format whitespace --folder --verify-no-changes --include Assets/Acderator
+```
+
+The coding rule checker validates C# files under `Assets/Acderator`, excluding generated master data under `Assets/Acderator/Scripts/Intense/Master`.
+
+It checks:
+
+- unused `using` directives
+- ABC ordering for `using` directives
+- `.editorconfig` warning diagnostics
+- C# files must not end with a final newline
+
+To apply supported automatic fixes:
+
+```bash
+dotnet run --project CodingRuleChecker.csproj -- --fix
+```
+
+Generated `bin` and `obj` directories should not be committed.
+
+## CI
+
+GitHub Actions runs Unity CI plus the local C# coding rule checker. The coding rule check is scoped to changed C# files, with generated master data excluded.
+
+## Project Status
+
+- [ ] Update ConfigPopup UI
+- [ ] Add Account Linking
+
 ## Credits
-・[Ched](https://github.com/paralleltree/Ched)  
-・[DOTween](https://assetstore.unity.com/packages/tools/visual-scripting/dotween-pro-32416)  
-・[MasterMemory](https://github.com/Cysharp/MasterMemory)  
-・[R3](https://github.com/Cysharp/R3)  
-・[UIEffect](https://github.com/mob-sakai/UIEffect)  
-・[uPalette](https://github.com/Haruma-K/uPalette)  
-・[UniTask](https://github.com/Cysharp/UniTask)  
-・[Zenject](https://github.com/modesttree/Zenject)  
-  
-## License  
-Acderator is under MIT [LICENSE](LICENSE).  
+
+- [Ched](https://github.com/paralleltree/Ched)
+- [DOTween](https://assetstore.unity.com/packages/tools/visual-scripting/dotween-pro-32416)
+- [MasterMemory](https://github.com/Cysharp/MasterMemory)
+- [R3](https://github.com/Cysharp/R3)
+- [UIEffect](https://github.com/mob-sakai/UIEffect)
+- [uPalette](https://github.com/Haruma-K/uPalette)
+- [UniTask](https://github.com/Cysharp/UniTask)
+- [Zenject](https://github.com/modesttree/Zenject)
+
+## License
+
+Acderator is under MIT [LICENSE](LICENSE).

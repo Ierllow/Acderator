@@ -1,4 +1,4 @@
-﻿using Element.UI;
+using Element.UI;
 using Intense;
 using Intense.UI;
 using R3;

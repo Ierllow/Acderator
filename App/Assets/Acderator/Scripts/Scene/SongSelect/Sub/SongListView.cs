@@ -1,4 +1,4 @@
-﻿using Cysharp.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using EnhancedUI.EnhancedScroller;
 using Intense.Internal;
 using Intense.Master;

@@ -1,6 +1,5 @@
-﻿using DG.Tweening;
+using DG.Tweening;
 using Intense;
-using System;
 using UnityEngine;
 
 namespace Song

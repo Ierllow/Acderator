@@ -1,5 +1,4 @@
-﻿using Intense;
-using System;
+using Intense;
 using UnityEngine;
 
 namespace Song

@@ -1,7 +1,7 @@
 using DG.Tweening;
 using Intense.Master;
-using System;
 using R3;
+using System;
 using UnityEngine;
 
 namespace Song

@@ -1,4 +1,4 @@
-﻿namespace Intense.Api
+namespace Intense.Api
 {
     public class LoginRequest : RequestBase
     {

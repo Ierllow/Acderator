@@ -1,7 +1,6 @@
 using Cysharp.Threading.Tasks;
 using Intense;
 using Intense.Asset;
-using System;
 using System.Threading;
 using UnityEngine;
 using Zenject;

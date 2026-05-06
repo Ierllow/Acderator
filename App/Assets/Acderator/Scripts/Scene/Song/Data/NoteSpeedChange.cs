@@ -1,4 +1,4 @@
-﻿namespace Song
+namespace Song
 {
     [System.Serializable]
     public class NoteSpeedChange

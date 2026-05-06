@@ -1,5 +1,4 @@
-﻿using Cysharp.Threading.Tasks;
-using Cysharp.Threading.Tasks.Linq;
+using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using System;
 using TMPro;

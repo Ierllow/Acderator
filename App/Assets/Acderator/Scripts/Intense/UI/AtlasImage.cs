@@ -1,4 +1,4 @@
-﻿using Cysharp.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using Intense.Asset;
 using UnityEngine;
 using UnityEngine.U2D;
