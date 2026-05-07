@@ -15,8 +15,8 @@ namespace SongSelect
         private void StartButtonSubscribes()
         {
             autoButton.SetToggleTextAsAsyncEnumerableForEachAsync(isOn => isOn ? "オートON" : "オートOFF");
-            decideButton.OnTapButtonAsObservable.SubscribeLockAwait(new(true), async (_, __) => await TapDecideButton()).RegisterTo(destroyCancellationToken);
-            orderButton.OnTapButtonAsObservable.SubscribeLock(new(true), _ => TapOrderButton()).RegisterTo(destroyCancellationToken);
+            decideButton.OnTapButtonAsObservable.SubscribeLockAwait(async (_, __) => await TapDecideButton()).RegisterTo(destroyCancellationToken);
+            orderButton.OnTapButtonAsObservable.SubscribeLock(_ => TapOrderButton()).RegisterTo(destroyCancellationToken);
         }
 
         private void StartUISubscribes()

@@ -29,11 +29,10 @@ namespace Result
         [Inject] private SoundManager soundManager;
         [Inject] private NetworkManager networkManager;
 
-        protected override void Start()
+        private void Start()
         {
-            retryButton.OnTapButtonAsObservable.SubscribeLockAwait(new(true), async (_, __) => await TapRetryButton()).RegisterTo(destroyCancellationToken);
-            quitButton.OnTapButtonAsObservable.SubscribeLockAwait(new(true), async (_, ___) => await sceneManager.ChangeSceneAsync(ESceneType.SongSelect, new SongSelect.SongSelectSceneContext())).RegisterTo(destroyCancellationToken);
-            base.Start();
+            retryButton.OnTapButtonAsObservable.SubscribeLockAwait(async (_, __) => await TapRetryButton()).RegisterTo(destroyCancellationToken);
+            quitButton.OnTapButtonAsObservable.SubscribeLockAwait(async (_, ___) => await sceneManager.ChangeSceneAsync(ESceneType.SongSelect, new SongSelect.SongSelectSceneContext())).RegisterTo(destroyCancellationToken);
         }
 
         public override void OnCreateScene() => UniTask.Void(async () =>

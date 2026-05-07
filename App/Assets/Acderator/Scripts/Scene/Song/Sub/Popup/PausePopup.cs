@@ -17,9 +17,9 @@ namespace Song
 
         private void Start()
         {
-            resumeButton.OnTapButtonAsObservable.SubscribeLock(new(true), _ => Close(EPopupTapKind.Resume)).RegisterTo(destroyCancellationToken);
-            restartButton.OnTapButtonAsObservable.SubscribeLock(new(true), _ => Close(EPopupTapKind.Restart)).RegisterTo(destroyCancellationToken);
-            quitButton.OnTapButtonAsObservable.SubscribeLock(new(true), _ => Close(EPopupTapKind.Quit)).RegisterTo(destroyCancellationToken);
+            resumeButton.OnTapButtonAsObservable.SubscribeLock(_ => Close(EPopupTapKind.Resume)).RegisterTo(destroyCancellationToken);
+            restartButton.OnTapButtonAsObservable.SubscribeLock(_ => Close(EPopupTapKind.Restart)).RegisterTo(destroyCancellationToken);
+            quitButton.OnTapButtonAsObservable.SubscribeLock(_ => Close(EPopupTapKind.Quit)).RegisterTo(destroyCancellationToken);
         }
 
         public void Open(bool showRestartButton, Action callback)

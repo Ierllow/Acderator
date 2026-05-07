@@ -33,11 +33,7 @@ namespace Song
             base.Awake();
         }
 
-        protected override void Start()
-        {
-            StartSubscribes();
-            base.Start();
-        }
+        private void Start() => StartSubscribes();
 
         private void OnApplicationPause(bool pauseStatus)
         {

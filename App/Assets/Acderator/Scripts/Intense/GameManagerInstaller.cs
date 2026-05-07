@@ -29,6 +29,8 @@ namespace Intense
             Container.Bind<SoundManager>().AsSingle().NonLazy();
             Container.Bind<AssetBundleManager>().FromInstance(assetBundleManager).AsSingle().NonLazy();
             Container.Bind<PopupManager>().FromInstance(popupManager).AsSingle().NonLazy();
+            Container.Bind<SceneErrorPopupController>().AsSingle();
+            Container.Bind<SceneErrorHandler>().AsTransient();
         }
     }
 }

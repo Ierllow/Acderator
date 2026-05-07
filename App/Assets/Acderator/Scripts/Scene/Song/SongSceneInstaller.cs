@@ -23,6 +23,7 @@ namespace Song
             Container.Bind<ScoreController>().AsSingle();
             Container.Bind<ComboController>().AsSingle();
             Container.Bind<HpBarController>().AsSingle();
+            Container.Bind<JudgmentTypeResolver>().AsSingle();
             Container.Bind<SongResultCalculator>().AsSingle();
             Container.Bind<ScoreNumController>().AsSingle();
             Container.BindInterfacesAndSelfTo<SongParticleController>().FromComponentInHierarchy().AsSingle();

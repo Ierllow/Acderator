@@ -1,7 +1,6 @@
 using Cysharp.Threading.Tasks;
 using Cysharp.Threading.Tasks.Linq;
 using Intense;
-using Intense.Master;
 using R3;
 using System;
 using System.Collections.Generic;
@@ -36,7 +35,7 @@ namespace Song
         [SerializeField] private float swipeThreshold = 50f;
 
         [Inject] private NotesManager notesManager;
-        [Inject] private MasterDataManager masterDataManager;
+        [Inject] private JudgmentTypeResolver judgmentTypeResolver;
         [Inject] private PointerInput pointerInput;
 
         private float dist;
@@ -78,7 +77,7 @@ namespace Song
                     var diff = GetNoteDiffSec(EFingerType.Down, note.NoteData);
                     if (diff < 0.5f)
                     {
-                        var judgementType = diff.GetJudgmentType(masterDataManager);
+                        var judgementType = judgmentTypeResolver.GetJudgmentType(diff);
                         note.OnJudgedNote(EFingerType.Down, judgementType);
                         fingerInfo = new FingerInfo
                         {
@@ -116,7 +115,7 @@ namespace Song
                 && note.IsTapping
                 && (note.NoteData.NoteType == ENoteType.Long || note.NoteData.NoteType == ENoteType.Curve))
             {
-                var judgementType = GetNoteDiffSec(EFingerType.Up, note.NoteData).GetJudgmentType(masterDataManager);
+                var judgementType = judgmentTypeResolver.GetJudgmentType(GetNoteDiffSec(EFingerType.Up, note.NoteData));
                 judgementType = judgementType != EJudgementType.None ? judgementType : EJudgementType.Miss;
 
                 note.OnJudgedNote(EFingerType.Up, judgementType);
@@ -154,7 +153,7 @@ namespace Song
 
             if (notesManager.TryGetNote(EFingerType.Up, lane, out var note))
             {
-                var judgementType = GetNoteDiffSec(EFingerType.Up, note.NoteData).GetJudgmentType(masterDataManager);
+                var judgementType = judgmentTypeResolver.GetJudgmentType(GetNoteDiffSec(EFingerType.Up, note.NoteData));
                 judgementType = judgementType != EJudgementType.None ? judgementType : EJudgementType.Miss;
 
                 note.OnJudgedNote(EFingerType.Up, judgementType);
@@ -178,7 +177,7 @@ namespace Song
             if (!notesManager.TryGetFlickNote(lane, out var note)) return;
 
             var diff = GetNoteDiffSec(EFingerType.Up, note.NoteData);
-            var judgementType = diff.GetJudgmentType(masterDataManager);
+            var judgementType = judgmentTypeResolver.GetJudgmentType(diff);
             judgementType = judgementType != EJudgementType.None ? judgementType : EJudgementType.Miss;
 
             note.OnJudgedNote(EFingerType.Up, judgementType);

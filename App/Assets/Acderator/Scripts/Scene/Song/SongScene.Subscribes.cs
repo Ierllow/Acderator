@@ -1,7 +1,6 @@
 using Cysharp.Threading.Tasks.Linq;
 using Intense;
 using R3;
-using R3.Triggers;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -67,17 +66,28 @@ namespace Song
         private void StartPauseSubscribes()
         {
 #if UNITY_EDITOR
-            this.OnPauseStateChangedAsObservable().Subscribe((state) =>
-            {
-                if (state == PauseState.Paused)
-                {
-                    songControllerResolver.Loop.UpdateState(ESongState.Stop);
-                    songPopupLayerController.OnOpenPausePopup(sceneContext.IsAuto);
-                    return;
-                }
-                songControllerResolver.Loop.UpdateState(ESongState.Playing);
-            }).RegisterTo(destroyCancellationToken);
+            EditorApplication.pauseStateChanged -= OnPauseStateChanged;
+            EditorApplication.pauseStateChanged += OnPauseStateChanged;
 #endif
         }
+
+#if UNITY_EDITOR
+        protected override void OnDestroy()
+        {
+            EditorApplication.pauseStateChanged -= OnPauseStateChanged;
+            base.OnDestroy();
+        }
+
+        private void OnPauseStateChanged(PauseState state)
+        {
+            if (state == PauseState.Paused)
+            {
+                songControllerResolver.Loop.UpdateState(ESongState.Stop);
+                songPopupLayerController.OnOpenPausePopup(sceneContext.IsAuto);
+                return;
+            }
+            songControllerResolver.Loop.UpdateState(ESongState.Playing);
+        }
+#endif
     }
 }

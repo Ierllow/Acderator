@@ -1,4 +1,4 @@
-namespace Zenject
+﻿namespace Zenject
 {
     public static partial class DiContainerExtensions
     {

@@ -25,14 +25,12 @@ namespace Element.UI
 
         private new Action<ESceneType> closeCallback;
 
-        private readonly ReactiveProperty<bool> gate = new(true);
-
         private void Start()
         {
-            configButton.OnTapButtonAsObservable.SubscribeLock(gate, _ => popupManager.OpenPopup(new ConfigPopupContext())).RegisterTo(destroyCancellationToken);
-            deleteAccountButton.OnTapButtonAsObservable.SubscribeLock(gate, _ => TapDeleteAccountButton()).RegisterTo(destroyCancellationToken);
-            licenseButton.OnTapButtonAsObservable.SubscribeLock(gate, _ => TapLicenseButton()).RegisterTo(destroyCancellationToken);
-            titleSceneButton.OnTapButtonAsObservable.SubscribeLock(gate, _ => TapTitleSceneButton()).RegisterTo(destroyCancellationToken);
+            configButton.OnTapButtonAsObservable.SubscribeLock(_ => popupManager.OpenPopup(new ConfigPopupContext())).RegisterTo(destroyCancellationToken);
+            deleteAccountButton.OnTapButtonAsObservable.SubscribeLock(_ => TapDeleteAccountButton()).RegisterTo(destroyCancellationToken);
+            licenseButton.OnTapButtonAsObservable.SubscribeLock(_ => TapLicenseButton()).RegisterTo(destroyCancellationToken);
+            titleSceneButton.OnTapButtonAsObservable.SubscribeLock(_ => TapTitleSceneButton()).RegisterTo(destroyCancellationToken);
         }
 
         public void Open(MenuPopupContext menuPopupContext)

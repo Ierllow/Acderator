@@ -31,11 +31,7 @@ namespace SongSelect
         [Inject] private ScoreManager scoreManager;
         [Inject] private Song.TutorialSceneContextBuilder tutorialSceneContextBuilder;
 
-        protected override void Start()
-        {
-            StartSubscribes();
-            base.Start();
-        }
+        private void Start() => StartSubscribes();
 
         private void OnApplicationPause(bool pauseStatus)
         {

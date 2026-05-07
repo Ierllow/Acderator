@@ -23,14 +23,13 @@ namespace Title
         [Inject] private NetworkManager networkManager;
         [Inject] private Song.TutorialSceneContextBuilder tutorialSceneContextBuilder;
 
-        protected override void Start()
+        private void Start()
         {
-            startButton.OnTapButtonAsObservable.SubscribeLockAwait(new(true), async (_, ct) =>
+            startButton.OnTapButtonAsObservable.SubscribeLockAwait(async (_, ct) =>
             {
                 while (!await titleAuthController.ExecuteAsync(ct, failFastExceptionWatcher)) { }
                 await ChangeNextScene();
             }).RegisterTo(destroyCancellationToken);
-            base.Start();
         }
 
         public override void OnCreateScene()

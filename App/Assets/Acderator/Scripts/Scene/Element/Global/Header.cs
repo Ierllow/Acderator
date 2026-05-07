@@ -17,7 +17,7 @@ namespace Element
         private void Start()
         {
             var context = new MenuPopupContext { NegativeCallback = async (sceneType) => await sceneManager.ChangeSceneAsync(sceneType) };
-            menuButton.OnTapButtonAsObservable.SubscribeLock(new(true), __ => popupManager.OpenPopup(context)).RegisterTo(destroyCancellationToken);
+            menuButton.OnTapButtonAsObservable.SubscribeLock(__ => popupManager.OpenPopup(context)).RegisterTo(destroyCancellationToken);
         }
 
         public void SetHeaderActive(bool active) => gameObject.SetActive(active);
