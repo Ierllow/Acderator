@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>MasterMemory</name>
+    </assembly>
+    <members>
+        <member name="T:MasterMemory.TableInfo">
+            <summary>
+            Diagnostic info of MasterMemory's table.
+            </summary>
+        </member>
+    </members>
+</doc>

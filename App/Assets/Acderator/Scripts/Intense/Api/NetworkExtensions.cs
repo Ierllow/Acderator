@@ -86,7 +86,7 @@ namespace Intense.Api
             };
             request.SetRequestHeader("Content-Type", "application/x-msgpack");
             request.SetRequestHeader("Accept", "application/x-msgpack");
-            request.SetRequestHeader("header", MessagePackSerializer.ToJson(header));
+            request.SetRequestHeader("header", MessagePackSerializer.ConvertToJson(MessagePackSerializer.Serialize(header)));
             if (!string.IsNullOrEmpty(token)) request.SetRequestHeader("Authorization", string.Format("Bearer {0}", token));
         }
 

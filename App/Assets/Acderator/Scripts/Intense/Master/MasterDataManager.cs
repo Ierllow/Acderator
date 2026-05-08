@@ -1,6 +1,7 @@
 ﻿using Cysharp.Threading.Tasks;
 using Master;
 using Intense.Api;
+using MessagePack;
 using MessagePack.Resolvers;
 using System;
 using System.Collections.Generic;
@@ -15,7 +16,11 @@ namespace Intense.Master
 
         public MemoryDatabase MemoryDatabase { get; private set; }
 
-        public void Initialize() => CompositeResolver.RegisterAndSetAsDefault(new[] { MasterMemoryResolver.Instance, GeneratedResolver.Instance, StandardResolver.Instance });
+        public void Initialize()
+        {
+            var resolver = CompositeResolver.Create(MasterMemoryResolver.Instance, GeneratedResolver.Instance, StandardResolver.Instance);
+            MessagePackSerializer.DefaultOptions = MessagePackSerializerOptions.Standard.WithResolver(resolver);
+        }
 
         public async UniTask LoadMasterAsync(Dictionary<string, object> masterDict)
         {

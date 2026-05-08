@@ -68,7 +68,7 @@ namespace Intense.Api
                 await www.SendWebRequest();
                 var responseBytes = www.downloadHandler.data;
                 if (www.result != UnityWebRequest.Result.Success) return default;
-                var responseData = MessagePackSerializer.Deserialize<Dictionary<string, object>>(responseBytes);
+                var responseData = DeserializeResponse(responseBytes);
                 var response = request.CreateResponse(responseData);
                 Debug.Log(string.Format("errorCode: {0}, networkError: {1}, errorResponse: {2}", response.ErrorCode, response.NetworkError, response.ErrorMessage));
                 return response;
@@ -77,6 +77,12 @@ namespace Intense.Api
             {
                 loading.HideLoading();
             }
+        }
+
+        private static Dictionary<string, object> DeserializeResponse(byte[] responseBytes)
+        {
+            var reader = new MessagePackReader(new System.Buffers.ReadOnlySequence<byte>(responseBytes));
+            return MessagePackSerializer.Deserialize<Dictionary<string, object>>(ref reader);
         }
     }
 }
