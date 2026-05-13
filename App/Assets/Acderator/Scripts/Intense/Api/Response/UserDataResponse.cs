@@ -8,10 +8,10 @@ namespace Intense.Api
         {
             get
             {
-                if (Body.TryGetDictionary("scores", out var oldFormatScores)) return oldFormatScores;
+                if (responseData.TryGetDictionary("scores", out var oldFormatScores)) return oldFormatScores;
 
                 var scores = new Dictionary<string, object>();
-                foreach (var item in Body.GetList("scores"))
+                foreach (var item in responseData.GetList("scores"))
                 {
                     if (!item.TryConvertDictionary(out var scoreData)) continue;
                     if (!scoreData.TryGetInt("score_id", out var scoreId)) continue;

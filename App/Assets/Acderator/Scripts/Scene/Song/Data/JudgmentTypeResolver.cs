@@ -1,4 +1,4 @@
-using Intense;
+﻿using Intense;
 using Intense.Master;
 
 namespace Song
@@ -7,7 +7,7 @@ namespace Song
     {
         private readonly MasterDataManager masterDataManager;
 
-        public JudgmentTypeResolver(MasterDataManager masterDataManager) => this.masterDataManager = masterDataManager;
+        internal JudgmentTypeResolver(MasterDataManager masterDataManager) => this.masterDataManager = masterDataManager; //
 
         public EJudgementType GetJudgmentType(float diffSec)
         {

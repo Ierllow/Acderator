@@ -79,7 +79,7 @@ namespace Intense.Api
             }
         }
 
-        private static Dictionary<string, object> DeserializeResponse(byte[] responseBytes)
+        private Dictionary<string, object> DeserializeResponse(byte[] responseBytes)
         {
             var reader = new MessagePackReader(new System.Buffers.ReadOnlySequence<byte>(responseBytes));
             return MessagePackSerializer.Deserialize<Dictionary<string, object>>(ref reader);
