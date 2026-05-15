@@ -1,13 +1,21 @@
-using System.Collections.Generic;
+using MessagePack;
+using UnityEngine.Networking;
 
 namespace Intense.Api
 {
     public abstract class RequestBase
     {
-        public abstract string ApiKey { get; }
+        [IgnoreMember] public abstract string ApiKey { get; }
+        [IgnoreMember] public virtual string HttpMethod => UnityWebRequest.kHttpVerbPOST;
+        [IgnoreMember] public abstract object RequestObject { get; }
 
-        public virtual string HttpMethod => UnityEngine.Networking.UnityWebRequest.kHttpVerbPOST;
+        public abstract ResponseBase DeserializeResponse(byte[] bytes);
+    }
 
-        public virtual Dictionary<string, object> PostData { get; } = new();
+    public abstract class RequestBase<TResponse> : RequestBase where TResponse : ResponseBase, new()
+    {
+        [IgnoreMember] public override object RequestObject => this;
+
+        public override ResponseBase DeserializeResponse(byte[] bytes) => MessagePackSerializer.Deserialize<TResponse>(bytes);
     }
 }

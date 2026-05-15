@@ -194,7 +194,7 @@ namespace Song
 
         private Vector3 GetWorldPosition(Vector2 screenPosition) => choose.ScreenToWorldPoint(new Vector3(screenPosition.x, screenPosition.y, dist));
 
-        private static bool IsPointerOverGui(int pointerId) => EventSystem.current != null && EventSystem.current.IsPointerOverGameObject(pointerId);
+        private bool IsPointerOverGui(int pointerId) => EventSystem.current != null && EventSystem.current.IsPointerOverGameObject(pointerId);
 
         private List<NoteBase> CreateTappingNoteList()
         {

@@ -1,9 +1,7 @@
-using System.Collections.Generic;
+using MessagePack;
 
 namespace Intense.Api
 {
-    public class ScoreSubmitResponse : ResponseBase
-    {
-        public ScoreSubmitResponse(Dictionary<string, object> responseData) : base(responseData) { }
-    }
+    [MessagePackObject(keyAsPropertyName: true)]
+    public class ScoreSubmitResponse : ResponseBase { }
 }

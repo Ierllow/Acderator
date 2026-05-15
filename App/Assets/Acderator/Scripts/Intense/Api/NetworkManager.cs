@@ -1,7 +1,6 @@
 using Cysharp.Threading.Tasks;
 using Intense.UI;
 using MessagePack;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 using Zenject;
@@ -62,15 +61,20 @@ namespace Intense.Api
 
                 using var www = new UnityWebRequest(url, request.HttpMethod);
                 www.SetApiRequestHeaders(sessionToken, apiSession.MasterVersion);
-                if (request.HttpMethod != UnityWebRequest.kHttpVerbGET) www.uploadHandler = new UploadHandlerRaw(MessagePackSerializer.Serialize(request.PostData));
+                if (request.HttpMethod != UnityWebRequest.kHttpVerbGET)
+                {
+                    www.uploadHandler = new UploadHandlerRaw(MessagePackSerializer.Serialize(request.RequestObject));
+                }
                 www.downloadHandler = new DownloadHandlerBuffer();
                 www.timeout = 60;
                 await www.SendWebRequest();
-                var responseBytes = www.downloadHandler.data;
-                if (www.result != UnityWebRequest.Result.Success) return default;
-                var responseData = DeserializeResponse(responseBytes);
-                var response = request.CreateResponse(responseData);
-                Debug.Log(string.Format("errorCode: {0}, networkError: {1}, errorResponse: {2}", response.ErrorCode, response.NetworkError, response.ErrorMessage));
+
+                var response = www.result switch
+                {
+                    UnityWebRequest.Result.Success => request.DeserializeResponse(www.downloadHandler.data),
+                    _ => default
+                };
+                Debug.Log(string.Format("UnityWebRequest.Result:{1}, errorCode: {1}, networkError: {2}, errorResponse: {2}", www.result, response.ErrorCode, response.NetworkError, response.ErrorMessage));
                 return response;
             }
             finally
@@ -79,10 +83,6 @@ namespace Intense.Api
             }
         }
 
-        private Dictionary<string, object> DeserializeResponse(byte[] responseBytes)
-        {
-            var reader = new MessagePackReader(new System.Buffers.ReadOnlySequence<byte>(responseBytes));
-            return MessagePackSerializer.Deserialize<Dictionary<string, object>>(ref reader);
-        }
+        public async UniTask<TResponse> RequestAsync<TResponse>(RequestBase<TResponse> request) where TResponse : ResponseBase, new() => (TResponse)await RequestAsync((RequestBase)request);
     }
 }

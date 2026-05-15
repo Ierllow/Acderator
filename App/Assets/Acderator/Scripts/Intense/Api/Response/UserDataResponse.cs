@@ -1,27 +1,21 @@
+using MessagePack;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Intense.Api
 {
+    [MessagePackObject(keyAsPropertyName: true)]
+    public class ScoreEntry
+    {
+        [Key("score_id")] public int ScoreId { get; set; }
+        [Key("score")] public int Score { get; set; }
+    }
+
+    [MessagePackObject(keyAsPropertyName: true)]
     public class UserDataResponse : ResponseBase
     {
-        public Dictionary<string, object> Scores
-        {
-            get
-            {
-                if (responseData.TryGetDictionary("scores", out var oldFormatScores)) return oldFormatScores;
+        [Key("scores")] public List<ScoreEntry> Scores { get; set; } = new();
 
-                var scores = new Dictionary<string, object>();
-                foreach (var item in responseData.GetList("scores"))
-                {
-                    if (!item.TryConvertDictionary(out var scoreData)) continue;
-                    if (!scoreData.TryGetInt("score_id", out var scoreId)) continue;
-                    if (!scoreData.TryGetInt("score", out var score)) continue;
-                    scores[scoreId.ToString()] = score;
-                }
-                return scores;
-            }
-        }
-
-        public UserDataResponse(Dictionary<string, object> responseData) : base(responseData) { }
+        [IgnoreMember] public IEnumerable<(int sid, int score)> ScorePairs => Scores?.Select(s => (s.ScoreId, s.Score)) ?? Enumerable.Empty<(int, int)>();
     }
 }

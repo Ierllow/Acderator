@@ -1,11 +1,10 @@
-using System.Collections.Generic;
+using MessagePack;
 
 namespace Intense.Api
 {
+    [MessagePackObject(keyAsPropertyName: true)]
     public class ScoreBeginResponse : ResponseBase
     {
-        public string SessionId => responseData.TryGetString("session_id", out var sessionId) ? sessionId : string.Empty;
-
-        public ScoreBeginResponse(Dictionary<string, object> responseData) : base(responseData) { }
+        [Key("session_id")] public string SessionId { get; set; } = string.Empty;
     }
 }

@@ -89,15 +89,5 @@ namespace Intense.Api
             request.SetRequestHeader("header", MessagePackSerializer.ConvertToJson(MessagePackSerializer.Serialize(header)));
             if (!string.IsNullOrEmpty(token)) request.SetRequestHeader("Authorization", string.Format("Bearer {0}", token));
         }
-
-        public static ResponseBase CreateResponse(this RequestBase request, Dictionary<string, object> responseData) => request switch
-        {
-            RegisterRequest => new RegisterResponse(responseData),
-            LoginRequest => new LoginResponse(responseData),
-            UserDataRequest => new UserDataResponse(responseData),
-            ScoreBeginRequest => new ScoreBeginResponse(responseData),
-            ScoreSubmitRequest => new ScoreSubmitResponse(responseData),
-            _ => new ResponseBase(responseData),
-        };
     }
 }

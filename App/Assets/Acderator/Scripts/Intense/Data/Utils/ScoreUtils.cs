@@ -7,8 +7,7 @@ namespace Intense.Data
         public static ERankType ToRank(int score, bool isShowNew = false) => score switch
         {
             <= 0 when isShowNew => ERankType.New,
-            <= 0 => ERankType.D,
-            < 700000 => ERankType.D,
+            <= 0 or < 700000 => ERankType.D,
             < 800000 => ERankType.C,
             < 850000 => ERankType.B,
             < 900000 => ERankType.A,

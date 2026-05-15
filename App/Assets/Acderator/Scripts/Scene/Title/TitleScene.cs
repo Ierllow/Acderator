@@ -27,7 +27,7 @@ namespace Title
         {
             startButton.OnTapButtonAsObservable.SubscribeLockAwait(async (_, ct) =>
             {
-                while (!await titleAuthController.ExecuteAsync(ct, failFastExceptionWatcher)) { }
+                while (!await titleAuthController.Execute(ct, failFastExceptionWatcher)) { }
                 await ChangeNextScene();
             }).RegisterTo(destroyCancellationToken);
         }
@@ -54,9 +54,8 @@ namespace Title
                 return;
             }
 
-            var request = new ScoreBeginRequest();
-            request.PostData.Add("score_id", scoreId);
-            var response = await networkManager.RequestAsync(request) as ScoreBeginResponse;
+            var request = new ScoreBeginRequest { ScoreId = scoreId };
+            var response = await networkManager.RequestAsync(request);
             if ((response?.IsSuccess ?? false) && tutorialSceneContextBuilder.TryBuildFirstTutorial(response.SessionId, out var tutorialContext))
             {
                 await sceneManager.ChangeSceneAsync(ESceneType.Song, tutorialContext);
@@ -68,7 +67,7 @@ namespace Title
 
         private async UniTask AutoDownloadAllAssets()
         {
-            while (!await titleAuthController.ExecuteAsync(destroyCancellationToken, failFastExceptionWatcher)) { }
+            while (!await titleAuthController.Execute(destroyCancellationToken, failFastExceptionWatcher)) { }
             PlayerPrefsValues.Set(PlayerPrefsKey.TutorialCompletedNeedsFullDownload, false);
             await ChangeNextScene();
         }

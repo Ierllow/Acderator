@@ -1,7 +1,12 @@
+using MessagePack;
+
 namespace Intense.Api
 {
-    public class ScoreBeginRequest : RequestBase
+    [MessagePackObject(keyAsPropertyName: true)]
+    public class ScoreBeginRequest : RequestBase<ScoreBeginResponse>
     {
-        public override string ApiKey { get; } = "score/begin";
+        [IgnoreMember] public override string ApiKey => "score/begin";
+
+        [Key("score_id")] public int ScoreId { get; set; }
     }
 }

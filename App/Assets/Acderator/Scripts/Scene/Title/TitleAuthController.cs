@@ -21,11 +21,11 @@ namespace Title
         [Inject] private PopupManager popupManager;
         [Inject] private IApiSession apiSession;
 
-        public async UniTask<bool> ExecuteAsync(CancellationToken token, FailFastExceptionWatcher failFastExceptionWatcher)
+        public async UniTask<bool> Execute(CancellationToken token, FailFastExceptionWatcher failFastExceptionWatcher)
         {
             var request = CreateAuthRequest();
-            var authResponse = await RequestAuthAsync(request, failFastExceptionWatcher);
-            if (!(authResponse?.IsSuccess ?? false)) return await OpenNetworkErrorPopupAndIsCloseAsync(authResponse);
+            var authResponse = await RequestAuth(request, failFastExceptionWatcher);
+            if (!(authResponse?.IsSuccess ?? false)) return await OpenNetworkErrorPopup(authResponse);
 
             if (authResponse is RegisterResponse registerResponse)
             {
@@ -39,31 +39,19 @@ namespace Title
             }
 
             await LoadAssets(token).AddWatcherTo(failFastExceptionWatcher);
-            var userDataResponse = await networkManager.RequestAsync(new UserDataRequest()).AddWatcherTo(failFastExceptionWatcher) as UserDataResponse;
-            if (!(userDataResponse?.IsSuccess ?? false)) return await OpenNetworkErrorPopupAndIsCloseAsync(userDataResponse);
-            scoreManager.SetScoreData(userDataResponse.Scores);
+            var userDataResponse = await networkManager.RequestAsync(new UserDataRequest()).AddWatcherTo(failFastExceptionWatcher);
+            if (!(userDataResponse?.IsSuccess ?? false)) return await OpenNetworkErrorPopup(userDataResponse);
+            scoreManager.SetScoreData(userDataResponse.ScorePairs);
             return true;
         }
 
-        private static RequestBase CreateAuthRequest()
+        private RequestBase CreateAuthRequest()
         {
             var userid = PlayerPrefsValues.UserId;
-            if (string.IsNullOrEmpty(userid))
-            {
-                var request = new RegisterRequest();
-                request.PostData.Add("uuid", Guid.NewGuid().ToString());
-                return request;
-            }
-            else
-            {
-                var request = new LoginRequest();
-                request.PostData.Add("userid", userid);
-                request.PostData.Add("password", PlayerPrefsValues.Password);
-                return request;
-            }
+            return string.IsNullOrEmpty(userid) ? new RegisterRequest { Uuid = Guid.NewGuid().ToString() } : new LoginRequest { UserId = userid, Password = PlayerPrefsValues.Password };
         }
 
-        private async UniTask<ResponseBase> RequestAuthAsync(RequestBase request, FailFastExceptionWatcher failFastExceptionWatcher)
+        private async UniTask<ResponseBase> RequestAuth(RequestBase request, FailFastExceptionWatcher failFastExceptionWatcher)
         {
             var response = await networkManager.RequestAsync(request).AddWatcherTo(failFastExceptionWatcher);
             if (response?.NetworkError != NetworkError.PreconditionFailed || response.Master is not { } master) return response;
@@ -72,7 +60,7 @@ namespace Title
             return await networkManager.RequestAsync(request).AddWatcherTo(failFastExceptionWatcher);
         }
 
-        private async UniTask<bool> OpenNetworkErrorPopupAndIsCloseAsync(ResponseBase response)
+        private async UniTask<bool> OpenNetworkErrorPopup(ResponseBase response)
         {
             var completionSource = AutoResetUniTaskCompletionSource<ECommonPopupTapKind>.Create();
             var context = PopupContextFactory.CreateNetworkErrorPopupContext(completionSource, response?.ErrorMessage ?? "通信に失敗しました。", response?.ErrorCode ?? 0);

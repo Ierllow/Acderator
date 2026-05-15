@@ -1,7 +1,13 @@
+using MessagePack;
+
 namespace Intense.Api
 {
-    public class LoginRequest : RequestBase
+    [MessagePackObject(keyAsPropertyName: true)]
+    public class LoginRequest : RequestBase<LoginResponse>
     {
-        public override string ApiKey { get; } = "auth/login";
+        [IgnoreMember] public override string ApiKey => "auth/login";
+
+        [Key("userid")] public string UserId { get; set; } = string.Empty;
+        [Key("password")] public string Password { get; set; } = string.Empty;
     }
 }

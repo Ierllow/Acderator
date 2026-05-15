@@ -55,6 +55,6 @@ namespace Song
             return tutorial == default ? default : masterDataManager.MemoryDatabase.SongMasterTable.FindBySid(tutorial.Sid);
         }
 
-        private static SongSceneContext CreateTutorialSceneContext(TutorialMaster tutorial, List<TutorialStepMaster> steps, SongMaster song, string sessionId) => SongSceneContext.Create(new SongInfo(song), sessionId, new TutorialInfo(tutorial, steps.OrderBy(x => x.StepOrder).ToList()));
+        private SongSceneContext CreateTutorialSceneContext(TutorialMaster tutorial, List<TutorialStepMaster> steps, SongMaster song, string sessionId) => SongSceneContext.Create(new SongInfo(song), sessionId, new TutorialInfo(tutorial, steps.OrderBy(x => x.StepOrder).ToList()));
     }
 }

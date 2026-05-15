@@ -9,7 +9,7 @@ public class CodeGenerators
         private const string MasterMemoryGeneratorVersion = "1.3.1";
         private const string MessagePackGeneratorVersion = "2.0.323";
 
-        [MenuItem("Tools/MasterMemory/CodeGenerate")]
+        [MenuItem("Tools/CodeGenerate")]
         private static void Generate()
         {
                 ExecuteMasterMemoryCodeGenerator();
@@ -58,7 +58,7 @@ public class CodeGenerators
                 var rootPath = Application.dataPath + "/..";
                 var generatorPath = $"{rootPath}/Packages/MessagePack.Generator.{MessagePackGeneratorVersion}/tools/netcoreapp3.0/any/mpc.dll";
                 var input = $"{Application.dataPath}/Acderator/Scripts/Intense";
-                var output = $"{Application.dataPath}/Acderator/Scripts/Intense/Master/Master.Generated.cs";
+                var output = $"{Application.dataPath}/Acderator/Scripts/Intense/MessagePackGenerated.cs";
 
                 var psi = new ProcessStartInfo()
                 {

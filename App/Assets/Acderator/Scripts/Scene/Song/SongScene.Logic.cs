@@ -151,9 +151,7 @@ namespace Song
 
         private async UniTask<bool> RequestUpdateScoreAsync(string sessionId, int score)
         {
-            var request = new ScoreSubmitRequest();
-            request.PostData.Add("session_id", sessionId);
-            request.PostData.Add("score", score);
+            var request = new ScoreSubmitRequest { SessionId = sessionId, Score = score };
             var response = await networkManager.RequestAsync(request);
             return response?.IsSuccess ?? false;
         }

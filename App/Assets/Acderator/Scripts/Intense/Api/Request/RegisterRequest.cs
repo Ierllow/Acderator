@@ -1,7 +1,12 @@
+using MessagePack;
+
 namespace Intense.Api
 {
-    public class RegisterRequest : RequestBase
+    [MessagePackObject(keyAsPropertyName: true)]
+    public class RegisterRequest : RequestBase<RegisterResponse>
     {
-        public override string ApiKey { get; } = "auth/register";
+        [IgnoreMember] public override string ApiKey => "auth/register";
+
+        [Key("uuid")] public string Uuid { get; set; } = string.Empty;
     }
 }

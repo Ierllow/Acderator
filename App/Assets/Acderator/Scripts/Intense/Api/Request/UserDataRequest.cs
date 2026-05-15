@@ -1,9 +1,12 @@
+using MessagePack;
+using UnityEngine.Networking;
+
 namespace Intense.Api
 {
-    public class UserDataRequest : RequestBase
+    [MessagePackObject(keyAsPropertyName: true)]
+    public class UserDataRequest : RequestBase<UserDataResponse>
     {
-        public override string ApiKey => "user/data";
-
-        public override string HttpMethod => UnityEngine.Networking.UnityWebRequest.kHttpVerbGET;
+        [IgnoreMember] public override string ApiKey => "user/data";
+        [IgnoreMember] public override string HttpMethod => UnityWebRequest.kHttpVerbGET;
     }
 }

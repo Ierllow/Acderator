@@ -105,7 +105,7 @@ namespace Song
 
         public void CompleteTutorial() => FadeOut(() => TutorialCompletedReactiveProperty.Value = new());
 
-        private static bool IsAdvanceTapStarted() => Input.touchCount > 0 ? Input.GetTouch(0).phase == TouchPhase.Began : Input.GetMouseButtonDown(0);
+        private bool IsAdvanceTapStarted() => Input.touchCount > 0 ? Input.GetTouch(0).phase == TouchPhase.Began : Input.GetMouseButtonDown(0);
 
         private void FadeOut(Action onComplete)
         {

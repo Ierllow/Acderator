@@ -1,13 +1,14 @@
-using System.Collections.Generic;
+using MessagePack;
 
 namespace Intense.Api
 {
+    [MessagePackObject(keyAsPropertyName: true)]
     public class RegisterResponse : ResponseBase
     {
-        public string Token => responseData.TryGetString("token", out var token) ? token : string.Empty;
-        public int UserId => responseData.TryGetInt("userid", out var userid) ? userid : 0;
-        public string Password => responseData.TryGetString("password", out var password) && !string.IsNullOrEmpty(password) ? password : UserId.ToString();
+        [Key("token")] public string Token { get; set; } = string.Empty;
+        [Key("userid")] public int UserId { get; set; }
+        [Key("password")] public string RawPassword { get; set; } = string.Empty;
 
-        public RegisterResponse(Dictionary<string, object> responseData) : base(responseData) { }
+        [IgnoreMember] public string Password => string.IsNullOrEmpty(RawPassword) ? UserId.ToString() : RawPassword;
     }
 }

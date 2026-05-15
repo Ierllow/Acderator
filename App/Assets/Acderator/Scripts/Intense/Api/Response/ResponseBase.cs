@@ -1,19 +1,26 @@
+using MessagePack;
 using System.Collections.Generic;
 
 namespace Intense.Api
 {
+    [MessagePackObject(keyAsPropertyName: true)]
+    public class ResponseHeader
+    {
+        [Key("code")] public int Code { get; set; }
+        [Key("message")] public string Message { get; set; } = string.Empty;
+        [Key("token")] public string Token { get; set; } = string.Empty;
+        [Key("master")] public Dictionary<string, object> Master { get; set; }
+    }
+
+    [MessagePackObject(keyAsPropertyName: true)]
     public class ResponseBase
     {
-        protected readonly Dictionary<string, object> responseData;
+        [Key("header")] public ResponseHeader Header { get; set; }
 
-        protected Dictionary<string, object> Header => responseData.TryGetDictionary("header", out var header) ? header : default;
-        public int ErrorCode => Header.TryGetInt("code", out var code) ? code : -1;
-        public string ErrorMessage => Header.TryGetString("message", out var message) ? message : string.Empty;
-        public Dictionary<string, object> Master => Header.TryGetDictionary("master", out var master) ? master : default;
-
-        public NetworkError NetworkError => ErrorCode.GetNetworkError();
-        public bool IsSuccess => NetworkError == NetworkError.None;
-
-        public ResponseBase(Dictionary<string, object> responseData) => this.responseData = responseData;
+        [IgnoreMember] public int ErrorCode => Header?.Code ?? -1;
+        [IgnoreMember] public string ErrorMessage => Header?.Message ?? string.Empty;
+        [IgnoreMember] public Dictionary<string, object> Master => Header?.Master;
+        [IgnoreMember] public NetworkError NetworkError => ErrorCode.GetNetworkError();
+        [IgnoreMember] public bool IsSuccess => NetworkError == NetworkError.None;
     }
 }

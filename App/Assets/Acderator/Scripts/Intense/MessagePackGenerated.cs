@@ -51,20 +51,35 @@ namespace MessagePack.Resolvers
 
         static GeneratedResolverGetFormatterHelper()
         {
-            lookup = new global::System.Collections.Generic.Dictionary<Type, int>(12)
+            lookup = new global::System.Collections.Generic.Dictionary<Type, int>(27)
             {
-                { typeof(global::Intense.Master.BaseMaster), 0 },
-                { typeof(global::Intense.Master.VersionMaster), 1 },
-                { typeof(global::Intense.Master.TitleMaster), 2 },
-                { typeof(global::Intense.Master.SongSelectMaster), 3 },
-                { typeof(global::Intense.Master.SongMaster), 4 },
-                { typeof(global::Intense.Master.SongScoreRateMaster), 5 },
-                { typeof(global::Intense.Master.SongJudgeZoneMaster), 6 },
-                { typeof(global::Intense.Master.SongHpRateMaster), 7 },
-                { typeof(global::Intense.Master.ResultMaster), 8 },
-                { typeof(global::Intense.Master.SoundSheetNameMaster), 9 },
-                { typeof(global::Intense.Master.TutorialStepMaster), 10 },
-                { typeof(global::Intense.Master.TutorialMaster), 11 },
+                { typeof(global::System.Collections.Generic.Dictionary<string, object>), 0 },
+                { typeof(global::System.Collections.Generic.List<global::Intense.Api.ScoreEntry>), 1 },
+                { typeof(global::Intense.Master.BaseMaster), 2 },
+                { typeof(global::Intense.Api.LoginRequest), 3 },
+                { typeof(global::Intense.Api.RegisterRequest), 4 },
+                { typeof(global::Intense.Api.ScoreBeginRequest), 5 },
+                { typeof(global::Intense.Api.ScoreSubmitRequest), 6 },
+                { typeof(global::Intense.Api.UserDataRequest), 7 },
+                { typeof(global::Intense.Api.ResponseHeader), 8 },
+                { typeof(global::Intense.Api.LoginResponse), 9 },
+                { typeof(global::Intense.Api.RegisterResponse), 10 },
+                { typeof(global::Intense.Api.ResponseBase), 11 },
+                { typeof(global::Intense.Api.ScoreBeginResponse), 12 },
+                { typeof(global::Intense.Api.ScoreSubmitResponse), 13 },
+                { typeof(global::Intense.Api.ScoreEntry), 14 },
+                { typeof(global::Intense.Api.UserDataResponse), 15 },
+                { typeof(global::Intense.Master.VersionMaster), 16 },
+                { typeof(global::Intense.Master.TitleMaster), 17 },
+                { typeof(global::Intense.Master.SongSelectMaster), 18 },
+                { typeof(global::Intense.Master.SongMaster), 19 },
+                { typeof(global::Intense.Master.SongScoreRateMaster), 20 },
+                { typeof(global::Intense.Master.SongJudgeZoneMaster), 21 },
+                { typeof(global::Intense.Master.SongHpRateMaster), 22 },
+                { typeof(global::Intense.Master.ResultMaster), 23 },
+                { typeof(global::Intense.Master.SoundSheetNameMaster), 24 },
+                { typeof(global::Intense.Master.TutorialStepMaster), 25 },
+                { typeof(global::Intense.Master.TutorialMaster), 26 },
             };
         }
 
@@ -78,18 +93,33 @@ namespace MessagePack.Resolvers
 
             switch (key)
             {
-                case 0: return new MessagePack.Formatters.Intense.Master.BaseMasterFormatter();
-                case 1: return new MessagePack.Formatters.Intense.Master.VersionMasterFormatter();
-                case 2: return new MessagePack.Formatters.Intense.Master.TitleMasterFormatter();
-                case 3: return new MessagePack.Formatters.Intense.Master.SongSelectMasterFormatter();
-                case 4: return new MessagePack.Formatters.Intense.Master.SongMasterFormatter();
-                case 5: return new MessagePack.Formatters.Intense.Master.SongScoreRateMasterFormatter();
-                case 6: return new MessagePack.Formatters.Intense.Master.SongJudgeZoneMasterFormatter();
-                case 7: return new MessagePack.Formatters.Intense.Master.SongHpRateMasterFormatter();
-                case 8: return new MessagePack.Formatters.Intense.Master.ResultMasterFormatter();
-                case 9: return new MessagePack.Formatters.Intense.Master.SoundSheetNameMasterFormatter();
-                case 10: return new MessagePack.Formatters.Intense.Master.TutorialStepMasterFormatter();
-                case 11: return new MessagePack.Formatters.Intense.Master.TutorialMasterFormatter();
+                case 0: return new global::MessagePack.Formatters.DictionaryFormatter<string, object>();
+                case 1: return new global::MessagePack.Formatters.ListFormatter<global::Intense.Api.ScoreEntry>();
+                case 2: return new MessagePack.Formatters.Intense.Master.BaseMasterFormatter();
+                case 3: return new MessagePack.Formatters.Intense.Api.LoginRequestFormatter();
+                case 4: return new MessagePack.Formatters.Intense.Api.RegisterRequestFormatter();
+                case 5: return new MessagePack.Formatters.Intense.Api.ScoreBeginRequestFormatter();
+                case 6: return new MessagePack.Formatters.Intense.Api.ScoreSubmitRequestFormatter();
+                case 7: return new MessagePack.Formatters.Intense.Api.UserDataRequestFormatter();
+                case 8: return new MessagePack.Formatters.Intense.Api.ResponseHeaderFormatter();
+                case 9: return new MessagePack.Formatters.Intense.Api.LoginResponseFormatter();
+                case 10: return new MessagePack.Formatters.Intense.Api.RegisterResponseFormatter();
+                case 11: return new MessagePack.Formatters.Intense.Api.ResponseBaseFormatter();
+                case 12: return new MessagePack.Formatters.Intense.Api.ScoreBeginResponseFormatter();
+                case 13: return new MessagePack.Formatters.Intense.Api.ScoreSubmitResponseFormatter();
+                case 14: return new MessagePack.Formatters.Intense.Api.ScoreEntryFormatter();
+                case 15: return new MessagePack.Formatters.Intense.Api.UserDataResponseFormatter();
+                case 16: return new MessagePack.Formatters.Intense.Master.VersionMasterFormatter();
+                case 17: return new MessagePack.Formatters.Intense.Master.TitleMasterFormatter();
+                case 18: return new MessagePack.Formatters.Intense.Master.SongSelectMasterFormatter();
+                case 19: return new MessagePack.Formatters.Intense.Master.SongMasterFormatter();
+                case 20: return new MessagePack.Formatters.Intense.Master.SongScoreRateMasterFormatter();
+                case 21: return new MessagePack.Formatters.Intense.Master.SongJudgeZoneMasterFormatter();
+                case 22: return new MessagePack.Formatters.Intense.Master.SongHpRateMasterFormatter();
+                case 23: return new MessagePack.Formatters.Intense.Master.ResultMasterFormatter();
+                case 24: return new MessagePack.Formatters.Intense.Master.SoundSheetNameMasterFormatter();
+                case 25: return new MessagePack.Formatters.Intense.Master.TutorialStepMasterFormatter();
+                case 26: return new MessagePack.Formatters.Intense.Master.TutorialMasterFormatter();
                 default: return null;
             }
         }
@@ -292,6 +322,1067 @@ namespace MessagePack.Formatters.Intense.Master
 #pragma warning restore SA1403 // File may only contain a single namespace
 #pragma warning restore SA1649 // File name should match first type name
 
+
+// <auto-generated>
+// THIS (.cs) FILE IS GENERATED BY MPC(MessagePack-CSharp). DO NOT CHANGE IT.
+// </auto-generated>
+
+#pragma warning disable 618
+#pragma warning disable 612
+#pragma warning disable 414
+#pragma warning disable 168
+
+#pragma warning disable SA1129 // Do not use default value type constructor
+#pragma warning disable SA1200 // Using directives should be placed correctly
+#pragma warning disable SA1309 // Field names should not begin with underscore
+#pragma warning disable SA1312 // Variable names should begin with lower-case letter
+#pragma warning disable SA1403 // File may only contain a single namespace
+#pragma warning disable SA1649 // File name should match first type name
+
+namespace MessagePack.Formatters.Intense.Api
+{
+    using System;
+    using System.Buffers;
+    using MessagePack;
+
+    public sealed class LoginRequestFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::Intense.Api.LoginRequest>
+    {
+
+
+        private readonly global::MessagePack.Internal.AutomataDictionary ____keyMapping;
+        private readonly byte[][] ____stringByteKeys;
+
+        public LoginRequestFormatter()
+        {
+            this.____keyMapping = new global::MessagePack.Internal.AutomataDictionary()
+            {
+                { "UserId", 0 },
+                { "Password", 1 },
+            };
+
+            this.____stringByteKeys = new byte[][]
+            {
+                global::MessagePack.Internal.CodeGenHelpers.GetEncodedStringBytes("UserId"),
+                global::MessagePack.Internal.CodeGenHelpers.GetEncodedStringBytes("Password"),
+            };
+        }
+
+        public void Serialize(ref MessagePackWriter writer, global::Intense.Api.LoginRequest value, global::MessagePack.MessagePackSerializerOptions options)
+        {
+            if (value == null)
+            {
+                writer.WriteNil();
+                return;
+            }
+
+            IFormatterResolver formatterResolver = options.Resolver;
+            writer.WriteMapHeader(2);
+            writer.WriteRaw(new ReadOnlySequence<byte>(this.____stringByteKeys[0]));
+            formatterResolver.GetFormatterWithVerify<string>().Serialize(ref writer, value.UserId, options);
+            writer.WriteRaw(new ReadOnlySequence<byte>(this.____stringByteKeys[1]));
+            formatterResolver.GetFormatterWithVerify<string>().Serialize(ref writer, value.Password, options);
+        }
+
+        public global::Intense.Api.LoginRequest Deserialize(ref MessagePackReader reader, global::MessagePack.MessagePackSerializerOptions options)
+        {
+            if (reader.TryReadNil())
+            {
+                return null;
+            }
+
+            IFormatterResolver formatterResolver = options.Resolver;
+            var length = reader.ReadMapHeader();
+            var __UserId__ = default(string);
+            var __Password__ = default(string);
+
+            for (int i = 0; i < length; i++)
+            {
+                ReadOnlySequence<byte> stringKey = reader.ReadStringSequence().Value;
+                int key;
+                if (!this.____keyMapping.TryGetValue(stringKey, out key))
+                {
+                    reader.Skip();
+                    continue;
+                }
+
+                switch (key)
+                {
+                    case 0:
+                        __UserId__ = formatterResolver.GetFormatterWithVerify<string>().Deserialize(ref reader, options);
+                        break;
+                    case 1:
+                        __Password__ = formatterResolver.GetFormatterWithVerify<string>().Deserialize(ref reader, options);
+                        break;
+                    default:
+                        reader.Skip();
+                        break;
+                }
+            }
+
+            var ____result = new global::Intense.Api.LoginRequest();
+            ____result.UserId = __UserId__;
+            ____result.Password = __Password__;
+            return ____result;
+        }
+    }
+
+    public sealed class RegisterRequestFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::Intense.Api.RegisterRequest>
+    {
+
+
+        private readonly global::MessagePack.Internal.AutomataDictionary ____keyMapping;
+        private readonly byte[][] ____stringByteKeys;
+
+        public RegisterRequestFormatter()
+        {
+            this.____keyMapping = new global::MessagePack.Internal.AutomataDictionary()
+            {
+                { "Uuid", 0 },
+            };
+
+            this.____stringByteKeys = new byte[][]
+            {
+                global::MessagePack.Internal.CodeGenHelpers.GetEncodedStringBytes("Uuid"),
+            };
+        }
+
+        public void Serialize(ref MessagePackWriter writer, global::Intense.Api.RegisterRequest value, global::MessagePack.MessagePackSerializerOptions options)
+        {
+            if (value == null)
+            {
+                writer.WriteNil();
+                return;
+            }
+
+            IFormatterResolver formatterResolver = options.Resolver;
+            writer.WriteMapHeader(1);
+            writer.WriteRaw(new ReadOnlySequence<byte>(this.____stringByteKeys[0]));
+            formatterResolver.GetFormatterWithVerify<string>().Serialize(ref writer, value.Uuid, options);
+        }
+
+        public global::Intense.Api.RegisterRequest Deserialize(ref MessagePackReader reader, global::MessagePack.MessagePackSerializerOptions options)
+        {
+            if (reader.TryReadNil())
+            {
+                return null;
+            }
+
+            IFormatterResolver formatterResolver = options.Resolver;
+            var length = reader.ReadMapHeader();
+            var __Uuid__ = default(string);
+
+            for (int i = 0; i < length; i++)
+            {
+                ReadOnlySequence<byte> stringKey = reader.ReadStringSequence().Value;
+                int key;
+                if (!this.____keyMapping.TryGetValue(stringKey, out key))
+                {
+                    reader.Skip();
+                    continue;
+                }
+
+                switch (key)
+                {
+                    case 0:
+                        __Uuid__ = formatterResolver.GetFormatterWithVerify<string>().Deserialize(ref reader, options);
+                        break;
+                    default:
+                        reader.Skip();
+                        break;
+                }
+            }
+
+            var ____result = new global::Intense.Api.RegisterRequest();
+            ____result.Uuid = __Uuid__;
+            return ____result;
+        }
+    }
+
+    public sealed class ScoreBeginRequestFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::Intense.Api.ScoreBeginRequest>
+    {
+
+
+        private readonly global::MessagePack.Internal.AutomataDictionary ____keyMapping;
+        private readonly byte[][] ____stringByteKeys;
+
+        public ScoreBeginRequestFormatter()
+        {
+            this.____keyMapping = new global::MessagePack.Internal.AutomataDictionary()
+            {
+                { "ScoreId", 0 },
+            };
+
+            this.____stringByteKeys = new byte[][]
+            {
+                global::MessagePack.Internal.CodeGenHelpers.GetEncodedStringBytes("ScoreId"),
+            };
+        }
+
+        public void Serialize(ref MessagePackWriter writer, global::Intense.Api.ScoreBeginRequest value, global::MessagePack.MessagePackSerializerOptions options)
+        {
+            if (value == null)
+            {
+                writer.WriteNil();
+                return;
+            }
+
+            IFormatterResolver formatterResolver = options.Resolver;
+            writer.WriteMapHeader(1);
+            writer.WriteRaw(new ReadOnlySequence<byte>(this.____stringByteKeys[0]));
+            writer.Write(value.ScoreId);
+        }
+
+        public global::Intense.Api.ScoreBeginRequest Deserialize(ref MessagePackReader reader, global::MessagePack.MessagePackSerializerOptions options)
+        {
+            if (reader.TryReadNil())
+            {
+                return null;
+            }
+
+            IFormatterResolver formatterResolver = options.Resolver;
+            var length = reader.ReadMapHeader();
+            var __ScoreId__ = default(int);
+
+            for (int i = 0; i < length; i++)
+            {
+                ReadOnlySequence<byte> stringKey = reader.ReadStringSequence().Value;
+                int key;
+                if (!this.____keyMapping.TryGetValue(stringKey, out key))
+                {
+                    reader.Skip();
+                    continue;
+                }
+
+                switch (key)
+                {
+                    case 0:
+                        __ScoreId__ = reader.ReadInt32();
+                        break;
+                    default:
+                        reader.Skip();
+                        break;
+                }
+            }
+
+            var ____result = new global::Intense.Api.ScoreBeginRequest();
+            ____result.ScoreId = __ScoreId__;
+            return ____result;
+        }
+    }
+
+    public sealed class ScoreSubmitRequestFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::Intense.Api.ScoreSubmitRequest>
+    {
+
+
+        private readonly global::MessagePack.Internal.AutomataDictionary ____keyMapping;
+        private readonly byte[][] ____stringByteKeys;
+
+        public ScoreSubmitRequestFormatter()
+        {
+            this.____keyMapping = new global::MessagePack.Internal.AutomataDictionary()
+            {
+                { "SessionId", 0 },
+                { "Score", 1 },
+            };
+
+            this.____stringByteKeys = new byte[][]
+            {
+                global::MessagePack.Internal.CodeGenHelpers.GetEncodedStringBytes("SessionId"),
+                global::MessagePack.Internal.CodeGenHelpers.GetEncodedStringBytes("Score"),
+            };
+        }
+
+        public void Serialize(ref MessagePackWriter writer, global::Intense.Api.ScoreSubmitRequest value, global::MessagePack.MessagePackSerializerOptions options)
+        {
+            if (value == null)
+            {
+                writer.WriteNil();
+                return;
+            }
+
+            IFormatterResolver formatterResolver = options.Resolver;
+            writer.WriteMapHeader(2);
+            writer.WriteRaw(new ReadOnlySequence<byte>(this.____stringByteKeys[0]));
+            formatterResolver.GetFormatterWithVerify<string>().Serialize(ref writer, value.SessionId, options);
+            writer.WriteRaw(new ReadOnlySequence<byte>(this.____stringByteKeys[1]));
+            writer.Write(value.Score);
+        }
+
+        public global::Intense.Api.ScoreSubmitRequest Deserialize(ref MessagePackReader reader, global::MessagePack.MessagePackSerializerOptions options)
+        {
+            if (reader.TryReadNil())
+            {
+                return null;
+            }
+
+            IFormatterResolver formatterResolver = options.Resolver;
+            var length = reader.ReadMapHeader();
+            var __SessionId__ = default(string);
+            var __Score__ = default(int);
+
+            for (int i = 0; i < length; i++)
+            {
+                ReadOnlySequence<byte> stringKey = reader.ReadStringSequence().Value;
+                int key;
+                if (!this.____keyMapping.TryGetValue(stringKey, out key))
+                {
+                    reader.Skip();
+                    continue;
+                }
+
+                switch (key)
+                {
+                    case 0:
+                        __SessionId__ = formatterResolver.GetFormatterWithVerify<string>().Deserialize(ref reader, options);
+                        break;
+                    case 1:
+                        __Score__ = reader.ReadInt32();
+                        break;
+                    default:
+                        reader.Skip();
+                        break;
+                }
+            }
+
+            var ____result = new global::Intense.Api.ScoreSubmitRequest();
+            ____result.SessionId = __SessionId__;
+            ____result.Score = __Score__;
+            return ____result;
+        }
+    }
+
+    public sealed class UserDataRequestFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::Intense.Api.UserDataRequest>
+    {
+
+
+        private readonly global::MessagePack.Internal.AutomataDictionary ____keyMapping;
+        private readonly byte[][] ____stringByteKeys;
+
+        public UserDataRequestFormatter()
+        {
+            this.____keyMapping = new global::MessagePack.Internal.AutomataDictionary()
+            {
+            };
+
+            this.____stringByteKeys = new byte[][]
+            {
+            };
+        }
+
+        public void Serialize(ref MessagePackWriter writer, global::Intense.Api.UserDataRequest value, global::MessagePack.MessagePackSerializerOptions options)
+        {
+            if (value == null)
+            {
+                writer.WriteNil();
+                return;
+            }
+
+            IFormatterResolver formatterResolver = options.Resolver;
+            writer.WriteMapHeader(0);
+        }
+
+        public global::Intense.Api.UserDataRequest Deserialize(ref MessagePackReader reader, global::MessagePack.MessagePackSerializerOptions options)
+        {
+            if (reader.TryReadNil())
+            {
+                return null;
+            }
+
+            IFormatterResolver formatterResolver = options.Resolver;
+            var length = reader.ReadMapHeader();
+
+            for (int i = 0; i < length; i++)
+            {
+                ReadOnlySequence<byte> stringKey = reader.ReadStringSequence().Value;
+                int key;
+                if (!this.____keyMapping.TryGetValue(stringKey, out key))
+                {
+                    reader.Skip();
+                    continue;
+                }
+
+                switch (key)
+                {
+                    default:
+                        reader.Skip();
+                        break;
+                }
+            }
+
+            var ____result = new global::Intense.Api.UserDataRequest();
+            return ____result;
+        }
+    }
+
+    public sealed class ResponseHeaderFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::Intense.Api.ResponseHeader>
+    {
+
+
+        private readonly global::MessagePack.Internal.AutomataDictionary ____keyMapping;
+        private readonly byte[][] ____stringByteKeys;
+
+        public ResponseHeaderFormatter()
+        {
+            this.____keyMapping = new global::MessagePack.Internal.AutomataDictionary()
+            {
+                { "Code", 0 },
+                { "Message", 1 },
+                { "Token", 2 },
+                { "Master", 3 },
+            };
+
+            this.____stringByteKeys = new byte[][]
+            {
+                global::MessagePack.Internal.CodeGenHelpers.GetEncodedStringBytes("Code"),
+                global::MessagePack.Internal.CodeGenHelpers.GetEncodedStringBytes("Message"),
+                global::MessagePack.Internal.CodeGenHelpers.GetEncodedStringBytes("Token"),
+                global::MessagePack.Internal.CodeGenHelpers.GetEncodedStringBytes("Master"),
+            };
+        }
+
+        public void Serialize(ref MessagePackWriter writer, global::Intense.Api.ResponseHeader value, global::MessagePack.MessagePackSerializerOptions options)
+        {
+            if (value == null)
+            {
+                writer.WriteNil();
+                return;
+            }
+
+            IFormatterResolver formatterResolver = options.Resolver;
+            writer.WriteMapHeader(4);
+            writer.WriteRaw(new ReadOnlySequence<byte>(this.____stringByteKeys[0]));
+            writer.Write(value.Code);
+            writer.WriteRaw(new ReadOnlySequence<byte>(this.____stringByteKeys[1]));
+            formatterResolver.GetFormatterWithVerify<string>().Serialize(ref writer, value.Message, options);
+            writer.WriteRaw(new ReadOnlySequence<byte>(this.____stringByteKeys[2]));
+            formatterResolver.GetFormatterWithVerify<string>().Serialize(ref writer, value.Token, options);
+            writer.WriteRaw(new ReadOnlySequence<byte>(this.____stringByteKeys[3]));
+            formatterResolver.GetFormatterWithVerify<global::System.Collections.Generic.Dictionary<string, object>>().Serialize(ref writer, value.Master, options);
+        }
+
+        public global::Intense.Api.ResponseHeader Deserialize(ref MessagePackReader reader, global::MessagePack.MessagePackSerializerOptions options)
+        {
+            if (reader.TryReadNil())
+            {
+                return null;
+            }
+
+            IFormatterResolver formatterResolver = options.Resolver;
+            var length = reader.ReadMapHeader();
+            var __Code__ = default(int);
+            var __Message__ = default(string);
+            var __Token__ = default(string);
+            var __Master__ = default(global::System.Collections.Generic.Dictionary<string, object>);
+
+            for (int i = 0; i < length; i++)
+            {
+                ReadOnlySequence<byte> stringKey = reader.ReadStringSequence().Value;
+                int key;
+                if (!this.____keyMapping.TryGetValue(stringKey, out key))
+                {
+                    reader.Skip();
+                    continue;
+                }
+
+                switch (key)
+                {
+                    case 0:
+                        __Code__ = reader.ReadInt32();
+                        break;
+                    case 1:
+                        __Message__ = formatterResolver.GetFormatterWithVerify<string>().Deserialize(ref reader, options);
+                        break;
+                    case 2:
+                        __Token__ = formatterResolver.GetFormatterWithVerify<string>().Deserialize(ref reader, options);
+                        break;
+                    case 3:
+                        __Master__ = formatterResolver.GetFormatterWithVerify<global::System.Collections.Generic.Dictionary<string, object>>().Deserialize(ref reader, options);
+                        break;
+                    default:
+                        reader.Skip();
+                        break;
+                }
+            }
+
+            var ____result = new global::Intense.Api.ResponseHeader();
+            ____result.Code = __Code__;
+            ____result.Message = __Message__;
+            ____result.Token = __Token__;
+            ____result.Master = __Master__;
+            return ____result;
+        }
+    }
+
+    public sealed class LoginResponseFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::Intense.Api.LoginResponse>
+    {
+
+
+        private readonly global::MessagePack.Internal.AutomataDictionary ____keyMapping;
+        private readonly byte[][] ____stringByteKeys;
+
+        public LoginResponseFormatter()
+        {
+            this.____keyMapping = new global::MessagePack.Internal.AutomataDictionary()
+            {
+                { "Header", 0 },
+            };
+
+            this.____stringByteKeys = new byte[][]
+            {
+                global::MessagePack.Internal.CodeGenHelpers.GetEncodedStringBytes("Header"),
+            };
+        }
+
+        public void Serialize(ref MessagePackWriter writer, global::Intense.Api.LoginResponse value, global::MessagePack.MessagePackSerializerOptions options)
+        {
+            if (value == null)
+            {
+                writer.WriteNil();
+                return;
+            }
+
+            IFormatterResolver formatterResolver = options.Resolver;
+            writer.WriteMapHeader(1);
+            writer.WriteRaw(new ReadOnlySequence<byte>(this.____stringByteKeys[0]));
+            formatterResolver.GetFormatterWithVerify<global::Intense.Api.ResponseHeader>().Serialize(ref writer, value.Header, options);
+        }
+
+        public global::Intense.Api.LoginResponse Deserialize(ref MessagePackReader reader, global::MessagePack.MessagePackSerializerOptions options)
+        {
+            if (reader.TryReadNil())
+            {
+                return null;
+            }
+
+            IFormatterResolver formatterResolver = options.Resolver;
+            var length = reader.ReadMapHeader();
+            var __Header__ = default(global::Intense.Api.ResponseHeader);
+
+            for (int i = 0; i < length; i++)
+            {
+                ReadOnlySequence<byte> stringKey = reader.ReadStringSequence().Value;
+                int key;
+                if (!this.____keyMapping.TryGetValue(stringKey, out key))
+                {
+                    reader.Skip();
+                    continue;
+                }
+
+                switch (key)
+                {
+                    case 0:
+                        __Header__ = formatterResolver.GetFormatterWithVerify<global::Intense.Api.ResponseHeader>().Deserialize(ref reader, options);
+                        break;
+                    default:
+                        reader.Skip();
+                        break;
+                }
+            }
+
+            var ____result = new global::Intense.Api.LoginResponse();
+            ____result.Header = __Header__;
+            return ____result;
+        }
+    }
+
+    public sealed class RegisterResponseFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::Intense.Api.RegisterResponse>
+    {
+
+
+        private readonly global::MessagePack.Internal.AutomataDictionary ____keyMapping;
+        private readonly byte[][] ____stringByteKeys;
+
+        public RegisterResponseFormatter()
+        {
+            this.____keyMapping = new global::MessagePack.Internal.AutomataDictionary()
+            {
+                { "Token", 0 },
+                { "UserId", 1 },
+                { "RawPassword", 2 },
+                { "Header", 3 },
+            };
+
+            this.____stringByteKeys = new byte[][]
+            {
+                global::MessagePack.Internal.CodeGenHelpers.GetEncodedStringBytes("Token"),
+                global::MessagePack.Internal.CodeGenHelpers.GetEncodedStringBytes("UserId"),
+                global::MessagePack.Internal.CodeGenHelpers.GetEncodedStringBytes("RawPassword"),
+                global::MessagePack.Internal.CodeGenHelpers.GetEncodedStringBytes("Header"),
+            };
+        }
+
+        public void Serialize(ref MessagePackWriter writer, global::Intense.Api.RegisterResponse value, global::MessagePack.MessagePackSerializerOptions options)
+        {
+            if (value == null)
+            {
+                writer.WriteNil();
+                return;
+            }
+
+            IFormatterResolver formatterResolver = options.Resolver;
+            writer.WriteMapHeader(4);
+            writer.WriteRaw(new ReadOnlySequence<byte>(this.____stringByteKeys[0]));
+            formatterResolver.GetFormatterWithVerify<string>().Serialize(ref writer, value.Token, options);
+            writer.WriteRaw(new ReadOnlySequence<byte>(this.____stringByteKeys[1]));
+            writer.Write(value.UserId);
+            writer.WriteRaw(new ReadOnlySequence<byte>(this.____stringByteKeys[2]));
+            formatterResolver.GetFormatterWithVerify<string>().Serialize(ref writer, value.RawPassword, options);
+            writer.WriteRaw(new ReadOnlySequence<byte>(this.____stringByteKeys[3]));
+            formatterResolver.GetFormatterWithVerify<global::Intense.Api.ResponseHeader>().Serialize(ref writer, value.Header, options);
+        }
+
+        public global::Intense.Api.RegisterResponse Deserialize(ref MessagePackReader reader, global::MessagePack.MessagePackSerializerOptions options)
+        {
+            if (reader.TryReadNil())
+            {
+                return null;
+            }
+
+            IFormatterResolver formatterResolver = options.Resolver;
+            var length = reader.ReadMapHeader();
+            var __Token__ = default(string);
+            var __UserId__ = default(int);
+            var __RawPassword__ = default(string);
+            var __Header__ = default(global::Intense.Api.ResponseHeader);
+
+            for (int i = 0; i < length; i++)
+            {
+                ReadOnlySequence<byte> stringKey = reader.ReadStringSequence().Value;
+                int key;
+                if (!this.____keyMapping.TryGetValue(stringKey, out key))
+                {
+                    reader.Skip();
+                    continue;
+                }
+
+                switch (key)
+                {
+                    case 0:
+                        __Token__ = formatterResolver.GetFormatterWithVerify<string>().Deserialize(ref reader, options);
+                        break;
+                    case 1:
+                        __UserId__ = reader.ReadInt32();
+                        break;
+                    case 2:
+                        __RawPassword__ = formatterResolver.GetFormatterWithVerify<string>().Deserialize(ref reader, options);
+                        break;
+                    case 3:
+                        __Header__ = formatterResolver.GetFormatterWithVerify<global::Intense.Api.ResponseHeader>().Deserialize(ref reader, options);
+                        break;
+                    default:
+                        reader.Skip();
+                        break;
+                }
+            }
+
+            var ____result = new global::Intense.Api.RegisterResponse();
+            ____result.Token = __Token__;
+            ____result.UserId = __UserId__;
+            ____result.RawPassword = __RawPassword__;
+            ____result.Header = __Header__;
+            return ____result;
+        }
+    }
+
+    public sealed class ResponseBaseFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::Intense.Api.ResponseBase>
+    {
+
+
+        private readonly global::MessagePack.Internal.AutomataDictionary ____keyMapping;
+        private readonly byte[][] ____stringByteKeys;
+
+        public ResponseBaseFormatter()
+        {
+            this.____keyMapping = new global::MessagePack.Internal.AutomataDictionary()
+            {
+                { "Header", 0 },
+            };
+
+            this.____stringByteKeys = new byte[][]
+            {
+                global::MessagePack.Internal.CodeGenHelpers.GetEncodedStringBytes("Header"),
+            };
+        }
+
+        public void Serialize(ref MessagePackWriter writer, global::Intense.Api.ResponseBase value, global::MessagePack.MessagePackSerializerOptions options)
+        {
+            if (value == null)
+            {
+                writer.WriteNil();
+                return;
+            }
+
+            IFormatterResolver formatterResolver = options.Resolver;
+            writer.WriteMapHeader(1);
+            writer.WriteRaw(new ReadOnlySequence<byte>(this.____stringByteKeys[0]));
+            formatterResolver.GetFormatterWithVerify<global::Intense.Api.ResponseHeader>().Serialize(ref writer, value.Header, options);
+        }
+
+        public global::Intense.Api.ResponseBase Deserialize(ref MessagePackReader reader, global::MessagePack.MessagePackSerializerOptions options)
+        {
+            if (reader.TryReadNil())
+            {
+                return null;
+            }
+
+            IFormatterResolver formatterResolver = options.Resolver;
+            var length = reader.ReadMapHeader();
+            var __Header__ = default(global::Intense.Api.ResponseHeader);
+
+            for (int i = 0; i < length; i++)
+            {
+                ReadOnlySequence<byte> stringKey = reader.ReadStringSequence().Value;
+                int key;
+                if (!this.____keyMapping.TryGetValue(stringKey, out key))
+                {
+                    reader.Skip();
+                    continue;
+                }
+
+                switch (key)
+                {
+                    case 0:
+                        __Header__ = formatterResolver.GetFormatterWithVerify<global::Intense.Api.ResponseHeader>().Deserialize(ref reader, options);
+                        break;
+                    default:
+                        reader.Skip();
+                        break;
+                }
+            }
+
+            var ____result = new global::Intense.Api.ResponseBase();
+            ____result.Header = __Header__;
+            return ____result;
+        }
+    }
+
+    public sealed class ScoreBeginResponseFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::Intense.Api.ScoreBeginResponse>
+    {
+
+
+        private readonly global::MessagePack.Internal.AutomataDictionary ____keyMapping;
+        private readonly byte[][] ____stringByteKeys;
+
+        public ScoreBeginResponseFormatter()
+        {
+            this.____keyMapping = new global::MessagePack.Internal.AutomataDictionary()
+            {
+                { "SessionId", 0 },
+                { "Header", 1 },
+            };
+
+            this.____stringByteKeys = new byte[][]
+            {
+                global::MessagePack.Internal.CodeGenHelpers.GetEncodedStringBytes("SessionId"),
+                global::MessagePack.Internal.CodeGenHelpers.GetEncodedStringBytes("Header"),
+            };
+        }
+
+        public void Serialize(ref MessagePackWriter writer, global::Intense.Api.ScoreBeginResponse value, global::MessagePack.MessagePackSerializerOptions options)
+        {
+            if (value == null)
+            {
+                writer.WriteNil();
+                return;
+            }
+
+            IFormatterResolver formatterResolver = options.Resolver;
+            writer.WriteMapHeader(2);
+            writer.WriteRaw(new ReadOnlySequence<byte>(this.____stringByteKeys[0]));
+            formatterResolver.GetFormatterWithVerify<string>().Serialize(ref writer, value.SessionId, options);
+            writer.WriteRaw(new ReadOnlySequence<byte>(this.____stringByteKeys[1]));
+            formatterResolver.GetFormatterWithVerify<global::Intense.Api.ResponseHeader>().Serialize(ref writer, value.Header, options);
+        }
+
+        public global::Intense.Api.ScoreBeginResponse Deserialize(ref MessagePackReader reader, global::MessagePack.MessagePackSerializerOptions options)
+        {
+            if (reader.TryReadNil())
+            {
+                return null;
+            }
+
+            IFormatterResolver formatterResolver = options.Resolver;
+            var length = reader.ReadMapHeader();
+            var __SessionId__ = default(string);
+            var __Header__ = default(global::Intense.Api.ResponseHeader);
+
+            for (int i = 0; i < length; i++)
+            {
+                ReadOnlySequence<byte> stringKey = reader.ReadStringSequence().Value;
+                int key;
+                if (!this.____keyMapping.TryGetValue(stringKey, out key))
+                {
+                    reader.Skip();
+                    continue;
+                }
+
+                switch (key)
+                {
+                    case 0:
+                        __SessionId__ = formatterResolver.GetFormatterWithVerify<string>().Deserialize(ref reader, options);
+                        break;
+                    case 1:
+                        __Header__ = formatterResolver.GetFormatterWithVerify<global::Intense.Api.ResponseHeader>().Deserialize(ref reader, options);
+                        break;
+                    default:
+                        reader.Skip();
+                        break;
+                }
+            }
+
+            var ____result = new global::Intense.Api.ScoreBeginResponse();
+            ____result.SessionId = __SessionId__;
+            ____result.Header = __Header__;
+            return ____result;
+        }
+    }
+
+    public sealed class ScoreSubmitResponseFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::Intense.Api.ScoreSubmitResponse>
+    {
+
+
+        private readonly global::MessagePack.Internal.AutomataDictionary ____keyMapping;
+        private readonly byte[][] ____stringByteKeys;
+
+        public ScoreSubmitResponseFormatter()
+        {
+            this.____keyMapping = new global::MessagePack.Internal.AutomataDictionary()
+            {
+                { "Header", 0 },
+            };
+
+            this.____stringByteKeys = new byte[][]
+            {
+                global::MessagePack.Internal.CodeGenHelpers.GetEncodedStringBytes("Header"),
+            };
+        }
+
+        public void Serialize(ref MessagePackWriter writer, global::Intense.Api.ScoreSubmitResponse value, global::MessagePack.MessagePackSerializerOptions options)
+        {
+            if (value == null)
+            {
+                writer.WriteNil();
+                return;
+            }
+
+            IFormatterResolver formatterResolver = options.Resolver;
+            writer.WriteMapHeader(1);
+            writer.WriteRaw(new ReadOnlySequence<byte>(this.____stringByteKeys[0]));
+            formatterResolver.GetFormatterWithVerify<global::Intense.Api.ResponseHeader>().Serialize(ref writer, value.Header, options);
+        }
+
+        public global::Intense.Api.ScoreSubmitResponse Deserialize(ref MessagePackReader reader, global::MessagePack.MessagePackSerializerOptions options)
+        {
+            if (reader.TryReadNil())
+            {
+                return null;
+            }
+
+            IFormatterResolver formatterResolver = options.Resolver;
+            var length = reader.ReadMapHeader();
+            var __Header__ = default(global::Intense.Api.ResponseHeader);
+
+            for (int i = 0; i < length; i++)
+            {
+                ReadOnlySequence<byte> stringKey = reader.ReadStringSequence().Value;
+                int key;
+                if (!this.____keyMapping.TryGetValue(stringKey, out key))
+                {
+                    reader.Skip();
+                    continue;
+                }
+
+                switch (key)
+                {
+                    case 0:
+                        __Header__ = formatterResolver.GetFormatterWithVerify<global::Intense.Api.ResponseHeader>().Deserialize(ref reader, options);
+                        break;
+                    default:
+                        reader.Skip();
+                        break;
+                }
+            }
+
+            var ____result = new global::Intense.Api.ScoreSubmitResponse();
+            ____result.Header = __Header__;
+            return ____result;
+        }
+    }
+
+    public sealed class ScoreEntryFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::Intense.Api.ScoreEntry>
+    {
+
+
+        private readonly global::MessagePack.Internal.AutomataDictionary ____keyMapping;
+        private readonly byte[][] ____stringByteKeys;
+
+        public ScoreEntryFormatter()
+        {
+            this.____keyMapping = new global::MessagePack.Internal.AutomataDictionary()
+            {
+                { "ScoreId", 0 },
+                { "Score", 1 },
+            };
+
+            this.____stringByteKeys = new byte[][]
+            {
+                global::MessagePack.Internal.CodeGenHelpers.GetEncodedStringBytes("ScoreId"),
+                global::MessagePack.Internal.CodeGenHelpers.GetEncodedStringBytes("Score"),
+            };
+        }
+
+        public void Serialize(ref MessagePackWriter writer, global::Intense.Api.ScoreEntry value, global::MessagePack.MessagePackSerializerOptions options)
+        {
+            if (value == null)
+            {
+                writer.WriteNil();
+                return;
+            }
+
+            IFormatterResolver formatterResolver = options.Resolver;
+            writer.WriteMapHeader(2);
+            writer.WriteRaw(new ReadOnlySequence<byte>(this.____stringByteKeys[0]));
+            writer.Write(value.ScoreId);
+            writer.WriteRaw(new ReadOnlySequence<byte>(this.____stringByteKeys[1]));
+            writer.Write(value.Score);
+        }
+
+        public global::Intense.Api.ScoreEntry Deserialize(ref MessagePackReader reader, global::MessagePack.MessagePackSerializerOptions options)
+        {
+            if (reader.TryReadNil())
+            {
+                return null;
+            }
+
+            IFormatterResolver formatterResolver = options.Resolver;
+            var length = reader.ReadMapHeader();
+            var __ScoreId__ = default(int);
+            var __Score__ = default(int);
+
+            for (int i = 0; i < length; i++)
+            {
+                ReadOnlySequence<byte> stringKey = reader.ReadStringSequence().Value;
+                int key;
+                if (!this.____keyMapping.TryGetValue(stringKey, out key))
+                {
+                    reader.Skip();
+                    continue;
+                }
+
+                switch (key)
+                {
+                    case 0:
+                        __ScoreId__ = reader.ReadInt32();
+                        break;
+                    case 1:
+                        __Score__ = reader.ReadInt32();
+                        break;
+                    default:
+                        reader.Skip();
+                        break;
+                }
+            }
+
+            var ____result = new global::Intense.Api.ScoreEntry();
+            ____result.ScoreId = __ScoreId__;
+            ____result.Score = __Score__;
+            return ____result;
+        }
+    }
+
+    public sealed class UserDataResponseFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::Intense.Api.UserDataResponse>
+    {
+
+
+        private readonly global::MessagePack.Internal.AutomataDictionary ____keyMapping;
+        private readonly byte[][] ____stringByteKeys;
+
+        public UserDataResponseFormatter()
+        {
+            this.____keyMapping = new global::MessagePack.Internal.AutomataDictionary()
+            {
+                { "Scores", 0 },
+                { "Header", 1 },
+            };
+
+            this.____stringByteKeys = new byte[][]
+            {
+                global::MessagePack.Internal.CodeGenHelpers.GetEncodedStringBytes("Scores"),
+                global::MessagePack.Internal.CodeGenHelpers.GetEncodedStringBytes("Header"),
+            };
+        }
+
+        public void Serialize(ref MessagePackWriter writer, global::Intense.Api.UserDataResponse value, global::MessagePack.MessagePackSerializerOptions options)
+        {
+            if (value == null)
+            {
+                writer.WriteNil();
+                return;
+            }
+
+            IFormatterResolver formatterResolver = options.Resolver;
+            writer.WriteMapHeader(2);
+            writer.WriteRaw(new ReadOnlySequence<byte>(this.____stringByteKeys[0]));
+            formatterResolver.GetFormatterWithVerify<global::System.Collections.Generic.List<global::Intense.Api.ScoreEntry>>().Serialize(ref writer, value.Scores, options);
+            writer.WriteRaw(new ReadOnlySequence<byte>(this.____stringByteKeys[1]));
+            formatterResolver.GetFormatterWithVerify<global::Intense.Api.ResponseHeader>().Serialize(ref writer, value.Header, options);
+        }
+
+        public global::Intense.Api.UserDataResponse Deserialize(ref MessagePackReader reader, global::MessagePack.MessagePackSerializerOptions options)
+        {
+            if (reader.TryReadNil())
+            {
+                return null;
+            }
+
+            IFormatterResolver formatterResolver = options.Resolver;
+            var length = reader.ReadMapHeader();
+            var __Scores__ = default(global::System.Collections.Generic.List<global::Intense.Api.ScoreEntry>);
+            var __Header__ = default(global::Intense.Api.ResponseHeader);
+
+            for (int i = 0; i < length; i++)
+            {
+                ReadOnlySequence<byte> stringKey = reader.ReadStringSequence().Value;
+                int key;
+                if (!this.____keyMapping.TryGetValue(stringKey, out key))
+                {
+                    reader.Skip();
+                    continue;
+                }
+
+                switch (key)
+                {
+                    case 0:
+                        __Scores__ = formatterResolver.GetFormatterWithVerify<global::System.Collections.Generic.List<global::Intense.Api.ScoreEntry>>().Deserialize(ref reader, options);
+                        break;
+                    case 1:
+                        __Header__ = formatterResolver.GetFormatterWithVerify<global::Intense.Api.ResponseHeader>().Deserialize(ref reader, options);
+                        break;
+                    default:
+                        reader.Skip();
+                        break;
+                }
+            }
+
+            var ____result = new global::Intense.Api.UserDataResponse();
+            ____result.Scores = __Scores__;
+            ____result.Header = __Header__;
+            return ____result;
+        }
+    }
+}
+
+#pragma warning restore 168
+#pragma warning restore 414
+#pragma warning restore 618
+#pragma warning restore 612
+
+#pragma warning restore SA1129 // Do not use default value type constructor
+#pragma warning restore SA1200 // Using directives should be placed correctly
+#pragma warning restore SA1309 // Field names should not begin with underscore
+#pragma warning restore SA1312 // Variable names should begin with lower-case letter
+#pragma warning restore SA1403 // File may only contain a single namespace
+#pragma warning restore SA1649 // File name should match first type name
 
 // <auto-generated>
 // THIS (.cs) FILE IS GENERATED BY MPC(MessagePack-CSharp). DO NOT CHANGE IT.

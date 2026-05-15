@@ -125,7 +125,7 @@ namespace Intense.Asset
         private async UniTask<bool> TryRetryAssetErrorAsync(UnityWebRequest.Result result)
         {
             var completionSource = AutoResetUniTaskCompletionSource<ECommonPopupTapKind>.Create();
-            var kind =result == UnityWebRequest.Result.ProtocolError
+            var kind = result == UnityWebRequest.Result.ProtocolError
                 ? EAssetBundleErrorKind.ProtocolError
                 : EAssetBundleErrorKind.ConnectionError;
             var popupContext = PopupContextFactory.CreateAssetErrorPopupContext(completionSource, kind);
@@ -151,16 +151,13 @@ namespace Intense.Asset
         private const long One_MB = 1024L * 1024;
         private const long One_GB = 1024L * 1024 * 1024;
 
-        public static double GetFileSize(this long fileSize)
+        public static double GetFileSize(this long fileSize) => GetFileSizeType(fileSize) switch
         {
-            return GetFileSizeType(fileSize) switch
-            {
-                EFileSizeType.KB => Math.Round(fileSize / One_KB, 2),
-                EFileSizeType.MB => Math.Round((double)fileSize / One_MB, 2),
-                EFileSizeType.GB => Math.Round((double)fileSize / One_GB, 2),
-                _ => 0
-            };
-        }
+            EFileSizeType.KB => Math.Round(fileSize / One_KB, 2),
+            EFileSizeType.MB => Math.Round((double)fileSize / One_MB, 2),
+            EFileSizeType.GB => Math.Round((double)fileSize / One_GB, 2),
+            _ => 0
+        };
 
         public static EFileSizeType GetFileSizeType(this long fileSize) => fileSize < One_MB ? EFileSizeType.KB : fileSize < One_GB ? EFileSizeType.MB : EFileSizeType.GB;
     }

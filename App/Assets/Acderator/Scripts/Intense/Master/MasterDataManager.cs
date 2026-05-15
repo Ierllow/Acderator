@@ -65,14 +65,14 @@ namespace Intense.Master
             };
         }
 
-        private static List<T> ReadMasters<T>(Dictionary<string, object> masterDict, string key, Func<Dictionary<string, object>, T> create) where T : class => masterDict.GetList(key).Select(x => x.TryConvertDictionary(out var dictionary) ? create(dictionary) : default).Where(x => x != null).ToList();
+        private List<T> ReadMasters<T>(Dictionary<string, object> masterDict, string key, Func<Dictionary<string, object>, T> create) where T : class => masterDict.GetList(key).Select(x => x.TryConvertDictionary(out var dictionary) ? create(dictionary) : default).Where(x => x != null).ToList();
 
-        private static Dictionary<string, object> RenameKey(Dictionary<string, object> dictionary, string from, string to)
+        private Dictionary<string, object> RenameKey(Dictionary<string, object> dictionary, string from, string to)
         {
             if (dictionary.TryGetValue(from, out var value) && !dictionary.ContainsKey(to)) dictionary[to] = value;
             return dictionary;
         }
 
-        private static int FirstInt(Dictionary<string, object> masterDict, string listKey, string valueKey) => masterDict.GetList(listKey).Select(x => x.TryConvertDictionary(out var dictionary) && dictionary.TryGetInt(valueKey, out var value) ? value : 0).FirstOrDefault();
+        private int FirstInt(Dictionary<string, object> masterDict, string listKey, string valueKey) => masterDict.GetList(listKey).Select(x => x.TryConvertDictionary(out var dictionary) && dictionary.TryGetInt(valueKey, out var value) ? value : 0).FirstOrDefault();
     }
 }

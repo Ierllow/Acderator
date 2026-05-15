@@ -6,16 +6,12 @@ namespace Intense.Data
 {
     internal class ScoreManager
     {
-        public bool IsInit { get; private set; }
-
         public List<ScoreData> ScoreDataList { get; } = new();
 
-        public void SetScoreData(Dictionary<string, object> dataDict)
+        public void SetScoreData(IEnumerable<(int sid, int score)> entries)
         {
-            foreach (var (key, value) in dataDict)
+            foreach (var (sid, score) in entries)
             {
-                var sid = int.Parse(key);
-                var score = int.Parse(value.ToString());
                 UpdateScoreData(sid, score);
             }
         }
