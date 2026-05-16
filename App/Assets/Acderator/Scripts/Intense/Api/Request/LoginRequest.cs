@@ -7,7 +7,7 @@ namespace Intense.Api
     {
         [IgnoreMember] public override string ApiKey => "auth/login";
 
-        [Key("userid")] public string UserId { get; set; } = string.Empty;
-        [Key("password")] public string Password { get; set; } = string.Empty;
+        [Key("userid")] public string UserId { get; set; }
+        [Key("password")] public string Password { get; set; }
     }
 }

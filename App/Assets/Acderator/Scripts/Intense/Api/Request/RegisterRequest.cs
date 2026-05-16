@@ -7,6 +7,6 @@ namespace Intense.Api
     {
         [IgnoreMember] public override string ApiKey => "auth/register";
 
-        [Key("uuid")] public string Uuid { get; set; } = string.Empty;
+        [Key("uuid")] public string Uuid { get; set; }
     }
 }

@@ -926,7 +926,7 @@ namespace MessagePack.Formatters.Intense.Api
             writer.WriteRaw(new ReadOnlySequence<byte>(this.____stringByteKeys[1]));
             writer.Write(value.UserId);
             writer.WriteRaw(new ReadOnlySequence<byte>(this.____stringByteKeys[2]));
-            formatterResolver.GetFormatterWithVerify<string>().Serialize(ref writer, value.RawPassword, options);
+            formatterResolver.GetFormatterWithVerify<string>().Serialize(ref writer, value.Password, options);
             writer.WriteRaw(new ReadOnlySequence<byte>(this.____stringByteKeys[3]));
             formatterResolver.GetFormatterWithVerify<global::Intense.Api.ResponseHeader>().Serialize(ref writer, value.Header, options);
         }
@@ -978,7 +978,7 @@ namespace MessagePack.Formatters.Intense.Api
             var ____result = new global::Intense.Api.RegisterResponse();
             ____result.Token = __Token__;
             ____result.UserId = __UserId__;
-            ____result.RawPassword = __RawPassword__;
+            ____result.Password = __RawPassword__;
             ____result.Header = __Header__;
             return ____result;
         }

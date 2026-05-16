@@ -7,7 +7,7 @@ namespace Intense.Api
     {
         [IgnoreMember] public override string ApiKey => "score/submit";
 
-        [Key("session_id")] public string SessionId { get; set; } = string.Empty;
+        [Key("session_id")] public string SessionId { get; set; }
         [Key("score")] public int Score { get; set; }
     }
 }

@@ -35,8 +35,8 @@ namespace Intense.Api
 
     internal class ApiSession : IApiSession
     {
-        public string Token { get; set; } = string.Empty;
-        public string MasterVersion { get; set; } = string.Empty;
+        public string Token { get; set; }
+        public string MasterVersion { get; set; }
     }
 
     internal class NetworkManager : MonoBehaviour

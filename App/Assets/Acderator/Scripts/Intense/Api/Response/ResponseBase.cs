@@ -7,8 +7,8 @@ namespace Intense.Api
     public class ResponseHeader
     {
         [Key("code")] public int Code { get; set; }
-        [Key("message")] public string Message { get; set; } = string.Empty;
-        [Key("token")] public string Token { get; set; } = string.Empty;
+        [Key("message")] public string Message { get; set; }
+        [Key("token")] public string Token { get; set; }
         [Key("master")] public Dictionary<string, object> Master { get; set; }
     }
 
