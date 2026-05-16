@@ -1656,10 +1656,9 @@ namespace MessagePack.Formatters.Intense.Master
                 { "Difficulty", 2 },
                 { "Name", 3 },
                 { "Composer", 4 },
-                { "Start_offset", 5 },
-                { "Bg", 6 },
-                { "Score", 7 },
-                { "Hp", 8 },
+                { "Bg", 5 },
+                { "Score", 6 },
+                { "Hp", 7 },
             };
 
             this.____stringByteKeys = new byte[][]
@@ -1669,7 +1668,6 @@ namespace MessagePack.Formatters.Intense.Master
                 global::MessagePack.Internal.CodeGenHelpers.GetEncodedStringBytes("Difficulty"),
                 global::MessagePack.Internal.CodeGenHelpers.GetEncodedStringBytes("Name"),
                 global::MessagePack.Internal.CodeGenHelpers.GetEncodedStringBytes("Composer"),
-                global::MessagePack.Internal.CodeGenHelpers.GetEncodedStringBytes("Start_offset"),
                 global::MessagePack.Internal.CodeGenHelpers.GetEncodedStringBytes("Bg"),
                 global::MessagePack.Internal.CodeGenHelpers.GetEncodedStringBytes("Score"),
                 global::MessagePack.Internal.CodeGenHelpers.GetEncodedStringBytes("Hp"),
@@ -1685,7 +1683,7 @@ namespace MessagePack.Formatters.Intense.Master
             }
 
             IFormatterResolver formatterResolver = options.Resolver;
-            writer.WriteMapHeader(9);
+            writer.WriteMapHeader(8);
             writer.WriteRaw(new ReadOnlySequence<byte>(this.____stringByteKeys[0]));
             writer.Write(value.Sid);
             writer.WriteRaw(new ReadOnlySequence<byte>(this.____stringByteKeys[1]));
@@ -1697,12 +1695,10 @@ namespace MessagePack.Formatters.Intense.Master
             writer.WriteRaw(new ReadOnlySequence<byte>(this.____stringByteKeys[4]));
             formatterResolver.GetFormatterWithVerify<string>().Serialize(ref writer, value.Composer, options);
             writer.WriteRaw(new ReadOnlySequence<byte>(this.____stringByteKeys[5]));
-            writer.Write(value.Start_offset);
-            writer.WriteRaw(new ReadOnlySequence<byte>(this.____stringByteKeys[6]));
             writer.Write(value.Bg);
-            writer.WriteRaw(new ReadOnlySequence<byte>(this.____stringByteKeys[7]));
+            writer.WriteRaw(new ReadOnlySequence<byte>(this.____stringByteKeys[6]));
             writer.Write(value.Score);
-            writer.WriteRaw(new ReadOnlySequence<byte>(this.____stringByteKeys[8]));
+            writer.WriteRaw(new ReadOnlySequence<byte>(this.____stringByteKeys[7]));
             writer.Write(value.Hp);
         }
 
@@ -1720,7 +1716,6 @@ namespace MessagePack.Formatters.Intense.Master
             var __Difficulty__ = default(int);
             var __Name__ = default(string);
             var __Composer__ = default(string);
-            var __Start_offset__ = default(float);
             var __Bg__ = default(int);
             var __Score__ = default(int);
             var __Hp__ = default(int);
@@ -1753,15 +1748,12 @@ namespace MessagePack.Formatters.Intense.Master
                         __Composer__ = formatterResolver.GetFormatterWithVerify<string>().Deserialize(ref reader, options);
                         break;
                     case 5:
-                        __Start_offset__ = reader.ReadSingle();
-                        break;
-                    case 6:
                         __Bg__ = reader.ReadInt32();
                         break;
-                    case 7:
+                    case 6:
                         __Score__ = reader.ReadInt32();
                         break;
-                    case 8:
+                    case 7:
                         __Hp__ = reader.ReadInt32();
                         break;
                     default:
@@ -1776,7 +1768,6 @@ namespace MessagePack.Formatters.Intense.Master
             ____result.Difficulty = __Difficulty__;
             ____result.Name = __Name__;
             ____result.Composer = __Composer__;
-            ____result.Start_offset = __Start_offset__;
             ____result.Bg = __Bg__;
             ____result.Score = __Score__;
             ____result.Hp = __Hp__;

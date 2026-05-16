@@ -64,7 +64,6 @@ namespace Intense.Master
         public int Difficulty { get; set; }
         public string Name { get; set; }
         public string Composer { get; set; }
-        public float Start_offset { get; set; }
         public int Bg { get; set; }
         public int Score { get; set; }
         public int Hp { get; set; }
@@ -76,7 +75,6 @@ namespace Intense.Master
             Difficulty = masterDict.TryGetValue("difficulty", out var difficulty) ? int.Parse(difficulty.ToString()) : 0,
             Name = masterDict.TryGetValue("name", out var name) ? name.ToString() : string.Empty,
             Composer = masterDict.TryGetValue("composer", out var composer) ? composer.ToString() : string.Empty,
-            Start_offset = masterDict.TryGetValue("start_offset", out var startOffset) ? float.Parse(startOffset.ToString()) : 0f,
             Bg = masterDict.TryGetValue("bg", out var bg) ? int.Parse(bg.ToString()) : 0,
             Score = masterDict.TryGetValue("score", out var score) ? int.Parse(score.ToString()) : 0,
             Hp = masterDict.TryGetValue("hp", out var hp) ? int.Parse(hp.ToString()) : 0,
