@@ -37,6 +37,7 @@ namespace Song
         {
             Container.Bind<SongControllerCollection>().AsSingle().WithArguments(songSceneContext.TutorialData);
             Container.Bind<SongControllerResolver>().AsSingle();
+            Container.Bind<SongManagerResolver>().AsSingle();
             Container.Bind<SongAssetLoader>().AsSingle();
         }
 

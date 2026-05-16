@@ -19,12 +19,9 @@ namespace Song
         [RequiredField, SerializeField] private FailFastExceptionWatcher failFastExceptionWatcher;
 
         [InjectOptional] private SongApplicationPauseHandler songApplicationPauseHandler;
-        [Inject] private NotesManager notesManager;
-        [Inject] private NoteFactory noteFactory;
         [Inject] private SongControllerResolver songControllerResolver;
+        [Inject] private SongManagerResolver songManagerResolver;
         [Inject] private SongSceneContext sceneContext;
-        [Inject] private SoundManager soundManager;
-        [Inject] private NetworkManager networkManager;
         [Inject] private SongAssetLoader songAssetLoader;
 
         protected override void Awake()

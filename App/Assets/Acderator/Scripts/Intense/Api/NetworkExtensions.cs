@@ -54,12 +54,6 @@ namespace Intense.Api
             return true;
         }
 
-        public static bool TryGetDictionary(this Dictionary<string, object> dictionary, string key, out Dictionary<string, object> value)
-        {
-            value = default;
-            return (dictionary?.TryGetValue(key, out var rawValue) ?? false) && rawValue.TryConvertDictionary(out value);
-        }
-
         public static bool TryConvertDictionary(this object rawValue, out Dictionary<string, object> value)
         {
             value = default;

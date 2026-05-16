@@ -22,7 +22,7 @@ namespace Song
             songControllerResolver.Loop.EveryUpdateSongStateWhere.Subscribe(_ => UpdateSongProgressNext()).RegisterTo(destroyCancellationToken);
             songControllerResolver.Loop.EverySongStateChanged.SubscribeAwait(ChangeStateNext).RegisterTo(destroyCancellationToken);
             songControllerResolver.Loop.SongLoopUpdateSubject.Subscribe(OnSongLoopNext).RegisterTo(destroyCancellationToken);
-            songControllerResolver.Spawner.NoteFactorySubject.Select(noteFactory.SpawnNote).Where(x => x != default).Subscribe(notesManager.AddAliveNote).RegisterTo(destroyCancellationToken);
+            songControllerResolver.Spawner.NoteFactorySubject.Select(songManagerResolver.Factory.SpawnNote).Where(x => x != default).Subscribe(songManagerResolver.Notes.AddAliveNote).RegisterTo(destroyCancellationToken);
             songControllerResolver.Loop.SongSecondsZeroWhere.Skip(1).Where(_ => sceneContext.SongMode != ESongMode.Tutorial).Subscribe(_ => songControllerResolver.Loop.UpdateState(ESongState.Playing)).RegisterTo(destroyCancellationToken);
         }
 

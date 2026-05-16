@@ -12,9 +12,9 @@ namespace Song
             var loadResult = await songAssetLoader.LoadChart().AddWatcherTo(failFastExceptionWatcher);
             if (loadResult.IsSuccess)
             {
-                notesManager.Init(loadResult.ChartInfo);
-                noteFactory.Init();
-                var offset = notesManager.GetSpawnOffset(notesLineController.LaneLength);
+                songManagerResolver.Notes.Init(loadResult.ChartInfo);
+                songManagerResolver.Factory.Init();
+                var offset = songManagerResolver.Notes.GetSpawnOffset(notesLineController.LaneLength);
                 songControllerResolver.Loop.SetOffset(offset);
                 songControllerResolver.Spawner.Init(loadResult.ChartInfo.NoteDataList, offset);
                 songLayerController.Init(sceneContext.SongInfo.Sid);
@@ -28,18 +28,18 @@ namespace Song
 
         private void OnPlayingSong()
         {
-            if (soundManager.SongExPlayer.GetTime().ToSeconds() > 0)
+            if (songManagerResolver.Sound.SongExPlayer.GetTime().ToSeconds() > 0)
             {
-                soundManager.PauseSong(false);
+                songManagerResolver.Sound.PauseSong(false);
                 songControllerResolver.Finger?.TrySetUseTouch(!sceneContext.IsAuto);
                 return;
             }
-            soundManager.PlaySong(sceneContext.SongInfo.Group);
+            songManagerResolver.Sound.PlaySong(sceneContext.SongInfo.Group);
         }
 
         private void OnStopSong()
         {
-            soundManager.PauseSong(true);
+            songManagerResolver.Sound.PauseSong(true);
             songControllerResolver.Finger?.TrySetUseTouch(false);
         }
 
@@ -70,10 +70,12 @@ namespace Song
             }
 
             var currentScore = songLayerController.CurrentScore;
-            var noteCount = notesManager.LoadedChartInfo.NoteCount;
+            var noteCount = songManagerResolver.Notes.LoadedChartInfo.NoteCount;
             await frontTelopLayerController.ShowResult(songLayerController.GetSongResult(noteCount));
 
-            var isSaved = await RequestUpdateScoreAsync(sceneContext.SessionId, currentScore);
+            var request = new ScoreSubmitRequest { SessionId = sceneContext.SessionId, Score = currentScore };
+            var response = await songManagerResolver.Network.RequestAsync(request);
+            var isSaved = response?.IsSuccess ?? false;
             if (!isSaved)
             {
                 await scoreSaveError;
@@ -85,7 +87,7 @@ namespace Song
         private void UpdateSongProgressNext()
         {
             songControllerResolver.Finger?.UpdatePointerInput();
-            songControllerResolver.Loop.Tick(soundManager.SongExPlayer.GetTime().ToSeconds());
+            songControllerResolver.Loop.Tick(songManagerResolver.Sound.SongExPlayer.GetTime().ToSeconds());
             songControllerResolver.TutorialState?.ChangeState(songControllerResolver.Loop.CurrentState == ESongState.Playing);
             songControllerResolver.TutorialState?.Tick();
             songControllerResolver.Tutorial?.AdvanceByTapIfPossible(songControllerResolver.Loop.CurrentState != ESongState.Playing);
@@ -116,7 +118,7 @@ namespace Song
             if (lane >= 0) notesLineController.SetLaneLightActive(lane, fingerInfo.FingerType);
             songLayerController.UpdateSongLayer(fingerInfo);
 #if UNITY_EDITOR
-            songLayerController.DebugInfoView.UpdateDebugInfo(fingerInfo.NoteBase.NoteData.NoteType, notesManager.GetDiffSec(fingerInfo.FingerType, fingerInfo.NoteBase.NoteData), notesManager.CurrentBeat, songLayerController.JudgeCountDict);
+            songLayerController.DebugInfoView.UpdateDebugInfo(fingerInfo.NoteBase.NoteData.NoteType, songManagerResolver.Notes.GetDiffSec(fingerInfo.FingerType, fingerInfo.NoteBase.NoteData), songManagerResolver.Notes.CurrentBeat, songLayerController.JudgeCountDict);
 #endif
             songControllerResolver.Particle.UpdateParticles(fingerInfo);
             if (fingerInfo.IsMiss)
@@ -124,17 +126,17 @@ namespace Song
                 frontTelopLayerController.ShowMissMask();
                 return;
             }
-            soundManager.PlaySe(fingerInfo.IsFlick ? ESeType.Flick : ESeType.Tap);
+            songManagerResolver.Sound.PlaySe(fingerInfo.IsFlick ? ESeType.Flick : ESeType.Tap);
         }
 
         private void OnSongLoopNext(float sec)
         {
-            notesManager.UpdateNoteSpeed();
-            notesManager.UpdateBeat(sec);
+            songManagerResolver.Notes.UpdateNoteSpeed();
+            songManagerResolver.Notes.UpdateBeat(sec);
             songControllerResolver.Spawner.UpdateSpawn(sec);
             songControllerResolver.Optimizer.UpdatePositionNotes((x) => songControllerResolver.Auto?.NotifyFinger(x));
             songControllerResolver.Auto?.OnAutoFinger();
-            if (soundManager.SongExPlayer.IsPlayEnd()) songControllerResolver.Loop.UpdateState(ESongState.End);
+            if (songManagerResolver.Sound.SongExPlayer.IsPlayEnd()) songControllerResolver.Loop.UpdateState(ESongState.End);
         }
 
         private async UniTask ConfirmSkipTutorial()
@@ -147,13 +149,6 @@ namespace Song
                 return;
             }
             if (isPlaying) songControllerResolver.Loop.UpdateState(ESongState.Playing);
-        }
-
-        private async UniTask<bool> RequestUpdateScoreAsync(string sessionId, int score)
-        {
-            var request = new ScoreSubmitRequest { SessionId = sessionId, Score = score };
-            var response = await networkManager.RequestAsync(request);
-            return response?.IsSuccess ?? false;
         }
     }
 }

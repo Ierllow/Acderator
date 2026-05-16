@@ -27,18 +27,6 @@ namespace Intense.Api
         ServiceFailure,
     }
 
-    internal interface IApiSession
-    {
-        string Token { get; set; }
-        string MasterVersion { get; set; }
-    }
-
-    internal class ApiSession : IApiSession
-    {
-        public string Token { get; set; }
-        public string MasterVersion { get; set; }
-    }
-
     internal class NetworkManager : MonoBehaviour
     {
         [SerializeField] private NetworkConfig networkConfigObject;
@@ -74,7 +62,7 @@ namespace Intense.Api
                     UnityWebRequest.Result.Success => request.DeserializeResponse(www.downloadHandler.data),
                     _ => default
                 };
-                Debug.Log(string.Format("UnityWebRequest.Result:{1}, errorCode: {1}, networkError: {2}, errorResponse: {2}", www.result, response.ErrorCode, response.NetworkError, response.ErrorMessage));
+                Debug.Log(string.Format("UnityWebRequest.Result: {1}, errorCode: {1}, networkError: {2}, errorResponse: {2}", www.result, response.ErrorCode, response.NetworkError, response.ErrorMessage));
                 return response;
             }
             finally
