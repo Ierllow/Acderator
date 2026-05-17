@@ -9,14 +9,14 @@ public class CodeGenerators
         private const string MasterMemoryGeneratorVersion = "1.3.1";
         private const string MessagePackGeneratorVersion = "2.0.323";
 
-        [MenuItem("Tools/CodeGenerate")]
-        private static void Generate()
+        public static void GenerateAll()
         {
+                SpreadsheetToMasterGenerator.Generate();
                 ExecuteMasterMemoryCodeGenerator();
                 ExecuteMessagePackCodeGenerator();
         }
 
-        private static void ExecuteMasterMemoryCodeGenerator()
+        public static void ExecuteMasterMemoryCodeGenerator()
         {
                 UnityEngine.Debug.Log("start ExecuteMasterMemoryCodeGenerator");
 
@@ -51,14 +51,21 @@ public class CodeGenerators
                 };
         }
 
-        private static void ExecuteMessagePackCodeGenerator()
+        public static void ExecuteMessagePackCodeGenerator()
         {
                 UnityEngine.Debug.Log("start ExecuteMessagePackCodeGenerator");
 
                 var rootPath = Application.dataPath + "/..";
                 var generatorPath = $"{rootPath}/Packages/MessagePack.Generator.{MessagePackGeneratorVersion}/tools/netcoreapp3.0/any/mpc.dll";
                 var input = $"{Application.dataPath}/Acderator/Scripts/Intense";
-                var output = $"{Application.dataPath}/Acderator/Scripts/Intense/MessagePackGenerated.cs";
+
+                var outputDir = $"{Application.dataPath}/Acderator/Scripts/Intense/Generated";
+                var output = $"{outputDir}/MessagePackGenerated.cs";
+
+                if (!Directory.Exists(outputDir))
+                {
+                        Directory.CreateDirectory(outputDir);
+                }
 
                 var psi = new ProcessStartInfo()
                 {

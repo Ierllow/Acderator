@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using UnityEditor;
 using UnityEngine;
 
 public class Screenshot
@@ -9,10 +8,7 @@ public class Screenshot
     private static readonly string path = rootPath + "/" + "ScreenShot" + "/";
     private static readonly string fileName = string.Format("{0}{1}.png", path, DateTime.Now.ToString("yy-MM-dd_HH-mm-ss"));
 
-    [MenuItem("Tools/Screenshot")]
-    public static void CaptureScreenshot() => ExecCaptureScreenshot();
-
-    private static void ExecCaptureScreenshot()
+    public static void ExecCaptureScreenshot()
     {
         if (!Directory.Exists(path)) Directory.CreateDirectory(path);
 

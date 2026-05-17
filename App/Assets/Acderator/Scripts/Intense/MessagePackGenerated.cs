@@ -2471,4 +2471,3 @@ namespace MessagePack.Formatters.Intense.Master
 #pragma warning restore SA1312 // Variable names should begin with lower-case letter
 #pragma warning restore SA1403 // File may only contain a single namespace
 #pragma warning restore SA1649 // File name should match first type name
-
