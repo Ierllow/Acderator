@@ -38,18 +38,7 @@ namespace Song
             songPopupLayerController.OnOpenPausePopup(!sceneContext.IsAuto);
         }
 
-        public override void OnCreateScene() => UniTask.Void(async () =>
-        {
-            if (!sceneContext.IsRestart)
-            {
-                await songAssetLoader.LoadBundles(sceneManager.CurrentSceneType, destroyCancellationToken).AddWatcherTo(failFastExceptionWatcher);
-            }
-            await (sceneContext.IsRestart ? sceneManager.FadeInAsync().AddWatcherTo(failFastExceptionWatcher) : UniTask.WhenAll(backTelopLayerController.ShowSongIntro(sceneContext.SongInfo)), sceneManager.FadeInAsync());
-            songLayerController.Show(sceneContext.IsAuto);
-            await notesLineController.Show().AddWatcherTo(failFastExceptionWatcher);
-            backTelopLayerController.SetBackgroundImage(sceneContext.SongInfo.Bg);
-            songControllerResolver.Loop.UpdateState(ESongState.Ready);
-        });
+        public override void OnCreateScene() => UniTask.Void(async () => await LoadAssets());
 
         protected override async UniTask OnErrorScene()
         {

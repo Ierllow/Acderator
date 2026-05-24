@@ -67,5 +67,6 @@
         "*.sln": "*.csproj",
         "*.slnx": "*.csproj"
     },
-    "dotnet.defaultSolution": "App.slnx"
+    "dotnet.defaultSolution": "App.slnx",
+    "editor.formatOnSave": true
 }

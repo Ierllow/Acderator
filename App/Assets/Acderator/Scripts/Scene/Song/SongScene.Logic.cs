@@ -7,6 +7,19 @@ namespace Song
 {
     public partial class SongScene
     {
+        private async UniTask LoadAssets() 
+        {
+            if (!sceneContext.IsRestart)
+            {
+                await songAssetLoader.LoadBundles(sceneManager.CurrentSceneType, destroyCancellationToken).AddWatcherTo(failFastExceptionWatcher);
+            }
+            await (sceneContext.IsRestart ? sceneManager.FadeInAsync().AddWatcherTo(failFastExceptionWatcher) : UniTask.WhenAll(backTelopLayerController.ShowSongIntro(sceneContext.SongInfo)), sceneManager.FadeInAsync());
+            songLayerController.Show(sceneContext.IsAuto);
+            await notesLineController.Show().AddWatcherTo(failFastExceptionWatcher);
+            backTelopLayerController.SetBackgroundImage(sceneContext.SongInfo.Bg);
+            songControllerResolver.Loop.UpdateState(ESongState.Ready);
+        }
+
         private async UniTask OnReadySong()
         {
             var loadResult = await songAssetLoader.LoadChart().AddWatcherTo(failFastExceptionWatcher);
