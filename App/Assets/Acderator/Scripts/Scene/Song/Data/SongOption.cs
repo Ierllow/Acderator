@@ -1,9 +1,9 @@
 namespace Song
 {
-    public class SongOption
+    public record SongOption
     {
-        public float NoteSpeed { get; } = PlayerPrefsValues.NoteSpeed;
-        public float TapTiming { get; } = PlayerPrefsValues.TapTiming;
+        public float NoteSpeed { get; init; } = PlayerPrefsValues.NoteSpeed;
+        public float TapTiming { get; init; } = PlayerPrefsValues.TapTiming;
         public bool IsAuto { get; init; }
     }
 }

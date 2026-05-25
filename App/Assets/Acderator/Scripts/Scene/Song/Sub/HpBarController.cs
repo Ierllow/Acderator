@@ -1,7 +1,6 @@
-using Cysharp.Threading.Tasks;
-using Cysharp.Threading.Tasks.Linq;
 using Intense;
 using Intense.Master;
+using R3;
 using System;
 using UnityEngine;
 using Zenject;
@@ -13,12 +12,10 @@ namespace Song
         [Inject] private MasterDataManager masterDataManager;
 
         private int currentHpNum;
-        private decimal currentHpPercent;
         private int baseHp;
+        private readonly ReactiveProperty<float> currentHpPercent = new(0f);
 
-        public float CurrentHpPercent => (float)currentHpPercent;
-
-        public IUniTaskAsyncEnumerable<float> EveryUpdateHpPercentAsAsyncEnumerable => UniTaskAsyncEnumerable.EveryValueChanged(this, x => (float)x.currentHpPercent);
+        public ReadOnlyReactiveProperty<float> CurrentHpPercent => currentHpPercent;
 
         public const int MAX_HP_PERCENT = 100;
 
@@ -28,7 +25,7 @@ namespace Song
         {
             if (judgmentType == EJudgementType.Bad || judgmentType == EJudgementType.Miss) return;
             if (currentHpNum >= baseHp) return;
-            if (currentHpPercent >= MAX_HP_PERCENT) return;
+            if (currentHpPercent.Value >= MAX_HP_PERCENT) return;
 
             var rate = masterDataManager.MemoryDatabase.SongHpRateMasterTable.FindByType((int)judgmentType).Rate;
             currentHpNum += judgmentType switch
@@ -36,7 +33,7 @@ namespace Song
                 EJudgementType.Perfect or EJudgementType.Great or EJudgementType.Good => Mathf.FloorToInt(rate / noteCount),
                 _ => -Mathf.FloorToInt(rate / noteCount),
             };
-            currentHpPercent = Math.Round((decimal)((double)currentHpNum / baseHp), 4, MidpointRounding.AwayFromZero);
+            currentHpPercent.Value = (float)Math.Round((decimal)((double)currentHpNum / baseHp), 4, MidpointRounding.AwayFromZero);
         }
     }
 }

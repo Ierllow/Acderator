@@ -2,7 +2,7 @@ using Intense.Master;
 
 namespace Song
 {
-    public class SongInfo
+    public record SongInfo
     {
         private readonly SongMaster mSong;
 

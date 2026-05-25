@@ -22,24 +22,21 @@ namespace Song
         public static TutorialEvent ShowComplete() => new(ETutorialEventType.ShowComplete);
     }
 
-    public class SongTutorialStateController : ITutorialController
+    public class SongTutorialStateController : IController
     {
-        private ETutorialState cachedTutorialState;
+        private ETutorialState cachedTutorialState = ETutorialState.Intro;
         private TutorialData tutorialData;
         private float tutorialElapsedTime;
         private bool isRunning;
 
         public bool IsCompleted => tutorialData.IsCompleted;
 
-        public readonly Subject<TutorialEvent> TutorialEventSubject = new();
+        private readonly Subject<TutorialEvent> tutorialEventSubject = new();
+        public Observable<TutorialEvent> TutorialEventStream => tutorialEventSubject;
+
+        public SongTutorialStateController(TutorialData tutorialData) => this.tutorialData = tutorialData;
 
         public void UpdateState(ETutorialState currentState) => cachedTutorialState = currentState;
-
-        public void Init(TutorialData tutorialData)
-        {
-            this.tutorialData = tutorialData;
-            UpdateState(ETutorialState.Intro);
-        }
 
         public void ChangeState(bool isPlaying) => isRunning = isPlaying;
 
@@ -90,8 +87,8 @@ namespace Song
             UpdateState(ETutorialState.None);
         }
 
-        public void ShowIntro() => TutorialEventSubject.OnNext(TutorialEvent.ShowIntro(tutorialData.TutorialMaster));
-        private void ShowCurrentStep() => TutorialEventSubject.OnNext(TutorialEvent.ShowStep(tutorialData.GetCurrentStep()));
-        private void ShowComplete() => TutorialEventSubject.OnNext(TutorialEvent.ShowComplete());
+        public void ShowIntro() => tutorialEventSubject.OnNext(TutorialEvent.ShowIntro(tutorialData.TutorialMaster));
+        private void ShowCurrentStep() => tutorialEventSubject.OnNext(TutorialEvent.ShowStep(tutorialData.GetCurrentStep()));
+        private void ShowComplete() => tutorialEventSubject.OnNext(TutorialEvent.ShowComplete());
     }
 }

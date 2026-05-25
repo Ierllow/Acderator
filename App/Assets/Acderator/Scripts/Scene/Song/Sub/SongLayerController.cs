@@ -1,8 +1,7 @@
 using Intense;
+using Intense.Data;
 using R3;
-using System;
 using System.Collections.Generic;
-using System.Threading;
 using UnityEngine;
 using Zenject;
 
@@ -13,12 +12,10 @@ namespace Song
         [SerializeField] private ComboView comboView;
         [SerializeField] private SongPlayingFieldView songPlayingFieldView;
         [SerializeField] private HpBar hpBar;
-#if UNITY_EDITOR
-        [SerializeField] private DebugInfoView debugInfoView;
-        public DebugInfoView DebugInfoView => debugInfoView;
-#endif
+
         [Inject] private SongGameLogic songGameLogic;
-        [Inject] private SongResultCalculator songResultCalculator;
+
+        private const int MinClearHpPercent = 70;
 
         public Observable<Unit> OnTapPauseButtonAsObservable => songPlayingFieldView.PauseButton.OnTapButtonAsObservable;
 
@@ -37,15 +34,15 @@ namespace Song
 
         public void UpdateSongLayer(FingerInfo fingerInfo) => songGameLogic.UpdateGameLogic(fingerInfo);
 
-        public ESongResultType GetSongResult(int noteCount) => songResultCalculator.CalculateResult(songGameLogic.CurrentHpPercent, songGameLogic.JudgeCountDict, songGameLogic.CurrentCombo, noteCount);
+        public ESongResultType GetSongResult(int noteCount) => true switch
+        {
+            _ when (int)(songGameLogic.CurrentHpPercent * HpBarController.MAX_HP_PERCENT) < MinClearHpPercent => ESongResultType.Failed,
+            _ when noteCount == songGameLogic.JudgeCountDict.GetValueOrDefault(EJudgementType.Perfect) => ESongResultType.Excellent,
+            _ when noteCount == songGameLogic.CurrentCombo => ESongResultType.FullCombo,
+            _ when ScoreUtils.IsClear(songGameLogic.CurrentCombo) => ESongResultType.Clear,
+            _ => ESongResultType.Failed,
+        };
 
         public void SetPauseButtonGrayOut(bool value) => songPlayingFieldView.PauseButton.SetGrayOut(value);
-
-        public void Subscribes(Func<float, bool> predicate, CancellationToken cancellationToken = default)
-        {
-            songGameLogic.SubscribeHpUpdate(predicate, hpBar.SetHp).RegisterTo(cancellationToken);
-            songGameLogic.SubscribeComboUpdate(predicate, comboView.UpdateComboNum).RegisterTo(cancellationToken);
-            songGameLogic.SubscribeScoreUpdate(songPlayingFieldView.UpdateDisplay).RegisterTo(cancellationToken);
-        }
     }
 }

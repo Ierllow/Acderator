@@ -1,5 +1,7 @@
+using R3;
 using TMPro;
 using UnityEngine;
+using Zenject;
 
 namespace Song
 {
@@ -7,6 +9,8 @@ namespace Song
     {
         [SerializeField] private TextMeshProUGUI comboNumText;
 
-        public void UpdateComboNum(int currentCombo) => comboNumText.SetText(currentCombo == 0 ? "" : currentCombo.ToString());
+        [Inject] private ComboController comboController;
+
+        private void Start() => comboController.CurrentCombo.Subscribe(combo => comboNumText.SetText(combo == 0 ? "" : combo.ToString())).RegisterTo(destroyCancellationToken);
     }
 }

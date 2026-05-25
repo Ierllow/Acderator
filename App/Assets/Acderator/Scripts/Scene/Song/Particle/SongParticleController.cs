@@ -3,43 +3,39 @@ using Intense;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Pool;
 
 namespace Song
 {
     public class SongParticleController : MonoBehaviour, IController
     {
         [SerializeField] private ParticleObject tapParticleObject;
-        [SerializeField] private HoldParticleObject holdParticleObject;
-        [SerializeField] private JudgeParticleObject judgeParticleObject;
+        [SerializeField] private ParticleObject holdParticleObject;
+        [SerializeField] private ParticleObject judgeParticleObject;
         [SerializeField] private Transform particlePoolTransform;
 
-        private TapParticlePool tapParticlePool;
-        private HoldParticlePool holdParticlePool;
-        private JudgeParticlePool judgeParticlePool;
+        private ObjectPool<ParticleObject> tapParticlePool;
+        private ObjectPool<ParticleObject> holdParticlePool;
+        private ObjectPool<ParticleObject> judgeParticlePool;
 
-        private readonly Dictionary<int, HoldParticleObject> playingHoldParticleDict = new();
+        private readonly Dictionary<int, ParticleObject> playingHoldParticleDict = new();
 
         private void Awake()
         {
-            tapParticlePool = new(
-                createFunc: () => Instantiate(tapParticleObject, particlePoolTransform),
-                actionOnGet: note => note.gameObject.SetActive(true),
-                actionOnRelease: note => note.gameObject.SetActive(false),
-                actionOnDestroy: note => Destroy(note.gameObject)
-            );
-            holdParticlePool = new(
-                createFunc: () => Instantiate(holdParticleObject, particlePoolTransform),
-                actionOnGet: note => note.gameObject.SetActive(true),
-                actionOnRelease: note => note.gameObject.SetActive(false),
-                actionOnDestroy: note => Destroy(note.gameObject)
-            );
-            judgeParticlePool = new(
-                createFunc: () => Instantiate(judgeParticleObject, particlePoolTransform),
-                actionOnGet: note => note.gameObject.SetActive(true),
-                actionOnRelease: note => note.gameObject.SetActive(false),
-                actionOnDestroy: note => Destroy(note.gameObject)
-            );
+            tapParticlePool = CreatePool(tapParticleObject);
+            holdParticlePool = CreatePool(holdParticleObject);
+            judgeParticlePool = CreatePool(judgeParticleObject);
         }
+
+        private ObjectPool<ParticleObject> CreatePool(ParticleObject prefab) => new(
+            createFunc: () => Instantiate(prefab, particlePoolTransform),
+            actionOnGet: p => p.gameObject.SetActive(true),
+            actionOnRelease: p => p.gameObject.SetActive(false),
+            actionOnDestroy: p => Destroy(p.gameObject),
+            collectionCheck: false,
+            defaultCapacity: 4,
+            maxSize: 10
+        );
 
         public void UpdateParticles(FingerInfo fingerInfo)
         {

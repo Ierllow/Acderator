@@ -9,21 +9,11 @@ namespace Song
         void Init();
     }
 
-    public interface IFingeController : IController
+    public interface IFingerController : IController
     {
-        Subject<(FingerInfo, int)> FingerInfoSubject { get; }
-        void NotifyFinger(FingerInfo fingerInfo, int lane);
+        Observable<FingerInfo> JudgmentStream { get; }
         void Init();
-    }
-
-    public interface IAutoFingerController : IController
-    {
-        Subject<FingerInfo> FingerInfoSubject { get; }
-        void NotifyFinger(FingerInfo fingerInfo);
-    }
-
-    public interface ITutorialController : IController
-    {
-        void Init(TutorialData tutorialData);
+        void UpdateInput();
+        void Judge(float currentSec);
     }
 }

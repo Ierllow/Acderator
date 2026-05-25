@@ -5,7 +5,6 @@ using Zenject;
 
 namespace Song
 {
-    [RequireComponent(typeof(TextMeshProUGUI))]
     public class TutorialTextView : MonoBehaviour
     {
         [SerializeField] private TextMeshProUGUI descriptionText;

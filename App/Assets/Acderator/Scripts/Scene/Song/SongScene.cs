@@ -1,6 +1,5 @@
 using Cysharp.Threading.Tasks;
 using Intense;
-using Intense.Api;
 using Intense.Attribute;
 using Intense.UI;
 using UnityEngine;
@@ -18,7 +17,6 @@ namespace Song
         [RequiredField, SerializeField] private NotesLineController notesLineController;
         [RequiredField, SerializeField] private FailFastExceptionWatcher failFastExceptionWatcher;
 
-        [InjectOptional] private SongApplicationPauseHandler songApplicationPauseHandler;
         [Inject] private SongControllerResolver songControllerResolver;
         [Inject] private SongManagerResolver songManagerResolver;
         [Inject] private SongSceneContext sceneContext;
@@ -34,7 +32,11 @@ namespace Song
 
         private void OnApplicationPause(bool pauseStatus)
         {
-            if (songApplicationPauseHandler?.IsHandlePause(pauseStatus) == false) return;
+            if (!pauseStatus) return;
+            if (sceneContext.SongMode != ESongMode.Normal) return;
+            if (songManagerResolver.Sound.SongExPlayer.IsPlayEnd() || songManagerResolver.Notes.AliveNoteList.Count == 0) return;
+
+            songControllerResolver.Loop.UpdateState(ESongState.Stop);
             songPopupLayerController.OnOpenPausePopup(!sceneContext.IsAuto);
         }
 

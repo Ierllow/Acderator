@@ -1,5 +1,3 @@
-using Cysharp.Threading.Tasks;
-using Cysharp.Threading.Tasks.Linq;
 using Intense;
 using R3;
 using System;
@@ -12,21 +10,9 @@ namespace Song
 {
     public enum EFingerType { None, Up, Down }
 
-    public class FingerController : MonoBehaviour, IFingeController
+    public class FingerController : MonoBehaviour, IController, IInitializable
     {
-        private readonly struct TouchState
-        {
-            public TouchState(Vector2 startScreenPosition, int lane)
-            {
-                StartScreenPosition = startScreenPosition;
-                Lane = lane;
-            }
-
-            public Vector2 StartScreenPosition { get; }
-            public int Lane { get; }
-
-            public TouchState WithLane(int lane) => new(StartScreenPosition, lane);
-        }
+        private const int LaneNone = -1;
 
         [SerializeField] private Camera choose;
         [SerializeField] private Transform hitPlane;
@@ -35,168 +21,194 @@ namespace Song
         [SerializeField] private float swipeThreshold = 50f;
 
         [Inject] private NotesManager notesManager;
-        [Inject] private JudgmentTypeResolver judgmentTypeResolver;
+        [Inject] private NoteJudgeController noteJudgeController;
         [Inject] private PointerInput pointerInput;
+        [Inject] private LaneDetector laneDetector;
+        [Inject] private TouchStateManager touchStateManager;
 
-        private float dist;
         private bool useTouch;
-        private readonly Dictionary<int, TouchState> touchStateDict = new();
 
-        public Subject<(FingerInfo, int)> FingerInfoSubject { get; } = new();
+        private readonly Subject<FingerInfo> judgmentSubject = new();
+        private readonly Subject<bool> useTouchSubject = new();
 
-        public IUniTaskAsyncEnumerable<bool> EveryUseTouchChanged => UniTaskAsyncEnumerable.EveryValueChanged(this, x => x.useTouch).Where(x => !x);
+        public Observable<FingerInfo> JudgmentStream => judgmentSubject;
+        public Observable<bool> EveryUseTouchChanged => useTouchSubject.Where(x => !x);
 
-        public void Init()
+        private bool IsAuto => notesManager.SongOption.IsAuto;
+
+        public void Initialize()
         {
-            dist = Vector3.Distance(choose.transform.position, hitPlane.position);
+            if (IsAuto) return;
+            laneDetector.Init(choose, hitPlane);
             pointerInput.SetCallbacks(FingerDown, FingerUpdate, FingerUp);
             TrySetUseTouch(true);
         }
 
-        public void UpdatePointerInput()
+        public void UpdateInput()
         {
-            if (!useTouch) return;
-
+            if (IsAuto || !useTouch) return;
             pointerInput.Update();
+        }
+
+        public void Judge(float currentSec)
+        {
+            var notes = notesManager.AliveNoteList;
+            for (var i = notes.Count - 1; i >= 0; i--)
+            {
+                var note = notes[i];
+                if (!note || !note.IsActive) continue;
+                if (TryEmitMiss(note, currentSec)) continue;
+                if (IsAuto) EmitAutoPerfect(note);
+            }
+        }
+
+        public bool TrySetUseTouch(bool useTouch)
+        {
+            if (IsAuto || this.useTouch == useTouch) return false;
+
+            this.useTouch = useTouch;
+            if (!useTouch) touchStateManager.Clear();
+            useTouchSubject.OnNext(useTouch);
+            return true;
         }
 
         private void FingerDown(int pointerId, Vector2 screenPosition)
         {
-            var isOverGui = IsPointerOverGui(pointerId);
-            if (ignoreStartedOverGui && isOverGui) return;
-            if (ignoreIsOverGui && isOverGui) return;
+            if ((ignoreStartedOverGui || ignoreIsOverGui) && IsPointerOverGui(pointerId)) return;
 
-            var touchInPlane = GetWorldPosition(screenPosition);
-            var fingerInfo = new FingerInfo { FingerType = EFingerType.Down };
-            if (TryGetTouchLane(touchInPlane.x, touchInPlane.y, out var lane))
+            var touchInPlane = laneDetector.GetWorldPosition(screenPosition);
+            if (!laneDetector.TryGetLane(touchInPlane.x, touchInPlane.y, out var lane)) return;
+
+            touchStateManager.Set(pointerId, new TouchStateManager.TouchState(screenPosition, lane));
+
+            var fingerInfo = new FingerInfo { FingerType = EFingerType.Down, Lane = lane };
+            if (notesManager.TryGetNote(EFingerType.Down, lane, out var note))
             {
-                touchStateDict[pointerId] = new TouchState(screenPosition, lane);
-
-                if (notesManager.TryGetNote(EFingerType.Down, lane, out var note))
-                {
-                    var diff = GetNoteDiffSec(EFingerType.Down, note.NoteData);
-                    if (diff < 0.5f)
-                    {
-                        var judgementType = judgmentTypeResolver.GetJudgmentType(diff);
-                        note.OnJudgedNote(EFingerType.Down, judgementType);
-                        fingerInfo = new FingerInfo
-                        {
-                            NoteBase = note,
-                            JudgmentType = judgementType,
-                            FingerType = EFingerType.Down
-                        };
-                    }
-                }
-                NotifyFinger(fingerInfo, lane);
+                var diff = noteJudgeController.GetNoteDiffSec(EFingerType.Down, note.NoteData);
+                if (diff < 0.5f) fingerInfo = ApplyJudgement(note, EFingerType.Down, lane, noteJudgeController.GetJudgmentType(diff));
             }
-        }
-
-        private float GetNoteDiffSec(EFingerType fingerType, NoteData noteData)
-        {
-            if (noteData.NoteType == ENoteType.Curve)
-            {
-                var curveProgress = Mathf.Clamp01((notesManager.CurrentSec - noteData.SecBegin) / noteData.CurveDuration);
-                return notesManager.GetCurveNoteDiffSec(noteData, curveProgress);
-            }
-            return notesManager.GetDiffSec(fingerType, noteData);
+            judgmentSubject.OnNext(fingerInfo);
         }
 
         private void FingerUpdate(int pointerId, Vector2 screenPosition)
         {
-            if (!touchStateDict.TryGetValue(pointerId, out var touchState)) return;
+            if (!touchStateManager.TryGet(pointerId, out var touchState)) return;
             if (ignoreIsOverGui && IsPointerOverGui(pointerId)) return;
 
-            var fingerInfo = new FingerInfo { FingerType = EFingerType.Down };
-            var touchInPlane = GetWorldPosition(screenPosition);
+            var touchInPlane = laneDetector.GetWorldPosition(screenPosition);
+            laneDetector.TryGetLane(touchInPlane.x, touchInPlane.y, out var lane);
 
-            if (TryGetTouchLane(touchInPlane.x, touchInPlane.y, out var lane)
-                && touchState.Lane != lane
-                && notesManager.TryGetNote(EFingerType.Up, lane, out var note)
-                && note.IsTapping
-                && (note.NoteData.NoteType == ENoteType.Long || note.NoteData.NoteType == ENoteType.Curve))
-            {
-                var judgementType = judgmentTypeResolver.GetJudgmentType(GetNoteDiffSec(EFingerType.Up, note.NoteData));
-                judgementType = judgementType != EJudgementType.None ? judgementType : EJudgementType.Miss;
+            if (TryHandleHoldCross(pointerId, touchState.Lane, lane)) return;
 
-                note.OnJudgedNote(EFingerType.Up, judgementType);
+            touchStateManager.Set(pointerId, touchState.WithLane(lane));
+            judgmentSubject.OnNext(new FingerInfo { FingerType = EFingerType.Down, Lane = lane });
+        }
 
-                fingerInfo = new FingerInfo
-                {
-                    NoteBase = note,
-                    JudgmentType = judgementType,
-                    FingerType = EFingerType.Up,
-                    TappingNoteList = CreateTappingNoteList()
-                };
+        private bool TryHandleHoldCross(int pointerId, int previousLane, int currentLane)
+        {
+            if (currentLane < 0 || previousLane == currentLane) return false;
+            if (!notesManager.TryGetNote(EFingerType.Up, currentLane, out var note)) return false;
+            if (!note.IsTapping) return false;
+            if (note.NoteData.NoteType is not (ENoteType.Long or ENoteType.Curve)) return false;
 
-                touchStateDict.Remove(pointerId);
-            }
-            else
-            {
-                touchStateDict[pointerId] = touchState.WithLane(lane);
-            }
+            var fingerInfo = ApplyJudgement(note, EFingerType.Up, currentLane, noteJudgeController.JudgeOrMiss(note, EFingerType.Up));
+            touchStateManager.Remove(pointerId);
 
-            NotifyFinger(fingerInfo, lane);
+            judgmentSubject.OnNext(fingerInfo.WithTappingNoteList(GetTappingNoteList()));
+            return true;
         }
 
         private void FingerUp(int pointerId, Vector2 screenPosition)
         {
-            if (!touchStateDict.TryGetValue(pointerId, out var touchState)) return;
+            if (!touchStateManager.TryGet(pointerId, out var touchState)) return;
 
             if ((touchState.StartScreenPosition - screenPosition).sqrMagnitude > swipeThreshold * swipeThreshold)
             {
                 FingerSwipe(pointerId);
-                if (!touchStateDict.TryGetValue(pointerId, out touchState)) return;
+                if (!touchStateManager.TryGet(pointerId, out touchState)) return;
             }
 
             var lane = touchState.Lane;
-            var fingerInfo = new FingerInfo { FingerType = EFingerType.Up };
+            var fingerInfo = new FingerInfo { FingerType = EFingerType.Up, Lane = lane };
 
             if (notesManager.TryGetNote(EFingerType.Up, lane, out var note))
-            {
-                var judgementType = judgmentTypeResolver.GetJudgmentType(GetNoteDiffSec(EFingerType.Up, note.NoteData));
-                judgementType = judgementType != EJudgementType.None ? judgementType : EJudgementType.Miss;
+                fingerInfo = ApplyJudgement(note, EFingerType.Up, lane, noteJudgeController.JudgeOrMiss(note, EFingerType.Up));
 
-                note.OnJudgedNote(EFingerType.Up, judgementType);
-                fingerInfo = new FingerInfo
-                {
-                    NoteBase = note,
-                    JudgmentType = judgementType,
-                    FingerType = EFingerType.Up
-                };
-            }
-
-            touchStateDict.Remove(pointerId);
-            NotifyFinger(fingerInfo, lane);
+            touchStateManager.Remove(pointerId);
+            judgmentSubject.OnNext(fingerInfo);
         }
 
         private void FingerSwipe(int pointerId)
         {
-            if (!touchStateDict.TryGetValue(pointerId, out var touchState)) return;
+            if (!touchStateManager.TryGet(pointerId, out var touchState)) return;
 
             var lane = touchState.Lane;
             if (!notesManager.TryGetFlickNote(lane, out var note)) return;
 
-            var diff = GetNoteDiffSec(EFingerType.Up, note.NoteData);
-            var judgementType = judgmentTypeResolver.GetJudgmentType(diff);
-            judgementType = judgementType != EJudgementType.None ? judgementType : EJudgementType.Miss;
+            var fingerInfo = ApplyJudgement(note, EFingerType.Up, lane, noteJudgeController.JudgeOrMiss(note, EFingerType.Up));
+            touchStateManager.Remove(pointerId);
 
-            note.OnJudgedNote(EFingerType.Up, judgementType);
+            judgmentSubject.OnNext(fingerInfo);
+        }
 
-            NotifyFinger(new()
+        private void EmitAutoPerfect(NoteBase note)
+        {
+            if (noteJudgeController.IsJustAutoTiming(note, EFingerType.Down))
+            {
+                EmitPerfect(note, EFingerType.Down);
+                return;
+            }
+            if (note.NoteData.NoteType != ENoteType.Single && noteJudgeController.IsJustAutoTiming(note, EFingerType.Up))
+                EmitPerfect(note, EFingerType.Up);
+        }
+
+        private bool TryEmitMiss(NoteBase note, float currentSec)
+        {
+            if (!noteJudgeController.IsMissed(note, currentSec, out var missEnd)) return false;
+            EmitMiss(note, missEnd);
+            return true;
+        }
+
+        private void EmitMiss(NoteBase note, bool missEnd)
+        {
+            if (notesManager.RemoveNote(note)) note.Final();
+
+            judgmentSubject.OnNext(new FingerInfo
+            {
+                NoteBase = note,
+                JudgmentType = IsAuto ? EJudgementType.Perfect : EJudgementType.Miss,
+                Lane = LaneNone,
+                MissInfo = (true, missEnd),
+            });
+        }
+
+        private void EmitPerfect(NoteBase note, EFingerType fingerType)
+        {
+            note.OnJudgedNote(fingerType, EJudgementType.Perfect);
+            judgmentSubject.OnNext(new FingerInfo
+            {
+                NoteBase = note,
+                FingerType = fingerType,
+                JudgmentType = EJudgementType.Perfect,
+                Lane = LaneNone,
+            });
+        }
+
+        private FingerInfo ApplyJudgement(NoteBase note, EFingerType fingerType, int lane, EJudgementType judgementType)
+        {
+            note.OnJudgedNote(fingerType, judgementType);
+            return new FingerInfo
             {
                 NoteBase = note,
                 JudgmentType = judgementType,
-                FingerType = EFingerType.Up
-            }, lane);
-
-            touchStateDict.Remove(pointerId);
+                FingerType = fingerType,
+                Lane = lane,
+            };
         }
-
-        private Vector3 GetWorldPosition(Vector2 screenPosition) => choose.ScreenToWorldPoint(new Vector3(screenPosition.x, screenPosition.y, dist));
 
         private bool IsPointerOverGui(int pointerId) => EventSystem.current != null && EventSystem.current.IsPointerOverGameObject(pointerId);
 
-        private List<NoteBase> CreateTappingNoteList()
+        private List<NoteBase> GetTappingNoteList()
         {
             var aliveNotes = notesManager.AliveNoteList;
             var tappingNotes = new List<NoteBase>(aliveNotes.Count);
@@ -206,27 +218,6 @@ namespace Song
                 if (note.IsActive && note.IsTapping) tappingNotes.Add(note);
             }
             return tappingNotes;
-        }
-
-        private bool TryGetTouchLane(float positionX, float positionY, out int lane)
-        {
-            lane = positionX >= -6.8f && positionX <= -2.8f && positionY <= -1.2f && positionY >= -4.5f
-                ? 0 : positionX >= -2.8f && positionX <= 0.0f && positionY <= -1.2f && positionY >= -4.5f
-                ? 1 : positionX >= 0.0f && positionX <= 2.8f && positionY <= -1.2f && positionY >= -4.5f
-                ? 2 : positionX >= 2.8f && positionX <= 6.8f && positionY <= -1.2f && positionY >= -4.5f
-                ? 3 : -1;
-            return lane >= 0;
-        }
-
-        public void NotifyFinger(FingerInfo fingerInfo, int lane) => FingerInfoSubject.OnNext((fingerInfo, lane));
-
-        public bool TrySetUseTouch(bool useTouch)
-        {
-            if (this.useTouch == useTouch) return false;
-
-            this.useTouch = useTouch;
-            if (!useTouch) touchStateDict.Clear();
-            return true;
         }
     }
 

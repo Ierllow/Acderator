@@ -7,7 +7,7 @@ namespace Song
 {
     public partial class SongScene
     {
-        private async UniTask LoadAssets() 
+        private async UniTask LoadAssets()
         {
             if (!sceneContext.IsRestart)
             {
@@ -44,7 +44,7 @@ namespace Song
             if (songManagerResolver.Sound.SongExPlayer.GetTime().ToSeconds() > 0)
             {
                 songManagerResolver.Sound.PauseSong(false);
-                songControllerResolver.Finger?.TrySetUseTouch(!sceneContext.IsAuto);
+                songControllerResolver.Finger.TrySetUseTouch(true);
                 return;
             }
             songManagerResolver.Sound.PlaySong(sceneContext.SongInfo.Group);
@@ -53,13 +53,13 @@ namespace Song
         private void OnStopSong()
         {
             songManagerResolver.Sound.PauseSong(true);
-            songControllerResolver.Finger?.TrySetUseTouch(false);
+            songControllerResolver.Finger.TrySetUseTouch(false);
         }
 
         private async UniTask OnEndSong()
         {
             songLayerController.SetPauseButtonGrayOut(true);
-            songControllerResolver.Finger?.TrySetUseTouch(false);
+            songControllerResolver.Finger.TrySetUseTouch(false);
 
             var changeScene = UniTask.Defer(async () => sceneManager.ChangeSceneAsync(ESceneType.Result, sceneContext.ToResultSceneContext(songLayerController.CurrentScore, songLayerController.JudgeCountDict)));
             var scoreSaveError = UniTask.Defer(async () => await songPopupLayerController.DetectedError(new ScoreSaveError()));
@@ -99,7 +99,7 @@ namespace Song
 
         private void UpdateSongProgressNext()
         {
-            songControllerResolver.Finger?.UpdatePointerInput();
+            songControllerResolver.Finger.UpdateInput();
             songControllerResolver.Loop.Tick(songManagerResolver.Sound.SongExPlayer.GetTime().ToSeconds());
             songControllerResolver.TutorialState?.ChangeState(songControllerResolver.Loop.CurrentState == ESongState.Playing);
             songControllerResolver.TutorialState?.Tick();
@@ -126,13 +126,11 @@ namespace Song
             }
         }
 
-        private void FingerSubscribeNext(FingerInfo fingerInfo, int lane)
+        private void FingerSubscribeNext(FingerInfo fingerInfo)
         {
-            if (lane >= 0) notesLineController.SetLaneLightActive(lane, fingerInfo.FingerType);
+            if (fingerInfo.Lane >= 0) notesLineController.SetLaneLightActive(fingerInfo.Lane, fingerInfo.FingerType);
             songLayerController.UpdateSongLayer(fingerInfo);
-#if UNITY_EDITOR
-            songLayerController.DebugInfoView.UpdateDebugInfo(fingerInfo.NoteBase.NoteData.NoteType, songManagerResolver.Notes.GetDiffSec(fingerInfo.FingerType, fingerInfo.NoteBase.NoteData), songManagerResolver.Notes.CurrentBeat, songLayerController.JudgeCountDict);
-#endif
+
             songControllerResolver.Particle.UpdateParticles(fingerInfo);
             if (fingerInfo.IsMiss)
             {
@@ -147,8 +145,8 @@ namespace Song
             songManagerResolver.Notes.UpdateNoteSpeed();
             songManagerResolver.Notes.UpdateBeat(sec);
             songControllerResolver.Spawner.UpdateSpawn(sec);
-            songControllerResolver.Optimizer.UpdatePositionNotes((x) => songControllerResolver.Auto?.NotifyFinger(x));
-            songControllerResolver.Auto?.OnAutoFinger();
+            songControllerResolver.PositionUpdater.UpdatePositions();
+            songControllerResolver.Finger.Judge(sec);
             if (songManagerResolver.Sound.SongExPlayer.IsPlayEnd()) songControllerResolver.Loop.UpdateState(ESongState.End);
         }
 

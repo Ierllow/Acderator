@@ -1,7 +1,6 @@
-using Cysharp.Threading.Tasks;
-using Cysharp.Threading.Tasks.Linq;
 using Intense;
 using Intense.Master;
+using R3;
 using System.Collections.Generic;
 using UnityEngine;
 using Zenject;
@@ -12,9 +11,8 @@ namespace Song
     {
         [Inject] private MasterDataManager masterDataManager;
 
-        public float CurrentScore { get; private set; } = 0f;
-
-        public IUniTaskAsyncEnumerable<float> EveryUpdateScoreAsAsyncEnumerable => UniTaskAsyncEnumerable.EveryValueChanged(this, x => x.CurrentScore).Queue();
+        private readonly ReactiveProperty<float> currentScore = new(0f);
+        public ReadOnlyReactiveProperty<float> CurrentScore => currentScore;
 
         private readonly Queue<int> scoreQueue = new();
         private readonly Dictionary<EJudgementType, float> rateCacheDict = new();
@@ -54,8 +52,8 @@ namespace Song
             if (!scoreQueue.TryDequeue(out var baseScore)) return;
             if (!rateCacheDict.TryGetValue(judgmentType, out var rate)) return;
 
-            CurrentScore += Mathf.RoundToInt(baseScore * rate);
-            if (CurrentScore == maxScore) CurrentScore += noteCount;
+            currentScore.Value += Mathf.RoundToInt(baseScore * rate);
+            if (currentScore.Value == maxScore) currentScore.Value += noteCount;
         }
     }
 }

@@ -9,12 +9,12 @@ namespace Song
         [SerializeField] private float spawnTiming = 10f;
 
         private readonly List<NoteData> noteDataList = new();
-        private readonly List<NoteData> spawnedNoteDataList = new();
 
         private float offset = 0f;
         private int nextSpawnIndex;
 
-        public Subject<NoteData> NoteFactorySubject { get; } = new();
+        private readonly Subject<NoteData> noteFactorySubject = new();
+        public Observable<NoteData> NoteFactoryStream => noteFactorySubject;
 
         public void Init(List<NoteData> noteDataList, float offset)
         {
@@ -29,7 +29,7 @@ namespace Song
                 var noteData = noteDataList[nextSpawnIndex];
                 if (noteData.SecBegin - offset > currentSec) break;
 
-                NoteFactorySubject.OnNext(noteData);
+                noteFactorySubject.OnNext(noteData);
                 nextSpawnIndex++;
             }
         }

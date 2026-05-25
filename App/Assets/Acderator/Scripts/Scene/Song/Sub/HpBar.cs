@@ -1,7 +1,9 @@
 using DG.Tweening;
+using R3;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Zenject;
 
 namespace Song
 {
@@ -10,11 +12,13 @@ namespace Song
         [SerializeField] private Image gaugeImage;
         [SerializeField] private TextMeshProUGUI percent;
 
-        public void SetHp(float currentHp)
+        [Inject] private HpBarController hpBarController;
+
+        private void Start() => hpBarController.CurrentHpPercent.Subscribe(currentHp =>
         {
             gaugeImage.fillAmount = currentHp;
             percent.SetText(((int)(currentHp * 100)).ToString());
-        }
+        }).RegisterTo(destroyCancellationToken);
 
         public void Move() => gameObject.transform.DOMoveX(170, 0.6f).SetLink(gameObject);
     }

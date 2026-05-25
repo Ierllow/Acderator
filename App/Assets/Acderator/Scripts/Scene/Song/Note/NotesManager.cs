@@ -7,23 +7,46 @@ namespace Song
     {
         private enum NoteSearchMode { Down, Up, Flick }
 
+        public const int LaneCount = 4;
+        public const int MIN_NOTES_SPEED = 1;
+
         public float CurrentSec { get; private set; } = default;
         public float CurrentBeat { get; private set; } = default;
-        public List<NoteBase> AliveNoteList { get; } = new();
         public LoadedChartInfo LoadedChartInfo { get; private set; } = default;
         public List<NoteSpeedChange> NoteSpeedChangeList { get; } = new();
         public SongOption SongOption { get; init; } = default;
         public float CurrentNoteSpeed { get; private set; } = default;
 
-        private int currentSpeedChangeIndex = 0;
-        private readonly List<NoteBase>[] aliveNotesByLaneList = { new(), new(), new(), new(), };
+        public IReadOnlyList<NoteBase> AliveNoteList
+        {
+            get
+            {
+                if (aliveNotesCache)
+                {
+                    allAliveNotesCache.Clear();
+                    for (var lane = 0; lane < LaneCount; lane++)
+                    {
+                        allAliveNotesCache.AddRange(aliveNotesByLane[lane]);
+                    }
+                    aliveNotesCache = false;
+                }
+                return allAliveNotesCache;
+            }
+        }
 
-        public const int MIN_NOTES_SPEED = 1;
+        public IReadOnlyList<NoteBase> GetAliveNotesByLane(int lane) => aliveNotesByLane[lane];
+
+        private readonly Dictionary<int, List<NoteBase>> aliveNotesByLane;
+        private readonly List<NoteBase> allAliveNotesCache = new();
+        private bool aliveNotesCache;
+        private int currentSpeedChangeIndex = 0;
 
         public NotesManager(SongOption songOption)
         {
             SongOption = songOption;
             CurrentNoteSpeed = songOption.NoteSpeed;
+            aliveNotesByLane = new Dictionary<int, List<NoteBase>>(LaneCount);
+            for (var i = 0; i < LaneCount; i++) aliveNotesByLane[i] = new List<NoteBase>();
         }
 
         public void Init(LoadedChartInfo loadedChartInfo)
@@ -35,14 +58,14 @@ namespace Song
 
         public void AddAliveNote(NoteBase note)
         {
-            AliveNoteList.Add(note);
-            aliveNotesByLaneList[note.NoteData.Lane].Add(note);
+            aliveNotesByLane[note.NoteData.Lane].Add(note);
+            aliveNotesCache = true;
         }
 
         public bool RemoveNote(NoteBase note)
         {
-            var removed = AliveNoteList.Remove(note);
-            aliveNotesByLaneList[note.NoteData.Lane].Remove(note);
+            var removed = aliveNotesByLane[note.NoteData.Lane].Remove(note);
+            if (removed) aliveNotesCache = true;
             return removed;
         }
 
@@ -54,7 +77,7 @@ namespace Song
 
         public float GetDiffSec(EFingerType fingerType, NoteData noteData)
         {
-            var noteSec =fingerType == EFingerType.Down ? noteData.SecBegin : noteData.SecEnd;
+            var noteSec = fingerType == EFingerType.Down ? noteData.SecBegin : noteData.SecEnd;
             return Math.Abs(noteSec - CurrentSec + SongOption.TapTiming * 0.1f);
         }
 
@@ -70,7 +93,7 @@ namespace Song
 
         public bool TryGetNote(EFingerType type, int lane, out NoteBase note)
         {
-            var mode =type == EFingerType.Down ? NoteSearchMode.Down : NoteSearchMode.Up;
+            var mode = type == EFingerType.Down ? NoteSearchMode.Down : NoteSearchMode.Up;
             return TryGetNearestNote(lane, mode, out note);
         }
 
@@ -78,7 +101,7 @@ namespace Song
 
         private bool TryGetNearestNote(int lane, NoteSearchMode mode, out NoteBase note)
         {
-            var laneNoteList = aliveNotesByLaneList[lane];
+            var laneNoteList = aliveNotesByLane[lane];
             var bestDiff = float.MaxValue;
             var bestNote = default(NoteBase);
 

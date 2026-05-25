@@ -1,6 +1,4 @@
-using Cysharp.Threading.Tasks.Linq;
 using Intense;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Zenject;
@@ -14,12 +12,20 @@ namespace Song
         [Inject] private HpBarController hpBarController;
         [Inject] private NotesManager notesManager;
 
-        private readonly JudgmentCounter judgmentCounter = new();
+        private readonly Dictionary<EJudgementType, int> judgeCountDict = new()
+        {
+            { EJudgementType.None, 0 },
+            { EJudgementType.Perfect, 0 },
+            { EJudgementType.Great, 0 },
+            { EJudgementType.Good, 0 },
+            { EJudgementType.Bad, 0 },
+            { EJudgementType.Miss, 0 },
+        };
 
-        public Dictionary<EJudgementType, int> JudgeCountDict => judgmentCounter.GetJudgmentCountDict();
-        public int CurrentScore => (int)scoreController.CurrentScore;
-        public int CurrentCombo => comboController.CurrentCombo;
-        public float CurrentHpPercent => hpBarController.CurrentHpPercent;
+        public Dictionary<EJudgementType, int> JudgeCountDict => judgeCountDict;
+        public int CurrentScore => (int)scoreController.CurrentScore.CurrentValue;
+        public int CurrentCombo => comboController.CurrentCombo.CurrentValue;
+        public float CurrentHpPercent => hpBarController.CurrentHpPercent.CurrentValue;
 
         public void Init(int sid)
         {
@@ -37,23 +43,19 @@ namespace Song
             {
                 notesManager.RemoveNote(fingerInfo.NoteBase);
                 comboController.UpdateCombo(fingerInfo.JudgmentType);
-                judgmentCounter.AddJudgmentCount(fingerInfo.JudgmentType, (fingerInfo.MissInfo?.missLongNote ?? false) ? 2 : 1);
+                judgeCountDict[fingerInfo.JudgmentType] += (fingerInfo.MissInfo?.missLongNote ?? false) ? 2 : 1;
                 scoreController.AddScore(fingerInfo.JudgmentType);
             }
             else
             {
                 if (fingerInfo.NoteBase.NoteData.NoteType == ENoteType.Flick && fingerInfo.FingerType == EFingerType.Down) return;
                 comboController.UpdateCombo(fingerInfo.JudgmentType);
-                judgmentCounter.AddJudgmentCount(fingerInfo.JudgmentType, 1);
+                judgeCountDict[fingerInfo.JudgmentType] += 1;
                 scoreController.AddScore(fingerInfo.JudgmentType);
                 if (fingerInfo.NoteBase.NoteData.NoteType == ENoteType.Long && fingerInfo.FingerType == EFingerType.Down) return;
                 notesManager.RemoveNote(fingerInfo.NoteBase);
             }
             if (notesManager.SongOption.IsAuto) hpBarController.UpdateHp(fingerInfo.JudgmentType, notesManager.LoadedChartInfo.NoteCount);
         }
-
-        public IDisposable SubscribeHpUpdate(Func<float, bool> predicate, Action<float> onUpdate) => hpBarController.EveryUpdateHpPercentAsAsyncEnumerable.TakeWhile(x => predicate(x)).Subscribe(onUpdate);
-        public IDisposable SubscribeComboUpdate(Func<float, bool> predicate, Action<int> onUpdate) => comboController.EveryUpdateComboAsAsyncEnumerable.TakeWhile(x => predicate(x)).Subscribe(x => onUpdate(x));
-        public IDisposable SubscribeScoreUpdate(Action<int> onUpdate) => scoreController.EveryUpdateScoreAsAsyncEnumerable.Select(x => (int)x).Subscribe(onUpdate);
     }
 }
