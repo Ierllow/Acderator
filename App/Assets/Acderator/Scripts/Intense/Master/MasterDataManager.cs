@@ -1,4 +1,4 @@
-﻿using Cysharp.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using Master;
 using Intense.Api;
 using MessagePack;
@@ -12,7 +12,7 @@ namespace Intense.Master
 {
     internal class MasterDataManager : IInitializable
     {
-        [Inject] private IApiSession apiSession;
+        [Inject] private readonly IApiSession apiSession;
 
         public MemoryDatabase MemoryDatabase { get; private set; }
 

@@ -20,8 +20,8 @@ namespace SongSelect
             [Text("ハイスコア")] HighScore,
         }
 
-        [Inject] private MasterDataManager masterDataManager;
-        [Inject] private ScoreManager scoreManager;
+        [Inject] private readonly MasterDataManager masterDataManager;
+        [Inject] private readonly ScoreManager scoreManager;
 
         public EOrderType CurrentOrderType { get; private set; } = (EOrderType)PlayerPrefsValues.OrderType;
 

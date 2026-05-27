@@ -17,10 +17,10 @@ namespace Song
         [RequiredField, SerializeField] private NotesLineController notesLineController;
         [RequiredField, SerializeField] private FailFastExceptionWatcher failFastExceptionWatcher;
 
-        [Inject] private SongControllerResolver songControllerResolver;
-        [Inject] private SongManagerResolver songManagerResolver;
-        [Inject] private SongSceneContext sceneContext;
-        [Inject] private SongAssetLoader songAssetLoader;
+        [Inject] private readonly SongControllerResolver songControllerResolver;
+        [Inject] private readonly SongManagerResolver songManagerResolver;
+        [Inject] private readonly SongSceneContext sceneContext;
+        [Inject] private readonly SongAssetLoader songAssetLoader;
 
         protected override void Awake()
         {

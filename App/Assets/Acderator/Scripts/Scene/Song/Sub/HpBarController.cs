@@ -9,7 +9,7 @@ namespace Song
 {
     public class HpBarController
     {
-        [Inject] private MasterDataManager masterDataManager;
+        [Inject] private readonly MasterDataManager masterDataManager;
 
         private int currentHpNum;
         private int baseHp;

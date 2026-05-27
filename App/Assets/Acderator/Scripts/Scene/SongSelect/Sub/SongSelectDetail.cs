@@ -21,7 +21,7 @@ namespace SongSelect
         [SerializeField] private ToggleGroup toggleGroup;
         [SerializeField] private ToggleEx[] toggles;
 
-        [Inject] private MasterDataManager masterDataManager;
+        [Inject] private readonly MasterDataManager masterDataManager;
 
         public IUniTaskAsyncEnumerable<Toggle> EveryToggleChanged => UniTaskAsyncEnumerable.EveryValueChanged(toggleGroup, x => x.ActiveToggles().FirstOrDefault());
 

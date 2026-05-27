@@ -12,7 +12,7 @@ namespace Song
         [SerializeField] private Image gaugeImage;
         [SerializeField] private TextMeshProUGUI percent;
 
-        [Inject] private HpBarController hpBarController;
+        [Inject] private readonly HpBarController hpBarController;
 
         private void Start() => hpBarController.CurrentHpPercent.Subscribe(currentHp =>
         {

@@ -17,9 +17,9 @@ public abstract class SceneContext
 [SceneType(ESceneType.None)]
 public abstract class SceneBase : MonoBehaviour
 {
-    [Inject] protected SceneManager sceneManager;
-    [Inject] private SceneErrorHandler sceneErrorHandler;
-    [Inject] private SceneErrorPopupController sceneErrorPopupController;
+    [Inject] protected readonly SceneManager sceneManager;
+    [Inject] private readonly SceneErrorHandler sceneErrorHandler;
+    [Inject] private readonly SceneErrorPopupController sceneErrorPopupController;
 
     #region MonoBehaviour Handlers
     protected virtual void Awake()

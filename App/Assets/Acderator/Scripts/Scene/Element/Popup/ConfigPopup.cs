@@ -23,7 +23,7 @@ namespace Element.UI
         [SerializeField] private Slider BgmSlider;
         [SerializeField] private Slider SeSlider;
 
-        [Inject] private SoundManager soundManager;
+        [Inject] private readonly SoundManager soundManager;
 
         private void Start()
         {

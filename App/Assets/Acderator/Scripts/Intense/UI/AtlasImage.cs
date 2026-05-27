@@ -9,7 +9,7 @@ namespace Intense.UI
 {
     public class AtlasImage : Image
     {
-        [Inject] private AssetBundleManager assetBundleManager;
+        [Inject] private readonly AssetBundleManager assetBundleManager;
 
         [SerializeField] protected SpriteAtlas m_Atlas;
         [SerializeField] protected string m_SpriteName;

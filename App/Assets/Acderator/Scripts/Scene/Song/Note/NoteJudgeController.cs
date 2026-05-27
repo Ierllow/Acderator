@@ -8,8 +8,8 @@ namespace Song
 {
     public sealed class NoteJudgeController
     {
-        [Inject] private MasterDataManager masterDataManager;
-        [Inject] private NotesManager notesManager;
+        [Inject] private readonly MasterDataManager masterDataManager;
+        [Inject] private readonly NotesManager notesManager;
 
         private float? badJudgmentZone;
 

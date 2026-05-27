@@ -13,7 +13,7 @@ namespace Song
         [SerializeField] private SongPlayingFieldView songPlayingFieldView;
         [SerializeField] private HpBar hpBar;
 
-        [Inject] private SongGameLogic songGameLogic;
+        [Inject] private readonly SongGameLogic songGameLogic;
 
         private const int MinClearHpPercent = 70;
 

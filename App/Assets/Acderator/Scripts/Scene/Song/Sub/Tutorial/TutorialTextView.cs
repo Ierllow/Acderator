@@ -9,7 +9,7 @@ namespace Song
     {
         [SerializeField] private TextMeshProUGUI descriptionText;
 
-        [Inject] private TutorialMessageResolver tutorialMessageResolver;
+        [Inject] private readonly TutorialMessageResolver tutorialMessageResolver;
 
         public void ShowIntro(TutorialMaster tutorial) => descriptionText.SetText(tutorial.Description);
 

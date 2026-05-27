@@ -23,13 +23,13 @@ namespace SongSelect
         [SerializeField] private SongListView songListView;
         [SerializeField] private SongSelectDetail songSelectDetail;
 
-        [Inject] private SongSelectSceneContext sceneContext;
-        [Inject] private MasterDataManager masterDataManager;
-        [Inject] private SoundManager soundManager;
-        [Inject] private AssetBundleManager assetBundleManager;
-        [Inject] private NetworkManager networkManager;
-        [Inject] private ScoreManager scoreManager;
-        [Inject] private Song.TutorialSceneContextBuilder tutorialSceneContextBuilder;
+        [Inject] private readonly SongSelectSceneContext sceneContext;
+        [Inject] private readonly MasterDataManager masterDataManager;
+        [Inject] private readonly SoundManager soundManager;
+        [Inject] private readonly AssetBundleManager assetBundleManager;
+        [Inject] private readonly NetworkManager networkManager;
+        [Inject] private readonly ScoreManager scoreManager;
+        [Inject] private readonly Song.TutorialSceneContextBuilder tutorialSceneContextBuilder;
 
         private void Start() => StartSubscribes();
 

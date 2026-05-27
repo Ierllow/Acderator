@@ -21,8 +21,8 @@ namespace Intense.Asset
     {
         [SerializeField] private NetworkConfig networkConfigObject;
 
-        [Inject] private Loading loading;
-        [Inject] private PopupManager popupManager;
+        [Inject] private readonly Loading loading;
+        [Inject] private readonly PopupManager popupManager;
 
         private readonly Dictionary<string, AssetBundleManifestInfo> manifestInfoDict = new();
         private readonly Dictionary<string, LoadedAssetBundle> assetBundleDict = new();

@@ -4,12 +4,12 @@ namespace Song
 {
     public sealed class SongControllerResolver
     {
-        [Inject] public SongLoopController Loop;
-        [Inject] public NoteSpawnController Spawner;
-        [Inject] public NotePositionUpdater PositionUpdater;
-        [Inject] public SongParticleController Particle;
-        [Inject] public FingerController Finger;
-        [Inject] public SongTutorialLayerController Tutorial;
-        [Inject] public SongTutorialStateController TutorialState;
+        [Inject] public readonly SongLoopController Loop;
+        [Inject] public readonly NoteSpawnController Spawner;
+        [Inject] public readonly NotePositionUpdater PositionUpdater;
+        [Inject] public readonly SongParticleController Particle;
+        [Inject] public readonly FingerController Finger;
+        [Inject] public readonly SongTutorialLayerController Tutorial;
+        [Inject] public readonly SongTutorialStateController TutorialState;
     }
 }

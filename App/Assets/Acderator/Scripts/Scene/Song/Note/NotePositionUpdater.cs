@@ -4,7 +4,7 @@ namespace Song
 {
     public class NotePositionUpdater : IController
     {
-        [Inject] private NotesManager notesManager;
+        [Inject] private readonly NotesManager notesManager;
 
         public void UpdatePositions()
         {

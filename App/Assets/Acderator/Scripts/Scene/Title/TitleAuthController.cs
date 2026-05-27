@@ -14,12 +14,12 @@ namespace Title
 {
     public class TitleAuthController
     {
-        [Inject] private NetworkManager networkManager;
-        [Inject] private MasterDataManager masterDataManager;
-        [Inject] private ScoreManager scoreManager;
-        [Inject] private AssetBundleManager assetBundleManager;
-        [Inject] private PopupManager popupManager;
-        [Inject] private IApiSession apiSession;
+        [Inject] private readonly NetworkManager networkManager;
+        [Inject] private readonly MasterDataManager masterDataManager;
+        [Inject] private readonly ScoreManager scoreManager;
+        [Inject] private readonly AssetBundleManager assetBundleManager;
+        [Inject] private readonly PopupManager popupManager;
+        [Inject] private readonly IApiSession apiSession;
 
         public async UniTask<bool> Execute(CancellationToken token, FailFastExceptionWatcher failFastExceptionWatcher)
         {

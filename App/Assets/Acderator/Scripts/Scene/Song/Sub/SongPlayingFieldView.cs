@@ -17,7 +17,7 @@ namespace Song
 
         public CommonButton PauseButton => pauseButton;
 
-        [Inject] private ScoreController scoreController;
+        [Inject] private readonly ScoreController scoreController;
 
         private const float ScoreTweenDuration = 0.4f;
         private int displayedScore = 0;

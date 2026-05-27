@@ -25,10 +25,10 @@ namespace Intense
         [SerializeField] private Image fadeMask;
         [SerializeField] private Header header;
 
-        [Inject] private ZenjectSceneLoader zenjectSceneLoader;
-        [Inject] private AssetBundleManager assetBundleManager;
-        [Inject] private SoundManager soundManager;
-        [Inject] private Loading loading;
+        [Inject] private readonly ZenjectSceneLoader zenjectSceneLoader;
+        [Inject] private readonly AssetBundleManager assetBundleManager;
+        [Inject] private readonly SoundManager soundManager;
+        [Inject] private readonly Loading loading;
 
         public ESceneType CurrentSceneType => sceneBaseDict.Count > 0 ? sceneBaseDict.LastOrDefault().Key : default;
         public bool IsFadeIn { get; private set; } = false;

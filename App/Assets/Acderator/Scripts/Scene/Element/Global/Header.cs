@@ -11,8 +11,8 @@ namespace Element
     {
         [SerializeField] private CommonButton menuButton;
 
-        [Inject] private PopupManager popupManager;
-        [Inject] private SceneManager sceneManager;
+        [Inject] private readonly PopupManager popupManager;
+        [Inject] private readonly SceneManager sceneManager;
 
         private void Start()
         {

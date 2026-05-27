@@ -9,7 +9,7 @@ namespace Song
     {
         [SerializeField] private TextMeshProUGUI comboNumText;
 
-        [Inject] private ComboController comboController;
+        [Inject] private readonly ComboController comboController;
 
         private void Start() => comboController.CurrentCombo.Subscribe(combo => comboNumText.SetText(combo == 0 ? "" : combo.ToString())).RegisterTo(destroyCancellationToken);
     }

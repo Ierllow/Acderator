@@ -7,7 +7,7 @@ namespace Song
 {
     internal class TutorialSceneContextBuilder
     {
-        [Inject] private MasterDataManager masterDataManager;
+        [Inject] private readonly MasterDataManager masterDataManager;
 
         public bool TryBuild(SongMaster selectedSong, string sessionId, out SongSceneContext tutorialSceneContext)
         {

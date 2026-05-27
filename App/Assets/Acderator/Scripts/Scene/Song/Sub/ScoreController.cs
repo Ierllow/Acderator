@@ -9,7 +9,7 @@ namespace Song
 {
     public class ScoreController
     {
-        [Inject] private MasterDataManager masterDataManager;
+        [Inject] private readonly MasterDataManager masterDataManager;
 
         private readonly ReactiveProperty<float> currentScore = new(0f);
         public ReadOnlyReactiveProperty<float> CurrentScore => currentScore;

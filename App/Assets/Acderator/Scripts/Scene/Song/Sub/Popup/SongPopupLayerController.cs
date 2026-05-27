@@ -16,8 +16,8 @@ namespace Song
         [SerializeField] private PausePopup pausePopup;
         [SerializeField] private ScoreErrorPopup errorPopup;
 
-        [Inject] private PopupManager popupManager;
-        [Inject] private SceneManager sceneManager;
+        [Inject] private readonly PopupManager popupManager;
+        [Inject] private readonly SceneManager sceneManager;
 
         public IUniTaskAsyncEnumerable<EPopupTapKind> ClosedPausePopupAsAsyncEnumerable => UniTaskAsyncEnumerable.EveryValueChanged(pausePopup, x => x.TapKind);
         public Observable<ESceneType> EverySceneTypeChanged => asyncSceneTypeSubject.Where(x => x != ESceneType.None);

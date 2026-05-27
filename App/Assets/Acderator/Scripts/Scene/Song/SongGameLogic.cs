@@ -7,10 +7,10 @@ namespace Song
 {
     public class SongGameLogic
     {
-        [Inject] private ScoreController scoreController;
-        [Inject] private ComboController comboController;
-        [Inject] private HpBarController hpBarController;
-        [Inject] private NotesManager notesManager;
+        [Inject] private readonly ScoreController scoreController;
+        [Inject] private readonly ComboController comboController;
+        [Inject] private readonly HpBarController hpBarController;
+        [Inject] private readonly NotesManager notesManager;
 
         private readonly Dictionary<EJudgementType, int> judgeCountDict = new()
         {

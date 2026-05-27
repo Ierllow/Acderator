@@ -31,8 +31,8 @@ namespace Intense.Api
     {
         [SerializeField] private NetworkConfig networkConfigObject;
 
-        [Inject] private Loading loading;
-        [Inject] private IApiSession apiSession;
+        [Inject] private readonly Loading loading;
+        [Inject] private readonly IApiSession apiSession;
 
         public async UniTask<ResponseBase> RequestAsync(RequestBase request)
         {

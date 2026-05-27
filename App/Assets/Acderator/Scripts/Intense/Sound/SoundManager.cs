@@ -15,8 +15,8 @@ namespace Intense
 
     public class SoundManager : IInitializable
     {
-        [Inject] private AssetBundleManager assetBundleManager;
-        [Inject] private MasterDataManager masterDataManager;
+        [Inject] private readonly AssetBundleManager assetBundleManager;
+        [Inject] private readonly MasterDataManager masterDataManager;
 
         public CriAtomExPlayer BgmExPlayer { get; private set; }
         public CriAtomExPlayer SongExPlayer { get; private set; }

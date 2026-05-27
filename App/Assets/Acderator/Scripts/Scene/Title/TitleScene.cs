@@ -19,9 +19,9 @@ namespace Title
         [SerializeField] private TextMeshProUGUI versionText;
         [SerializeField] private FailFastExceptionWatcher failFastExceptionWatcher;
 
-        [Inject] private TitleAuthController titleAuthController;
-        [Inject] private NetworkManager networkManager;
-        [Inject] private Song.TutorialSceneContextBuilder tutorialSceneContextBuilder;
+        [Inject] private readonly TitleAuthController titleAuthController;
+        [Inject] private readonly NetworkManager networkManager;
+        [Inject] private readonly Song.TutorialSceneContextBuilder tutorialSceneContextBuilder;
 
         private void Start()
         {

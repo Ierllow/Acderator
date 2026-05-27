@@ -20,11 +20,11 @@ namespace Song
         [SerializeField] private bool ignoreStartedOverGui = true;
         [SerializeField] private float swipeThreshold = 50f;
 
-        [Inject] private NotesManager notesManager;
-        [Inject] private NoteJudgeController noteJudgeController;
-        [Inject] private PointerInput pointerInput;
-        [Inject] private LaneDetector laneDetector;
-        [Inject] private TouchStateManager touchStateManager;
+        [Inject] private readonly NotesManager notesManager;
+        [Inject] private readonly NoteJudgeController noteJudgeController;
+        [Inject] private readonly PointerInput pointerInput;
+        [Inject] private readonly LaneDetector laneDetector;
+        [Inject] private readonly TouchStateManager touchStateManager;
 
         private bool useTouch;
 

@@ -12,9 +12,9 @@ namespace SongSelect
         [SerializeField] private EnhancedScroller scroller;
         [SerializeField] private EnhancedScrollerCellView cellPrefab;
 
-        [Inject] private SongSelectCellListController songSelectCellListController;
-        [Inject] private SongSelectSortController songSelectSortController;
-        [Inject] private MasterDataManager masterDataManager;
+        [Inject] private readonly SongSelectCellListController songSelectCellListController;
+        [Inject] private readonly SongSelectSortController songSelectSortController;
+        [Inject] private readonly MasterDataManager masterDataManager;
 
         public int SelectedGroup => songSelectCellListController.SelectedGroup;
         public int SelectedDifficulty => songSelectCellListController.SelectedDifficulty;

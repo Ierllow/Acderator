@@ -21,7 +21,7 @@ namespace Element.UI
         [SerializeField] private CommonButton titleSceneButton;
         [SerializeField] private NetworkConfig networkConfigObject;
 
-        [Inject] private PopupManager popupManager;
+        [Inject] private readonly PopupManager popupManager;
 
         private new Action<ESceneType> closeCallback;
 

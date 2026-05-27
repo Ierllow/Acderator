@@ -1,4 +1,4 @@
-﻿using Cysharp.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using Cysharp.Threading.Tasks.Linq;
 using Intense.Master;
 using System.Collections.Generic;
@@ -9,7 +9,7 @@ namespace SongSelect
 {
     public class SongSelectCellListController : IInitializable
     {
-        [Inject] private MasterDataManager masterDataManager;
+        [Inject] private readonly MasterDataManager masterDataManager;
 
         public int SelectedGroup { get; private set; } = PlayerPrefsValues.SelectedGroup;
         public int SelectedDifficulty { get; private set; } = PlayerPrefsValues.SelectedDifficulty;

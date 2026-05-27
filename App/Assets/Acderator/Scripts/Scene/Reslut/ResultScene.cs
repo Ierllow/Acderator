@@ -23,11 +23,11 @@ namespace Result
         [SerializeField] private ResultDetail resultDetail;
         [SerializeField] private GameObject cautionTextRoot;
 
-        [Inject] private ResultSceneContext sceneContext;
-        [Inject] private AssetBundleManager assetBundleManager;
-        [Inject] private MasterDataManager masterDataManager;
-        [Inject] private SoundManager soundManager;
-        [Inject] private NetworkManager networkManager;
+        [Inject] private readonly ResultSceneContext sceneContext;
+        [Inject] private readonly AssetBundleManager assetBundleManager;
+        [Inject] private readonly MasterDataManager masterDataManager;
+        [Inject] private readonly SoundManager soundManager;
+        [Inject] private readonly NetworkManager networkManager;
 
         private void Start()
         {
