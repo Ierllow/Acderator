@@ -22,6 +22,7 @@ namespace Intense
             Container.Bind<PopupManager>().AsSingle().NonLazy();
             Container.Bind<SceneErrorPopupController>().AsSingle();
             Container.Bind<SceneErrorHandler>().AsTransient();
+            Container.Bind<AssetBundlePopupController>().AsTransient();
         }
     }
 }

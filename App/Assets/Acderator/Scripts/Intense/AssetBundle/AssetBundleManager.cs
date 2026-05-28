@@ -1,5 +1,4 @@
 using Cysharp.Threading.Tasks;
-using Element.UI;
 using Intense.Api;
 using Intense.Attribute;
 using Intense.UI;
@@ -19,17 +18,21 @@ namespace Intense.Asset
 
     internal class AssetBundleManager : MonoBehaviour
     {
+        private enum EManifestLoadResult { Success, Retry, Empty }
+
+        private const string ManifestFileName = "";
+        private const int LoadCoolDownMs = 500;
+
         [SerializeField] private NetworkConfig networkConfigObject;
 
         [Inject] private readonly Loading loading;
-        [Inject] private readonly PopupManager popupManager;
+        [Inject] private readonly AssetBundlePopupController assetBundlePopupController;
 
         private readonly Dictionary<string, AssetBundleManifestInfo> manifestInfoDict = new();
         private readonly Dictionary<string, LoadedAssetBundle> assetBundleDict = new();
         private readonly string[] assetBundleNameList = { "song/", "songselect/", "result/", "sounds/", "charts/" };
 
-        internal List<string> NotExistAssetBundleName
-            => manifestInfoDict.Where(kv => assetBundleNameList.Any(kv.Key.StartsWith) && !Caching.IsVersionCached(new(kv.Value.BundleName, kv.Value.Hash))).Select(x => x.Key).ToList();
+        internal List<string> NotExistAssetBundleName => manifestInfoDict.Where(kv => assetBundleNameList.Any(kv.Key.StartsWith) && !IsCached(kv.Value)).Select(kv => kv.Key).ToList();
 
         public async UniTask LoadAssetsAsync(ESceneType currentSceneType, CancellationToken cancellationToken)
         {
@@ -42,62 +45,26 @@ namespace Intense.Asset
 
                     if (manifestInfoDict.Count == 0)
                     {
-                        loading.ShowLoading();
-                        using var request = UnityWebRequest.Get(string.Format("{0}/filelist.txt", networkConfigObject.assetServerUrl));
-                        await request.SendWebRequest();
-                        if (request.result != UnityWebRequest.Result.Success && await TryRetryAssetErrorAsync(request.result))
-                            continue;
-
-                        foreach (var line in request.downloadHandler.text.Split('\n'))
+                        switch (await LoadManifestAsync())
                         {
-                            var info = new AssetBundleManifestInfo(line);
-                            if (!string.IsNullOrEmpty(info.BundleName)) manifestInfoDict[info.BundleName] = info;
+                            case EManifestLoadResult.Retry: continue;
+                            case EManifestLoadResult.Empty: return;
                         }
-                        if (manifestInfoDict.Count == 0) return;
-                        loading.HideLoading();
                     }
 
-                    var newFileSize = 0L;
-                    foreach (var name in targetList)
-                    {
-                        if (manifestInfoDict.TryGetValue(name, out var info) && !Caching.IsVersionCached(new(info.BundleName, info.Hash)))
-                            newFileSize += info.FileSize;
-                    }
-
+                    var newFileSize = CalculateDownloadSize(targetList);
                     if (newFileSize > 0)
                     {
-                        if (!await TryDownloadConfirmedAsync(newFileSize)) return;
+                        if (!await assetBundlePopupController.TryDownloadConfirmedAsync(newFileSize)) return;
                         loading.ShowLoading();
                     }
 
-                    var downloadedFileSize = 0L;
-                    var allLoadedAssetBundle = AssetBundle.GetAllLoadedAssetBundles();
-                    var loadedSet = allLoadedAssetBundle.Select(x => x.name).ToHashSet();
-                    foreach (var bundleName in targetList)
-                    {
-                        if (!manifestInfoDict.TryGetValue(bundleName, out var info)) continue;
-                        if (loadedSet.Contains(bundleName)) continue;
-
-                        var isCached = Caching.IsVersionCached(new(info.BundleName, info.Hash));
-
-                        using var request = UnityWebRequestAssetBundle.GetAssetBundle(string.Format("{0}/{1}", networkConfigObject.assetServerUrl, bundleName), new CachedAssetBundle(info.BundleName, info.Hash), info.Crc);
-                        await request.SendWebRequest();
-                        if (request.result != UnityWebRequest.Result.Success && await TryRetryAssetErrorAsync(request.result))
-                            continue;
-
-                        assetBundleDict[bundleName] = new LoadedAssetBundle { SceneType = currentSceneType, Bundle = DownloadHandlerAssetBundle.GetContent(request) };
-
-                        if (!isCached)
-                        {
-                            downloadedFileSize += info.FileSize;
-                            loading.SetDownloadFileSize(downloadedFileSize, newFileSize);
-                        }
-                    }
+                    await DownloadBundlesAsync(targetList, currentSceneType, newFileSize);
                     return;
                 }
                 finally
                 {
-                    await UniTask.Delay(500);
+                    await UniTask.Delay(LoadCoolDownMs);
                     loading.ClearProgressBar();
                 }
             }
@@ -118,31 +85,77 @@ namespace Intense.Asset
         internal async UniTask<UnityEngine.Object> GetLoadedObjectAsync(string bundleName, string assetName = null)
         {
             var bundle = assetBundleDict.GetValueOrDefault(bundleName)?.Bundle;
-            var request = bundle?.LoadAssetAsync(assetName ?? bundle.GetAllAssetNames()[0]);
-            return await request != null ? request.asset : default;
+            if (bundle == null) return null;
+
+            var request = bundle.LoadAssetAsync(assetName ?? bundle.GetAllAssetNames()[0]);
+            await request;
+            return request.asset;
         }
 
-        private async UniTask<bool> TryRetryAssetErrorAsync(UnityWebRequest.Result result)
+        private async UniTask<EManifestLoadResult> LoadManifestAsync()
         {
-            var completionSource = AutoResetUniTaskCompletionSource<ECommonPopupTapKind>.Create();
-            var kind = result == UnityWebRequest.Result.ProtocolError
-                ? EAssetBundleErrorKind.ProtocolError
-                : EAssetBundleErrorKind.ConnectionError;
-            var popupContext = PopupContextFactory.CreateAssetErrorPopupContext(completionSource, kind);
-            popupManager.OpenPopup(popupContext);
-            return await completionSource.Task == ECommonPopupTapKind.Positive;
+            loading.ShowLoading();
+
+            using var request = UnityWebRequest.Get(BuildUrl(ManifestFileName));
+            await request.SendWebRequest();
+            if (request.result != UnityWebRequest.Result.Success && await assetBundlePopupController.TryRetryAssetErrorAsync(request.result))
+                return EManifestLoadResult.Retry;
+
+            foreach (var line in request.downloadHandler.text.Split('\n'))
+            {
+                var info = new AssetBundleManifestInfo(line);
+                if (!string.IsNullOrEmpty(info.BundleName)) manifestInfoDict[info.BundleName] = info;
+            }
+            if (manifestInfoDict.Count == 0) return EManifestLoadResult.Empty;
+
+            loading.HideLoading();
+            return EManifestLoadResult.Success;
         }
 
-        private async UniTask<bool> TryDownloadConfirmedAsync(long fileSize)
+        private long CalculateDownloadSize(IEnumerable<string> targetList)
         {
-            if (fileSize <= 0) return true;
-
-            var context = PopupContextFactory.CreateDownloadSizeConfirmPopupContext(fileSize.GetFileSize(), fileSize.GetFileSizeType().GetType().GetCustomAttribute<TextAttribute>().Text);
-            popupManager.OpenPopup(context);
-            var downloadSizeConfPopup = popupManager.CurrentOpenPopup as DownloadSizeConfPopup;
-            await UniTask.WaitUntil(() => (popupManager.CurrentOpenPopup as DownloadSizeConfPopup).IsClose);
-            return downloadSizeConfPopup.IsConfirm;
+            var newFileSize = 0L;
+            foreach (var name in targetList)
+            {
+                if (manifestInfoDict.TryGetValue(name, out var info) && !IsCached(info))
+                    newFileSize += info.FileSize;
+            }
+            return newFileSize;
         }
+
+        private async UniTask DownloadBundlesAsync(IEnumerable<string> targetList, ESceneType currentSceneType, long newFileSize)
+        {
+            var downloadedFileSize = 0L;
+            var loadedSet = AssetBundle.GetAllLoadedAssetBundles().Select(x => x.name).ToHashSet();
+
+            foreach (var bundleName in targetList)
+            {
+                if (!manifestInfoDict.TryGetValue(bundleName, out var info)) continue;
+                if (loadedSet.Contains(bundleName)) continue;
+
+                var isCached = IsCached(info);
+
+                using var request = UnityWebRequestAssetBundle.GetAssetBundle(BuildUrl(bundleName), ToCachedBundle(info), info.Crc);
+                await request.SendWebRequest();
+                if (request.result != UnityWebRequest.Result.Success && await assetBundlePopupController.TryRetryAssetErrorAsync(request.result))
+                    continue;
+
+                assetBundleDict[bundleName] = new() { SceneType = currentSceneType, Bundle = DownloadHandlerAssetBundle.GetContent(request) }
+                ;
+
+                if (!isCached)
+                {
+                    downloadedFileSize += info.FileSize;
+                    loading.SetDownloadFileSize(downloadedFileSize, newFileSize);
+                }
+            }
+        }
+
+        private string BuildUrl(string path) => string.Format("{0}/{1}", networkConfigObject.assetServerUrl, path);
+
+        private bool IsCached(AssetBundleManifestInfo info) => Caching.IsVersionCached(ToCachedBundle(info));
+
+        private CachedAssetBundle ToCachedBundle(AssetBundleManifestInfo info) => new(info.BundleName, info.Hash);
     }
 
     static class FileSizeExtensions
@@ -160,5 +173,7 @@ namespace Intense.Asset
         };
 
         public static EFileSizeType GetFileSizeType(this long fileSize) => fileSize < One_MB ? EFileSizeType.KB : fileSize < One_GB ? EFileSizeType.MB : EFileSizeType.GB;
+
+        public static string GetText(this EFileSizeType type) => typeof(EFileSizeType).GetField(type.ToString())?.GetCustomAttribute<TextAttribute>()?.Text;
     }
 }
