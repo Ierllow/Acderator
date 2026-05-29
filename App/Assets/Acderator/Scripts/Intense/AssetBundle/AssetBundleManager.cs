@@ -20,19 +20,16 @@ namespace Intense.Asset
     {
         private enum EManifestLoadResult { Success, Retry, Empty }
 
-        private const string ManifestFileName = "";
-        private const int LoadCoolDownMs = 500;
-
         [SerializeField] private NetworkConfig networkConfigObject;
+        [SerializeField] private AssetBundleConfig assetBundleConfigObject;
 
         [Inject] private readonly Loading loading;
         [Inject] private readonly AssetBundlePopupController assetBundlePopupController;
 
         private readonly Dictionary<string, AssetBundleManifestInfo> manifestInfoDict = new();
         private readonly Dictionary<string, LoadedAssetBundle> assetBundleDict = new();
-        private readonly string[] assetBundleNameList = { "song/", "songselect/", "result/", "sounds/", "charts/" };
 
-        internal List<string> NotExistAssetBundleName => manifestInfoDict.Where(kv => assetBundleNameList.Any(kv.Key.StartsWith) && !IsCached(kv.Value)).Select(kv => kv.Key).ToList();
+        internal List<string> NotExistAssetBundleName => manifestInfoDict.Where(kv => assetBundleConfigObject.assetBundleNameList.Any(kv.Key.StartsWith) && !IsCached(kv.Value)).Select(kv => kv.Key).ToList();
 
         public async UniTask LoadAssetsAsync(ESceneType currentSceneType, CancellationToken cancellationToken)
         {
@@ -64,7 +61,7 @@ namespace Intense.Asset
                 }
                 finally
                 {
-                    await UniTask.Delay(LoadCoolDownMs);
+                    await UniTask.Delay(assetBundleConfigObject.loadCoolDownMs);
                     loading.ClearProgressBar();
                 }
             }
@@ -96,7 +93,7 @@ namespace Intense.Asset
         {
             loading.ShowLoading();
 
-            using var request = UnityWebRequest.Get(BuildUrl(ManifestFileName));
+            using var request = UnityWebRequest.Get(BuildUrl(assetBundleConfigObject.manifestFileName));
             await request.SendWebRequest();
             if (request.result != UnityWebRequest.Result.Success && await assetBundlePopupController.TryRetryAssetErrorAsync(request.result))
                 return EManifestLoadResult.Retry;

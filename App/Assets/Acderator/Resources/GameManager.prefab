@@ -1606,6 +1606,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   networkConfigObject: {fileID: 11400000, guid: 74872aedf3dc949459f8058bb2e11411, type: 2}
+  assetBundleConfigObject: {fileID: 11400000, guid: a9ecb1cc83199c14d9a0352ff30d0102, type: 2}
 --- !u!114 &5190035448891650319
 MonoBehaviour:
   m_ObjectHideFlags: 0
