@@ -11,7 +11,7 @@ namespace Song
 
     public interface IFingerController : IController
     {
-        Observable<FingerInfo> JudgmentStream { get; }
+        Observable<FingerInfo> JudgmentAsObservable { get; }
         void Init();
         void UpdateInput();
         void Judge(float currentSec);

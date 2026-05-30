@@ -25,6 +25,7 @@ namespace Song
             Container.Bind<HpBarController>().AsSingle();
             Container.Bind<NoteJudgeController>().AsSingle();
             Container.BindInterfacesAndSelfTo<SongParticleController>().FromComponentInHierarchy().AsSingle();
+            Container.Bind<SongTimeCalculator>().AsSingle();
             Container.BindInterfacesAndSelfTo<SongLoopController>().AsSingle();
             Container.BindInterfacesAndSelfTo<NotePositionUpdater>().AsSingle();
             Container.BindInterfacesAndSelfTo<NoteSpawnController>().FromComponentInHierarchy().AsSingle();

@@ -15,8 +15,6 @@ namespace Song
         public override int FrameRate { get; } = 60;
         public override EBgmType BgmType { get; } = EBgmType.Stop;
 
-        public bool IsAuto => SongOption?.IsAuto ?? false;
-
         public List<string> SongBundlePathList => SongMode == ESongMode.Tutorial ? TutorialBundlePathList : NormalBundlePathList;
 
         private List<string> NormalBundlePathList => new()
@@ -73,7 +71,6 @@ namespace Song
                 Sid = SongInfo.Sid,
                 CurrentScore = currentScore,
                 JudgeCountDict = judgeCountDict,
-                IsAuto = IsAuto,
             }
         };
     }

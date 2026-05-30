@@ -21,7 +21,9 @@ namespace Intense.UI
 
         public virtual Observable<Unit> OnTapButtonAsObservable => button.OnClickAsObservable();
 
-        protected virtual void Awake()
+        protected virtual void Awake() => AwakeCore();
+
+        private void AwakeCore()
         {
             if (uIEffect == null) return;
             if (uIEffect.effectMode != EffectMode.None) uIEffect.effectMode = EffectMode.None;
@@ -33,7 +35,9 @@ namespace Intense.UI
 
         public void OnPointerDown(PointerEventData eventData) => IsTapping = true;
 
-        public virtual void SetGrayOut(bool value)
+        public virtual void SetGrayOut(bool value) => SetGrayOutCore(value);
+
+        protected void SetGrayOutCore(bool value)
         {
             if (uIEffect == null)
             {
@@ -44,7 +48,9 @@ namespace Intense.UI
             button.interactable = !value;
         }
 
-        public virtual void SetButtonText(string text)
+        public virtual void SetButtonText(string text) => SetButtonTextCore(text);
+
+        protected void SetButtonTextCore(string text)
         {
             if (buttonText == null)
             {

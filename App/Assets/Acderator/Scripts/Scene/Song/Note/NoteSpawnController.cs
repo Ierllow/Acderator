@@ -14,7 +14,7 @@ namespace Song
         private int nextSpawnIndex;
 
         private readonly Subject<NoteData> noteFactorySubject = new();
-        public Observable<NoteData> NoteFactoryStream => noteFactorySubject;
+        public Observable<NoteData> NoteFactoryAsObservable => noteFactorySubject;
 
         public void Init(List<NoteData> noteDataList, float offset)
         {

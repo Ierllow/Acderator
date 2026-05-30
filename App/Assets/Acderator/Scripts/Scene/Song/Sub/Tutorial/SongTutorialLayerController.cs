@@ -20,7 +20,7 @@ namespace Song
         private TutorialLayerState currentState = TutorialLayerState.Hidden;
         private Tween fadeTween;
 
-        public readonly ReactiveProperty<Unit> TutorialCompletedReactiveProperty = new(default);
+        public readonly Subject<Unit> TutorialCompletedSubject = new();
         public readonly Subject<Unit> TutorialIntroCompletedSubject = new();
         public readonly Subject<Unit> TutorialStepCompletedSubject = new();
 
@@ -103,7 +103,7 @@ namespace Song
             }
         }
 
-        public void CompleteTutorial() => FadeOut(() => TutorialCompletedReactiveProperty.Value = new());
+        public void CompleteTutorial() => FadeOut(() => TutorialCompletedSubject.OnNext(Unit.Default));
 
         private bool IsAdvanceTapStarted() => Input.touchCount > 0 ? Input.GetTouch(0).phase == TouchPhase.Began : Input.GetMouseButtonDown(0);
 

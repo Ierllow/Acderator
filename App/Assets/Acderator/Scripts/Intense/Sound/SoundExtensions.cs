@@ -7,6 +7,7 @@ namespace Intense
         public static bool IsPlayEnd(this CriAtomExPlayer criAtomExPlayer) => criAtomExPlayer.GetStatus() == CriAtomExPlayer.Status.PlayEnd;
         public static bool IsPlaying(this CriAtomExPlayer criAtomExPlayer) => criAtomExPlayer.GetStatus() == CriAtomExPlayer.Status.Playing;
         public static bool IsStop(this CriAtomExPlayer criAtomExPlayer) => criAtomExPlayer.GetStatus() == CriAtomExPlayer.Status.Stop;
+        public static bool HasStarted(this CriAtomExPlayer criAtomExPlayer) => criAtomExPlayer.GetTime().ToSeconds() > 0;
         public static float ToSeconds(this long time) => time / 1000f;
     }
 }

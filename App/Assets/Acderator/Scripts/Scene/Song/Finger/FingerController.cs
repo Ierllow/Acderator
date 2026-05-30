@@ -31,7 +31,7 @@ namespace Song
         private readonly Subject<FingerInfo> judgmentSubject = new();
         private readonly Subject<bool> useTouchSubject = new();
 
-        public Observable<FingerInfo> JudgmentStream => judgmentSubject;
+        public Observable<FingerInfo> JudgmentAsObservable => judgmentSubject;
         public Observable<bool> EveryUseTouchChanged => useTouchSubject.Where(x => !x);
 
         private bool IsAuto => notesManager.SongOption.IsAuto;

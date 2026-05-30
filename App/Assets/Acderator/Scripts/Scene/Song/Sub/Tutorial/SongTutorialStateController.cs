@@ -32,7 +32,7 @@ namespace Song
         public bool IsCompleted => tutorialData.IsCompleted;
 
         private readonly Subject<TutorialEvent> tutorialEventSubject = new();
-        public Observable<TutorialEvent> TutorialEventStream => tutorialEventSubject;
+        public Observable<TutorialEvent> TutorialEventAsObservable => tutorialEventSubject;
 
         public SongTutorialStateController(TutorialData tutorialData) => this.tutorialData = tutorialData;
 
