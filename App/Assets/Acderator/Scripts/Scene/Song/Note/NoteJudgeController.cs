@@ -10,6 +10,7 @@ namespace Song
     {
         [Inject] private readonly MasterDataManager masterDataManager;
         [Inject] private readonly NotesManager notesManager;
+        [Inject] private readonly NoteFactory noteFactory;
 
         private float? badJudgmentZone;
 
@@ -17,7 +18,7 @@ namespace Song
 
         public EJudgementType JudgeOrMiss(NoteBase note, EFingerType fingerType)
         {
-            var judgementType = GetJudgmentType(GetNoteDiffSec(fingerType, note.NoteData));
+            var judgementType = GetJudgmentType(GetNoteDiffSec(fingerType, noteFactory.GetNoteData(note)));
             return judgementType != EJudgementType.None ? judgementType : EJudgementType.Miss;
         }
 
@@ -39,7 +40,7 @@ namespace Song
 
         public bool IsJustAutoTiming(NoteBase note, EFingerType fingerType)
         {
-            var data = note.NoteData;
+            var data = noteFactory.GetNoteData(note);
             var sec = notesManager.CurrentSec;
             var beginPassed = data.SecBegin <= sec;
             return data.NoteType switch
@@ -55,7 +56,7 @@ namespace Song
         public bool IsMissed(NoteBase note, float currentSec, out bool missEnd)
         {
             missEnd = false;
-            var data = note.NoteData;
+            var data = noteFactory.GetNoteData(note);
             if (data.NoteType is not (ENoteType.Long or ENoteType.Curve)) return false;
 
             var beginMissed = data.SecBegin - currentSec < -BadJudgmentZone;

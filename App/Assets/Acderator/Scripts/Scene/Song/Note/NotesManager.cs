@@ -34,9 +34,8 @@ namespace Song
             }
         }
 
-        public IReadOnlyList<NoteBase> GetAliveNotesByLane(int lane) => aliveNotesByLane[lane];
-
         private readonly Dictionary<int, List<NoteBase>> aliveNotesByLane;
+        private readonly Dictionary<NoteBase, NoteData> noteDataMap = new();
         private readonly List<NoteBase> allAliveNotesCache = new();
         private bool aliveNotesCache;
         private int currentSpeedChangeIndex = 0;
@@ -56,16 +55,22 @@ namespace Song
             UpdateNoteSpeed();
         }
 
-        public void AddAliveNote(NoteBase note)
+        public void AddAliveNote(NoteBase note, NoteData data)
         {
-            aliveNotesByLane[note.NoteData.Lane].Add(note);
+            noteDataMap[note] = data;
+            aliveNotesByLane[data.Lane].Add(note);
             aliveNotesCache = true;
         }
 
         public bool RemoveNote(NoteBase note)
         {
-            var removed = aliveNotesByLane[note.NoteData.Lane].Remove(note);
-            if (removed) aliveNotesCache = true;
+            if (!noteDataMap.TryGetValue(note, out var data)) return false;
+            var removed = aliveNotesByLane[data.Lane].Remove(note);
+            if (removed)
+            {
+                aliveNotesCache = true;
+                noteDataMap.Remove(note);
+            }
             return removed;
         }
 
@@ -109,17 +114,18 @@ namespace Song
             {
                 var candidate = laneNoteList[i];
                 if (candidate == null || !candidate.IsActive) continue;
+                if (!noteDataMap.TryGetValue(candidate, out var candidateData)) continue;
 
                 switch (mode)
                 {
                     case NoteSearchMode.Down when candidate.IsTapping:
                     case NoteSearchMode.Up when !candidate.IsTapping:
                         continue;
-                    case NoteSearchMode.Flick when candidate.NoteData.NoteType != ENoteType.Flick:
+                    case NoteSearchMode.Flick when candidateData.NoteType != ENoteType.Flick:
                         continue;
                 }
 
-                var diff = Math.Abs(candidate.NoteData.BeatBegin - CurrentBeat);
+                var diff = Math.Abs(candidateData.BeatBegin - CurrentBeat);
                 if (diff >= bestDiff) continue;
 
                 bestDiff = diff;

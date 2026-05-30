@@ -15,12 +15,16 @@ namespace Song
 
         private List<Vector2> curvePointList;
         private float curveDuration;
+        private float secBegin;
+        private bool useMidPoint;
 
-        public override void Init(NoteData data, NotePool<NoteBase> pool)
+        public override void Init(NoteData data)
         {
-            base.Init(data, pool);
+            base.Init(data);
             curvePointList = data.CurvePointList;
             curveDuration = data.CurveDuration;
+            secBegin = data.SecBegin;
+            useMidPoint = data.UseMidPoint;
 
             if (curvePointList.Count >= 2)
             {
@@ -44,11 +48,11 @@ namespace Song
             if (curvePointList.Count < 2) return;
 
             transform.localPosition = new(0, positionBeginY, transform.localPosition.z);
-            var curveProgress = Mathf.Clamp01((currentNoteSpeed - NoteData.SecBegin) / curveDuration);
+            var curveProgress = Mathf.Clamp01((currentNoteSpeed - secBegin) / curveDuration);
             var startCurvePos = GetCurvePosition(curveProgress);
             beginSprite.transform.localPosition = new(startCurvePos.x, startCurvePos.y, 0);
 
-            if (NoteData.UseMidPoint)
+            if (useMidPoint)
             {
                 var endCurvePosition = GetCurvePosition(1.0f);
                 endSprite.transform.localPosition = new(endCurvePosition.x, endCurvePosition.y, 0);

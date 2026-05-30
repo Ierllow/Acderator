@@ -21,6 +21,7 @@ namespace Song
         [SerializeField] private float swipeThreshold = 50f;
 
         [Inject] private readonly NotesManager notesManager;
+        [Inject] private readonly NoteFactory noteFactory;
         [Inject] private readonly NoteJudgeController noteJudgeController;
         [Inject] private readonly PointerInput pointerInput;
         [Inject] private readonly LaneDetector laneDetector;
@@ -84,7 +85,7 @@ namespace Song
             var fingerInfo = new FingerInfo { FingerType = EFingerType.Down, Lane = lane };
             if (notesManager.TryGetNote(EFingerType.Down, lane, out var note))
             {
-                var diff = noteJudgeController.GetNoteDiffSec(EFingerType.Down, note.NoteData);
+                var diff = noteJudgeController.GetNoteDiffSec(EFingerType.Down, noteFactory.GetNoteData(note));
                 if (diff < 0.5f) fingerInfo = ApplyJudgement(note, EFingerType.Down, lane, noteJudgeController.GetJudgmentType(diff));
             }
             judgmentSubject.OnNext(fingerInfo);
@@ -109,12 +110,12 @@ namespace Song
             if (currentLane < 0 || previousLane == currentLane) return false;
             if (!notesManager.TryGetNote(EFingerType.Up, currentLane, out var note)) return false;
             if (!note.IsTapping) return false;
-            if (note.NoteData.NoteType is not (ENoteType.Long or ENoteType.Curve)) return false;
+            if (noteFactory.GetNoteData(note).NoteType is not (ENoteType.Long or ENoteType.Curve)) return false;
 
             var fingerInfo = ApplyJudgement(note, EFingerType.Up, currentLane, noteJudgeController.JudgeOrMiss(note, EFingerType.Up));
             touchStateManager.Remove(pointerId);
 
-            judgmentSubject.OnNext(fingerInfo.WithTappingNoteList(GetTappingNoteList()));
+            judgmentSubject.OnNext(fingerInfo.WithTappingLanes(GetTappingLanes()));
             return true;
         }
 
@@ -158,7 +159,7 @@ namespace Song
                 EmitPerfect(note, EFingerType.Down);
                 return;
             }
-            if (note.NoteData.NoteType != ENoteType.Single && noteJudgeController.IsJustAutoTiming(note, EFingerType.Up))
+            if (noteFactory.GetNoteData(note).NoteType != ENoteType.Single && noteJudgeController.IsJustAutoTiming(note, EFingerType.Up))
                 EmitPerfect(note, EFingerType.Up);
         }
 
@@ -176,6 +177,7 @@ namespace Song
             judgmentSubject.OnNext(new FingerInfo
             {
                 NoteBase = note,
+                NoteData = noteFactory.GetNoteData(note),
                 JudgmentType = IsAuto ? EJudgementType.Perfect : EJudgementType.Miss,
                 Lane = LaneNone,
                 MissInfo = (true, missEnd),
@@ -188,6 +190,7 @@ namespace Song
             judgmentSubject.OnNext(new FingerInfo
             {
                 NoteBase = note,
+                NoteData = noteFactory.GetNoteData(note),
                 FingerType = fingerType,
                 JudgmentType = EJudgementType.Perfect,
                 Lane = LaneNone,
@@ -200,6 +203,7 @@ namespace Song
             return new FingerInfo
             {
                 NoteBase = note,
+                NoteData = noteFactory.GetNoteData(note),
                 JudgmentType = judgementType,
                 FingerType = fingerType,
                 Lane = lane,
@@ -208,16 +212,18 @@ namespace Song
 
         private bool IsPointerOverGui(int pointerId) => EventSystem.current != null && EventSystem.current.IsPointerOverGameObject(pointerId);
 
-        private List<NoteBase> GetTappingNoteList()
+        private List<int> GetTappingLanes()
         {
             var aliveNotes = notesManager.AliveNoteList;
-            var tappingNotes = new List<NoteBase>(aliveNotes.Count);
+            var tappingLanes = new List<int>(aliveNotes.Count);
             for (var i = 0; i < aliveNotes.Count; i++)
             {
                 var note = aliveNotes[i];
-                if (note.IsActive && note.IsTapping) tappingNotes.Add(note);
+                if (!note.IsActive || !note.IsTapping) continue;
+                if (!noteFactory.TryGetNoteData(note, out var data)) continue;
+                tappingLanes.Add(data.Lane);
             }
-            return tappingNotes;
+            return tappingLanes;
         }
     }
 

@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Pool;
 
 namespace Song
 {
@@ -18,13 +20,14 @@ namespace Song
         [SerializeField] private Transform[] parents;
         [SerializeField] private NotePrefabs notePrefabs;
 
-        private NotePool<NoteBase>[,] pools;
+        private ObjectPool<NoteBase>[,] pools;
+        private readonly Dictionary<NoteBase, NoteData> noteDict = new();
 
         public void Init()
         {
             var laneCount = parents.Length;
             var typeCount = Enum.GetValues(typeof(ENoteType)).Length;
-            pools = new NotePool<NoteBase>[typeCount, laneCount];
+            pools = new ObjectPool<NoteBase>[typeCount, laneCount];
 
             foreach (var (parent, lane) in parents.Select((parent, lane) => (parent, lane)))
             {
@@ -35,22 +38,55 @@ namespace Song
             }
         }
 
-        private NotePool<T> CreatePool<T>(T prefab, Transform parent) where T : NoteBase => new(
-            createFunc: () => Instantiate(prefab, parent),
+        private ObjectPool<T> CreatePool<T>(T prefab, Transform parent) where T : NoteBase => new(
+            createFunc: () =>
+            {
+                var note = Instantiate(prefab, parent);
+                note.Finalized = ReleaseNote;
+                return note;
+            },
             actionOnGet: note => note.gameObject.SetActive(true),
             actionOnRelease: note => note.gameObject.SetActive(false),
-            actionOnDestroy: note => Destroy(note.gameObject)
+            actionOnDestroy: note =>
+            {
+                noteDict.Remove(note);
+                Destroy(note.gameObject);
+            },
+            collectionCheck: false,
+            defaultCapacity: 5,
+            maxSize: 10
         );
 
         public NoteBase SpawnNote(NoteData noteData)
         {
-            if (pools?.TryGetPool((int)noteData.NoteType, noteData.Lane, out var pool) ?? false)
-            {
-                var note = pool.Get();
-                note.Init(noteData, pool);
-                return note;
-            }
-            return default;
+            if (pools == null) return default;
+
+            var type = (int)noteData.NoteType;
+            var lane = noteData.Lane;
+            if (type < 0 || type >= pools.GetLength(0) || lane < 0 || lane >= pools.GetLength(1)) return default;
+
+            var pool = pools[type, lane];
+            if (pool == null) return default;
+
+            var note = pool.Get();
+            noteDict[note] = noteData;
+            note.Init(noteData);
+            return note;
+        }
+
+        public NoteData GetNoteData(NoteBase note) => noteDict.TryGetValue(note, out var data) ? data : null;
+
+        public bool TryGetNoteData(NoteBase note, out NoteData data) => noteDict.TryGetValue(note, out data);
+
+        private void ReleaseNote(NoteBase note)
+        {
+            if (pools == null || !noteDict.TryGetValue(note, out var data)) return;
+
+            var type = (int)data.NoteType;
+            var lane = data.Lane;
+            if (type < 0 || type >= pools.GetLength(0) || lane < 0 || lane >= pools.GetLength(1)) return;
+
+            pools[type, lane]?.Release(note);
         }
     }
 }

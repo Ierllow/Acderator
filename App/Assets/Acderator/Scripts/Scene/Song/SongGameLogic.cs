@@ -38,7 +38,7 @@ namespace Song
             if (fingerInfo.NoteBase == default) return;
             if (!notesManager.AliveNoteList.Any(x => x == fingerInfo.NoteBase)) return;
 
-            var noteType =fingerInfo.NoteBase.NoteData.NoteType == ENoteType.Flick;
+            var noteType = fingerInfo.NoteData.NoteType == ENoteType.Flick;
             if (fingerInfo.IsMissed)
             {
                 notesManager.RemoveNote(fingerInfo.NoteBase);
@@ -48,11 +48,11 @@ namespace Song
             }
             else
             {
-                if (fingerInfo.NoteBase.NoteData.NoteType == ENoteType.Flick && fingerInfo.FingerType == EFingerType.Down) return;
+                if (fingerInfo.NoteData.NoteType == ENoteType.Flick && fingerInfo.FingerType == EFingerType.Down) return;
                 comboController.UpdateCombo(fingerInfo.JudgmentType);
                 judgeCountDict[fingerInfo.JudgmentType] += 1;
                 scoreController.AddScore(fingerInfo.JudgmentType);
-                if (fingerInfo.NoteBase.NoteData.NoteType == ENoteType.Long && fingerInfo.FingerType == EFingerType.Down) return;
+                if (fingerInfo.NoteData.NoteType == ENoteType.Long && fingerInfo.FingerType == EFingerType.Down) return;
                 notesManager.RemoveNote(fingerInfo.NoteBase);
             }
             if (notesManager.SongOption.IsAuto) hpBarController.UpdateHp(fingerInfo.JudgmentType, notesManager.LoadedChartInfo.NoteCount);

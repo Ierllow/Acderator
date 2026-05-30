@@ -1,7 +1,6 @@
 using Cysharp.Threading.Tasks;
 using Intense;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.Pool;
 
@@ -39,11 +38,11 @@ namespace Song
 
         public void UpdateParticles(FingerInfo fingerInfo)
         {
-            if (fingerInfo.IsMissed) StopHoldEffect(fingerInfo.NoteBase.NoteData.Lane);
-            else UpdateParticles((fingerInfo.FingerType, fingerInfo.NoteBase.NoteData.NoteType, fingerInfo.JudgmentType, fingerInfo.NoteBase.NoteData.Lane, fingerInfo.TappingNoteList));
+            if (fingerInfo.IsMissed) StopHoldEffect(fingerInfo.NoteData.Lane);
+            else UpdateParticles((fingerInfo.FingerType, fingerInfo.NoteData.NoteType, fingerInfo.JudgmentType, fingerInfo.NoteData.Lane, fingerInfo.TappingLanes));
         }
 
-        private void UpdateParticles((EFingerType, ENoteType, EJudgementType, int, List<NoteBase>) particleInfo)
+        private void UpdateParticles((EFingerType, ENoteType, EJudgementType, int, IReadOnlyList<int>) particleInfo)
         {
             if (particleInfo.Item3 == EJudgementType.None) return;
 
@@ -92,7 +91,7 @@ namespace Song
             tapParticlePool.Release(tapParticle);
         }
 
-        private async UniTask PlayHoldEffect((EFingerType fingerType, ENoteType noteType, EJudgementType judgeType, int lane, List<NoteBase> tappingNotes) particleInfo, float parentX, float childX)
+        private async UniTask PlayHoldEffect((EFingerType fingerType, ENoteType noteType, EJudgementType judgeType, int lane, IReadOnlyList<int> tappingLanes) particleInfo, float parentX, float childX)
         {
             if (!playingHoldParticleDict.ContainsKey(particleInfo.lane)
                 && particleInfo.fingerType == EFingerType.Down
@@ -103,12 +102,22 @@ namespace Song
                 playingHoldParticleDict.Add(particleInfo.lane, holdParticle);
             }
             if (playingHoldParticleDict.TryGetValue(particleInfo.lane, out var playing)
-                && !particleInfo.tappingNotes.Any(x => x.NoteData.Lane == particleInfo.lane))
+                && !TappingLanesContains(particleInfo.tappingLanes, particleInfo.lane))
             {
                 holdParticlePool.Release(playing);
                 playingHoldParticleDict.Remove(particleInfo.lane);
                 await SpawnJudgeEffect(parentX, childX, particleInfo.judgeType);
             }
+        }
+
+        private static bool TappingLanesContains(IReadOnlyList<int> lanes, int lane)
+        {
+            if (lanes == null) return false;
+            for (var i = 0; i < lanes.Count; i++)
+            {
+                if (lanes[i] == lane) return true;
+            }
+            return false;
         }
 
         private void StopHoldEffect(int lane)

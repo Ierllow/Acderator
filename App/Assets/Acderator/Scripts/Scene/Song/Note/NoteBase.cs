@@ -1,21 +1,19 @@
 using Intense;
+using System;
 using UnityEngine;
 
 namespace Song
 {
     public abstract class NoteBase : MonoBehaviour
     {
-        public NoteData NoteData { get; protected set; }
         public bool IsTapping { get; protected set; } = false;
 
         public bool IsActive => gameObject.activeSelf;
 
-        protected NotePool<NoteBase> pool;
+        public Action<NoteBase> Finalized;
 
-        public virtual void Init(NoteData data, NotePool<NoteBase> pool)
+        public virtual void Init(NoteData data)
         {
-            this.pool = pool;
-            NoteData = data;
             transform.localPosition = new Vector3(0, 50, 0);
         }
 
@@ -25,9 +23,8 @@ namespace Song
 
         public virtual void Final()
         {
-            pool.Release(this);
-            pool = default;
             IsTapping = false;
+            Finalized?.Invoke(this);
         }
     }
 }

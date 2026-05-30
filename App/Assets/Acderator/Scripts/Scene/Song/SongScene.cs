@@ -40,7 +40,7 @@ namespace Song
             songControllerResolver.Loop.EveryUpdateSongStateWhere.Subscribe(_ => UpdateSongProgressNext()).RegisterTo(destroyCancellationToken);
             songControllerResolver.Loop.EverySongStateChanged.SubscribeAwait(ChangeStateNext).RegisterTo(destroyCancellationToken);
             songControllerResolver.Loop.SongLoopUpdateAsObservable.Subscribe(OnSongLoopNext).RegisterTo(destroyCancellationToken);
-            songControllerResolver.Spawner.NoteFactoryAsObservable.Select(songManagerResolver.Factory.SpawnNote).Where(x => x != default).Subscribe(songManagerResolver.Notes.AddAliveNote).RegisterTo(destroyCancellationToken);
+            songControllerResolver.Spawner.NoteFactoryAsObservable.Select(x => (songManagerResolver.Factory.SpawnNote(x), x)).Where(x => x.Item1 != null).Subscribe(x => songManagerResolver.Notes.AddAliveNote(x.Item1, x.x)).RegisterTo(destroyCancellationToken);
             songControllerResolver.Loop.SongSecondsZeroWhere.Skip(1).Where(_ => !sceneContext.IsTutorial()).Subscribe(_ => songControllerResolver.Loop.UpdateState(ESongState.Playing)).RegisterTo(destroyCancellationToken);
             songControllerResolver.Finger.JudgmentAsObservable.Subscribe(FingerSubscribeNext).RegisterTo(destroyCancellationToken);
             songControllerResolver.Finger.EveryUseTouchChanged.Subscribe(notesLineController.SetLaneLightActiveAll).RegisterTo(destroyCancellationToken);
