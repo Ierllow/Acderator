@@ -40,7 +40,7 @@ namespace Song
         public void Initialize()
         {
             if (IsAuto) return;
-            laneDetector.Init(choose, hitPlane);
+            laneDetector.Init(choose, hitPlane, noteFactory.LaneParents);
             pointerInput.SetCallbacks(FingerDown, FingerUpdate, FingerUp);
             TrySetUseTouch(true);
         }
@@ -59,7 +59,7 @@ namespace Song
                 var note = notes[i];
                 if (!note || !note.IsActive) continue;
                 if (TryEmitMiss(note, currentSec)) continue;
-                if (IsAuto) EmitAutoPerfect(note);
+                if (IsAuto) EmitPerfect(note);
             }
         }
 
@@ -77,18 +77,11 @@ namespace Song
         {
             if ((ignoreStartedOverGui || ignoreIsOverGui) && IsPointerOverGui(pointerId)) return;
 
-            var touchInPlane = laneDetector.GetWorldPosition(screenPosition);
-            if (!laneDetector.TryGetLane(touchInPlane.x, touchInPlane.y, out var lane)) return;
+            if (!TryGetLane(screenPosition, out var lane)) return;
 
             touchStateManager.Set(pointerId, new TouchStateManager.TouchState(screenPosition, lane));
 
-            var fingerInfo = new FingerInfo { FingerType = EFingerType.Down, Lane = lane };
-            if (notesManager.TryGetNote(EFingerType.Down, lane, out var note))
-            {
-                var diff = noteJudgeController.GetNoteDiffSec(EFingerType.Down, noteFactory.GetNoteData(note));
-                if (diff < 0.5f) fingerInfo = ApplyJudgement(note, EFingerType.Down, lane, noteJudgeController.GetJudgmentType(diff));
-            }
-            judgmentSubject.OnNext(fingerInfo);
+            EmitLaneInput(EFingerType.Down, lane);
         }
 
         private void FingerUpdate(int pointerId, Vector2 screenPosition)
@@ -96,23 +89,20 @@ namespace Song
             if (!touchStateManager.TryGet(pointerId, out var touchState)) return;
             if (ignoreIsOverGui && IsPointerOverGui(pointerId)) return;
 
-            var touchInPlane = laneDetector.GetWorldPosition(screenPosition);
-            laneDetector.TryGetLane(touchInPlane.x, touchInPlane.y, out var lane);
+            TryGetLane(screenPosition, out var lane);
 
             if (TryHandleHoldCross(pointerId, touchState.Lane, lane)) return;
 
             touchStateManager.Set(pointerId, touchState.WithLane(lane));
-            judgmentSubject.OnNext(new FingerInfo { FingerType = EFingerType.Down, Lane = lane });
+            EmitLaneInput(EFingerType.Down, lane);
         }
 
         private bool TryHandleHoldCross(int pointerId, int previousLane, int currentLane)
         {
             if (currentLane < 0 || previousLane == currentLane) return false;
             if (!notesManager.TryGetNote(EFingerType.Up, currentLane, out var note)) return false;
-            if (!note.IsTapping) return false;
-            if (noteFactory.GetNoteData(note).NoteType is not (ENoteType.Long or ENoteType.Curve)) return false;
 
-            var fingerInfo = ApplyJudgement(note, EFingerType.Up, currentLane, noteJudgeController.JudgeOrMiss(note, EFingerType.Up));
+            if (!TryApplyJudgement(note, EFingerType.Up, currentLane, true, out var fingerInfo)) return false;
             touchStateManager.Remove(pointerId);
 
             judgmentSubject.OnNext(fingerInfo.WithTappingLanes(GetTappingLanes()));
@@ -130,10 +120,11 @@ namespace Song
             }
 
             var lane = touchState.Lane;
-            var fingerInfo = new FingerInfo { FingerType = EFingerType.Up, Lane = lane };
-
+            var fingerInfo = CreateFingerInfo(EFingerType.Up, lane);
             if (notesManager.TryGetNote(EFingerType.Up, lane, out var note))
-                fingerInfo = ApplyJudgement(note, EFingerType.Up, lane, noteJudgeController.JudgeOrMiss(note, EFingerType.Up));
+            {
+                TryApplyJudgement(note, EFingerType.Up, lane, true, out fingerInfo);
+            }
 
             touchStateManager.Remove(pointerId);
             judgmentSubject.OnNext(fingerInfo);
@@ -145,21 +136,33 @@ namespace Song
 
             var lane = touchState.Lane;
             if (!notesManager.TryGetFlickNote(lane, out var note)) return;
+            if (!TryApplyJudgement(note, EFingerType.Up, lane, false, out var fingerInfo)) return;
 
-            var fingerInfo = ApplyJudgement(note, EFingerType.Up, lane, noteJudgeController.JudgeOrMiss(note, EFingerType.Up));
             touchStateManager.Remove(pointerId);
 
             judgmentSubject.OnNext(fingerInfo);
         }
 
-        private void EmitAutoPerfect(NoteBase note)
+        private bool TryGetLane(Vector2 screenPosition, out int lane) => laneDetector.TryGetLane(screenPosition, out lane);
+
+        private void EmitLaneInput(EFingerType fingerType, int lane)
+        {
+            var fingerInfo = CreateFingerInfo(fingerType, lane);
+            if (notesManager.TryGetNote(fingerType, lane, out var note))
+            {
+                TryApplyJudgement(note, fingerType, lane, false, out fingerInfo);
+            }
+            judgmentSubject.OnNext(fingerInfo);
+        }
+
+        private void EmitPerfect(NoteBase note)
         {
             if (noteJudgeController.IsJustAutoTiming(note, EFingerType.Down))
             {
                 EmitPerfect(note, EFingerType.Down);
                 return;
             }
-            if (noteFactory.GetNoteData(note).NoteType != ENoteType.Single && noteJudgeController.IsJustAutoTiming(note, EFingerType.Up))
+            if (notesManager.GetNoteData(note).NoteType != ENoteType.Single && noteJudgeController.IsJustAutoTiming(note, EFingerType.Up))
                 EmitPerfect(note, EFingerType.Up);
         }
 
@@ -172,12 +175,13 @@ namespace Song
 
         private void EmitMiss(NoteBase note, bool missEnd)
         {
+            var noteData = notesManager.GetNoteData(note);
             if (notesManager.RemoveNote(note)) note.Final();
 
             judgmentSubject.OnNext(new FingerInfo
             {
                 NoteBase = note,
-                NoteData = noteFactory.GetNoteData(note),
+                NoteData = noteData,
                 JudgmentType = IsAuto ? EJudgementType.Perfect : EJudgementType.Miss,
                 Lane = LaneNone,
                 MissInfo = (true, missEnd),
@@ -190,25 +194,31 @@ namespace Song
             judgmentSubject.OnNext(new FingerInfo
             {
                 NoteBase = note,
-                NoteData = noteFactory.GetNoteData(note),
+                NoteData = notesManager.GetNoteData(note),
                 FingerType = fingerType,
                 JudgmentType = EJudgementType.Perfect,
                 Lane = LaneNone,
             });
         }
 
-        private FingerInfo ApplyJudgement(NoteBase note, EFingerType fingerType, int lane, EJudgementType judgementType)
+        private bool TryApplyJudgement(NoteBase note, EFingerType fingerType, int lane, bool allowMiss, out FingerInfo fingerInfo)
         {
+            fingerInfo = CreateFingerInfo(fingerType, lane);
+            if (!noteJudgeController.TryJudge(note, fingerType, allowMiss, out var judgementType)) return false;
+
             note.OnJudgedNote(fingerType, judgementType);
-            return new FingerInfo
+            fingerInfo = new FingerInfo
             {
                 NoteBase = note,
-                NoteData = noteFactory.GetNoteData(note),
+                NoteData = notesManager.GetNoteData(note),
                 JudgmentType = judgementType,
                 FingerType = fingerType,
                 Lane = lane,
             };
+            return true;
         }
+
+        private FingerInfo CreateFingerInfo(EFingerType fingerType, int lane) => new() { FingerType = fingerType, Lane = lane };
 
         private bool IsPointerOverGui(int pointerId) => EventSystem.current != null && EventSystem.current.IsPointerOverGameObject(pointerId);
 
@@ -220,8 +230,7 @@ namespace Song
             {
                 var note = aliveNotes[i];
                 if (!note.IsActive || !note.IsTapping) continue;
-                if (!noteFactory.TryGetNoteData(note, out var data)) continue;
-                tappingLanes.Add(data.Lane);
+                tappingLanes.Add(notesManager.GetNoteData(note).Lane);
             }
             return tappingLanes;
         }

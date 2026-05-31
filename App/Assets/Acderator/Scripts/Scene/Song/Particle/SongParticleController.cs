@@ -110,7 +110,7 @@ namespace Song
             }
         }
 
-        private static bool TappingLanesContains(IReadOnlyList<int> lanes, int lane)
+        private bool TappingLanesContains(IReadOnlyList<int> lanes, int lane)
         {
             if (lanes == null) return false;
             for (var i = 0; i < lanes.Count; i++)

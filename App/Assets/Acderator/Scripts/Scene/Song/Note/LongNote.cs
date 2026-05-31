@@ -11,10 +11,10 @@ namespace Song
         [SerializeField] private Color32 defaultTrailColor; //
         [SerializeField] private Color32 tappingTrailColor;
 
-        public override void MoveNote(float positionBeginY, float positionEndY, float currentNoteSpeed)
+        public override void UpdatePosition(NotePositionUpdateContext context)
         {
-            transform.localPosition = new(0, positionBeginY, 0);
-            var length = positionEndY - positionBeginY;
+            transform.localPosition = new(0, context.PositionBeginY, 0);
+            var length = context.PositionEndY - context.PositionBeginY;
             beginSprite.transform.localPosition = Vector3.zero;
             endSprite.transform.localPosition = new(0, length, 0);
             trailSprite.transform.localPosition = new(0, length / 2f, 0);

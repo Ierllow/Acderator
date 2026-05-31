@@ -3,10 +3,10 @@ using System.Collections.Generic;
 
 namespace Song
 {
+    internal enum NoteSearchMode { Down, Up, Flick }
+
     public class NotesManager
     {
-        private enum NoteSearchMode { Down, Up, Flick }
-
         public const int LaneCount = 4;
         public const int MIN_NOTES_SPEED = 1;
 
@@ -26,7 +26,7 @@ namespace Song
                     allAliveNotesCache.Clear();
                     for (var lane = 0; lane < LaneCount; lane++)
                     {
-                        allAliveNotesCache.AddRange(aliveNotesByLane[lane]);
+                        allAliveNotesCache.AddRange(aliveNotesByLaneDict[lane]);
                     }
                     aliveNotesCache = false;
                 }
@@ -34,8 +34,8 @@ namespace Song
             }
         }
 
-        private readonly Dictionary<int, List<NoteBase>> aliveNotesByLane;
-        private readonly Dictionary<NoteBase, NoteData> noteDataMap = new();
+        private readonly Dictionary<int, List<NoteBase>> aliveNotesByLaneDict;
+        private readonly Dictionary<NoteBase, NoteData> noteDataDict = new();
         private readonly List<NoteBase> allAliveNotesCache = new();
         private bool aliveNotesCache;
         private int currentSpeedChangeIndex = 0;
@@ -44,8 +44,8 @@ namespace Song
         {
             SongOption = songOption;
             CurrentNoteSpeed = songOption.NoteSpeed;
-            aliveNotesByLane = new Dictionary<int, List<NoteBase>>(LaneCount);
-            for (var i = 0; i < LaneCount; i++) aliveNotesByLane[i] = new List<NoteBase>();
+            aliveNotesByLaneDict = new Dictionary<int, List<NoteBase>>(LaneCount);
+            for (var i = 0; i < LaneCount; i++) aliveNotesByLaneDict[i] = new List<NoteBase>();
         }
 
         public void Init(LoadedChartInfo loadedChartInfo)
@@ -60,22 +60,24 @@ namespace Song
 
         public void AddAliveNote(NoteBase note, NoteData data)
         {
-            noteDataMap[note] = data;
-            aliveNotesByLane[data.Lane].Add(note);
+            noteDataDict[note] = data;
+            aliveNotesByLaneDict[data.Lane].Add(note);
             aliveNotesCache = true;
         }
 
         public bool RemoveNote(NoteBase note)
         {
-            if (!noteDataMap.TryGetValue(note, out var data)) return false;
-            var removed = aliveNotesByLane[data.Lane].Remove(note);
+            if (!noteDataDict.TryGetValue(note, out var data)) return false;
+            var removed = aliveNotesByLaneDict[data.Lane].Remove(note);
             if (removed)
             {
                 aliveNotesCache = true;
-                noteDataMap.Remove(note);
+                noteDataDict.Remove(note);
             }
             return removed;
         }
+
+        public NoteData GetNoteData(NoteBase note) => noteDataDict[note];
 
         public void UpdateBeat(float sec)
         {
@@ -83,33 +85,20 @@ namespace Song
             CurrentBeat = LoadedChartInfo != default ? sec * ((LoadedChartInfo.HeaderData?.Tempo ?? 0) / 60f) : 0;
         }
 
-        public float GetDiffSec(EFingerType fingerType, NoteData noteData)
+        public bool TryGetNote(EFingerType type, int lane, out NoteBase note) => TryGetNearestNote(lane, type switch
         {
-            var noteSec = fingerType == EFingerType.Down ? noteData.SecBegin : noteData.SecEnd;
-            return Math.Abs(noteSec - CurrentSec + SongOption.TapTiming * 0.1f);
-        }
-
-        public float GetCurveNoteDiffSec(NoteData noteData, float curveProgress)
-        {
-            if (noteData.NoteType == ENoteType.Curve)
-            {
-                var curveTime = noteData.SecBegin + noteData.CurveDuration * curveProgress;
-                return Math.Abs(curveTime - CurrentSec + SongOption.TapTiming * 0.1f);
-            }
-            return default;
-        }
-
-        public bool TryGetNote(EFingerType type, int lane, out NoteBase note)
-        {
-            var mode = type == EFingerType.Down ? NoteSearchMode.Down : NoteSearchMode.Up;
-            return TryGetNearestNote(lane, mode, out note);
-        }
+            EFingerType.Down => NoteSearchMode.Down,
+            _ => NoteSearchMode.Up,
+        }, out note);
 
         public bool TryGetFlickNote(int lane, out NoteBase note) => TryGetNearestNote(lane, NoteSearchMode.Flick, out note);
 
         private bool TryGetNearestNote(int lane, NoteSearchMode mode, out NoteBase note)
         {
-            var laneNoteList = aliveNotesByLane[lane];
+            note = default;
+            if (lane < 0 || lane >= LaneCount) return false;
+
+            var laneNoteList = aliveNotesByLaneDict[lane];
             var bestDiff = float.MaxValue;
             var bestNote = default(NoteBase);
 
@@ -117,18 +106,16 @@ namespace Song
             {
                 var candidate = laneNoteList[i];
                 if (candidate == null || !candidate.IsActive) continue;
-                if (!noteDataMap.TryGetValue(candidate, out var candidateData)) continue;
-
-                switch (mode)
+                if (!noteDataDict.TryGetValue(candidate, out var candidateData)) continue;
+                if (mode switch
                 {
-                    case NoteSearchMode.Down when candidate.IsTapping:
-                    case NoteSearchMode.Up when !candidate.IsTapping:
-                        continue;
-                    case NoteSearchMode.Flick when candidateData.NoteType != ENoteType.Flick:
-                        continue;
-                }
+                    NoteSearchMode.Down => candidate.IsTapping,
+                    NoteSearchMode.Up => !candidate.IsTapping || candidateData.NoteType is not (ENoteType.Long or ENoteType.Curve),
+                    NoteSearchMode.Flick => !candidate.IsTapping || candidateData.NoteType != ENoteType.Flick,
+                    _ => true,
+                }) continue;
 
-                var diff = Math.Abs(candidateData.BeatBegin - CurrentBeat);
+                var diff = GetSearchDiffSec(candidateData, mode);
                 if (diff >= bestDiff) continue;
 
                 bestDiff = diff;
@@ -138,6 +125,22 @@ namespace Song
             note = bestNote;
             return note != null;
         }
+
+        private float GetSearchDiffSec(NoteData noteData, NoteSearchMode mode)
+        {
+            var targetSec = mode switch
+            {
+                NoteSearchMode.Up => GetNoteEndSec(noteData),
+                _ => noteData.SecBegin,
+            };
+            return Math.Abs(targetSec - CurrentSec + SongOption.TapTiming * 0.1f);
+        }
+
+        private float GetNoteEndSec(NoteData noteData) => noteData.NoteType switch
+        {
+            ENoteType.Curve => noteData.SecBegin + noteData.CurveDuration,
+            _ => noteData.SecEnd,
+        };
 
         public void UpdateNoteSpeed()
         {
@@ -151,7 +154,6 @@ namespace Song
 
         public bool ShouldSpawn(NoteData noteData, float laneLength)
         {
-            if (noteData == null) return false;
             if (CurrentNoteSpeed <= 0) return noteData.SecBegin <= CurrentSec;
 
             var notePositionY = (noteData.BeatBegin - CurrentBeat) * CurrentNoteSpeed;

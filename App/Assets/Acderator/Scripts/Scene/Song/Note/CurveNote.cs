@@ -43,12 +43,12 @@ namespace Song
             trailSprite.gameObject.SetActive(true);
         }
 
-        public override void MoveNote(float positionBeginY, float _, float currentNoteSpeed)
+        public override void UpdatePosition(NotePositionUpdateContext context)
         {
             if (curvePointList.Count < 2) return;
 
-            transform.localPosition = new(0, positionBeginY, transform.localPosition.z);
-            var curveProgress = Mathf.Clamp01((currentNoteSpeed - secBegin) / curveDuration);
+            transform.localPosition = new(0, context.PositionBeginY, transform.localPosition.z);
+            var curveProgress = curveDuration > 0 ? Mathf.Clamp01((context.CurrentSec - secBegin) / curveDuration) : 1f;
             var startCurvePos = GetCurvePosition(curveProgress);
             beginSprite.transform.localPosition = new(startCurvePos.x, startCurvePos.y, 0);
 

@@ -23,6 +23,8 @@ namespace Song
         private ObjectPool<NoteBase>[,] pools;
         private readonly Dictionary<NoteBase, NoteData> noteDict = new();
 
+        public IReadOnlyList<Transform> LaneParents => parents;
+
         public void Init()
         {
             var laneCount = parents.Length;
@@ -73,10 +75,6 @@ namespace Song
             note.Init(noteData);
             return note;
         }
-
-        public NoteData GetNoteData(NoteBase note) => noteDict.TryGetValue(note, out var data) ? data : null;
-
-        public bool TryGetNoteData(NoteBase note, out NoteData data) => noteDict.TryGetValue(note, out data);
 
         private void ReleaseNote(NoteBase note)
         {

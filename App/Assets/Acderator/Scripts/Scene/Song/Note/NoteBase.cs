@@ -12,12 +12,9 @@ namespace Song
 
         public Action<NoteBase> Finalized;
 
-        public virtual void Init(NoteData data)
-        {
-            transform.localPosition = new Vector3(0, 50, 0);
-        }
+        public virtual void Init(NoteData data) => transform.localPosition = new Vector3(0, 50, 0);
 
-        public virtual void MoveNote(float positionBeginY, float positionEndY, float currentNoteSpeed) => transform.localPosition = new(0, positionBeginY, 0);
+        public virtual void UpdatePosition(NotePositionUpdateContext context) => transform.localPosition = new(0, context.PositionBeginY, 0);
 
         public abstract void OnJudgedNote(EFingerType fingerType, EJudgementType judgmentType = EJudgementType.None);
 
