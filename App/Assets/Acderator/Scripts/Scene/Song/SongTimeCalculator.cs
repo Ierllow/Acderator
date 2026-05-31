@@ -4,15 +4,31 @@ namespace Song
 {
     public sealed class SongTimeCalculator
     {
-        private float offset;
-        private float pauseTime;
+        private const float NotStartedSec = -9999f;
 
-        public void SetOffset(float offset) => this.offset = offset;
+        private float leadInSec;
+        private float leadInStartRealtime;
+        private float lastSec = NotStartedSec;
+        private bool isLeadInStarted;
+
+        public void StartLeadIn(float leadInSec)
+        {
+            this.leadInSec = Mathf.Max(0f, leadInSec);
+            leadInStartRealtime = Time.realtimeSinceStartup;
+            lastSec = -this.leadInSec;
+            isLeadInStarted = true;
+        }
 
         public float GetSec(float requestedSec, ESongState currentState)
         {
-            if (currentState is ESongState.None or ESongState.Stop) pauseTime += Time.deltaTime;
-            return requestedSec <= 0 ? Time.timeSinceLevelLoad - pauseTime - offset : requestedSec;
+            lastSec = currentState switch
+            {
+                ESongState.Ready when isLeadInStarted => Time.realtimeSinceStartup - leadInStartRealtime - leadInSec,
+                ESongState.Playing => requestedSec > 0 ? requestedSec : 0f,
+                ESongState.None => NotStartedSec,
+                _ => lastSec,
+            };
+            return lastSec;
         }
     }
 }

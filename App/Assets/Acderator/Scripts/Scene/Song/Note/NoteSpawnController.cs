@@ -1,33 +1,36 @@
 using R3;
 using System.Collections.Generic;
 using UnityEngine;
+using Zenject;
 
 namespace Song
 {
     public class NoteSpawnController : MonoBehaviour, IController
     {
-        [SerializeField] private float spawnTiming = 10f;
+        [Inject] private readonly NotesManager notesManager;
 
         private readonly List<NoteData> noteDataList = new();
 
-        private float offset = 0f;
+        private float laneLength;
         private int nextSpawnIndex;
 
         private readonly Subject<NoteData> noteFactorySubject = new();
         public Observable<NoteData> NoteFactoryAsObservable => noteFactorySubject;
 
-        public void Init(List<NoteData> noteDataList, float offset)
+        public void Init(List<NoteData> noteDataList, float laneLength)
         {
-            this.offset = offset;
+            this.laneLength = laneLength;
+            this.noteDataList.Clear();
             this.noteDataList.AddRange(noteDataList);
+            nextSpawnIndex = 0;
         }
 
-        public void UpdateSpawn(float currentSec)
+        public void UpdateSpawn()
         {
             while (nextSpawnIndex < noteDataList.Count)
             {
                 var noteData = noteDataList[nextSpawnIndex];
-                if (noteData.SecBegin - offset > currentSec) break;
+                if (!notesManager.ShouldSpawn(noteData, laneLength)) break;
 
                 noteFactorySubject.OnNext(noteData);
                 nextSpawnIndex++;

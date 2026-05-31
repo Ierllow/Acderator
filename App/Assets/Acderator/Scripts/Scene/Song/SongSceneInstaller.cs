@@ -12,7 +12,7 @@ namespace Song
             BindCore(songSceneContext);
             BindSceneServices();
             BindInput();
-            if (songSceneContext.SongMode != ESongMode.Tutorial) BindTutorial();
+            if (songSceneContext.SongMode == ESongMode.Tutorial) BindTutorial();
         }
 
         private void BindCore(SongSceneContext songSceneContext)
@@ -24,6 +24,7 @@ namespace Song
             Container.Bind<ComboController>().AsSingle();
             Container.Bind<HpBarController>().AsSingle();
             Container.Bind<NoteJudgeController>().AsSingle();
+            Container.Bind<SongSoundController>().AsSingle();
             Container.BindInterfacesAndSelfTo<SongParticleController>().FromComponentInHierarchy().AsSingle();
             Container.Bind<SongTimeCalculator>().AsSingle();
             Container.BindInterfacesAndSelfTo<SongLoopController>().AsSingle();

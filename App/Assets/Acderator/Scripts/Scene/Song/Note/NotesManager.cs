@@ -51,7 +51,10 @@ namespace Song
         public void Init(LoadedChartInfo loadedChartInfo)
         {
             LoadedChartInfo = loadedChartInfo;
+            NoteSpeedChangeList.Clear();
             NoteSpeedChangeList.AddRange(loadedChartInfo.HeaderData.NoteSpeedChangeList);
+            currentSpeedChangeIndex = 0;
+            CurrentNoteSpeed = SongOption.NoteSpeed;
             UpdateNoteSpeed();
         }
 
@@ -146,12 +149,21 @@ namespace Song
             }
         }
 
-        public float GetSpawnOffset(float laneLength)
+        public bool ShouldSpawn(NoteData noteData, float laneLength)
         {
-            var bpm = LoadedChartInfo.HeaderData.Tempo;
+            if (noteData == null) return false;
+            if (CurrentNoteSpeed <= 0) return noteData.SecBegin <= CurrentSec;
+
+            var notePositionY = (noteData.BeatBegin - CurrentBeat) * CurrentNoteSpeed;
+            return notePositionY <= laneLength;
+        }
+
+        public float GetInitialSpawnLeadInSec(float laneLength)
+        {
+            var bpm = LoadedChartInfo?.HeaderData?.Tempo ?? 0;
             var speed = CurrentNoteSpeed;
             var speedSec = speed * (bpm / 60f);
-            return laneLength / speedSec;
+            return speedSec <= 0 ? 0f : laneLength / speedSec;
         }
     }
 }

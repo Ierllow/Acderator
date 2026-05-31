@@ -17,9 +17,9 @@ namespace Song
         public IUniTaskAsyncEnumerable<AsyncUnit> EveryUpdateSongStateWhere => UniTaskAsyncEnumerable.EveryUpdate().Queue().TakeWhile(_ => CurrentState != ESongState.End);
 
         public Observable<float> SongLoopUpdateAsObservable => songLoopUpdateSubject;
-        public Observable<float> SongSecondsZeroWhere => songLoopUpdateSubject.Where(s => s >= 0);
+        public Observable<float> SongLeadInCompletedAsObservable => songLoopUpdateSubject.Where(s => s >= 0).Take(1);
 
-        public void SetOffset(float offset) => timeCalculator.SetOffset(offset);
+        public void StartLeadIn(float leadInSec) => timeCalculator.StartLeadIn(leadInSec);
 
         public void UpdateState(ESongState currentState) => CurrentState = currentState;
 

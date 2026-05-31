@@ -62,7 +62,7 @@ namespace Intense
         public void Initialize()
         {
             BgmExPlayer = new CriAtomExPlayer();
-            SongExPlayer = new CriAtomExPlayer();
+            SongExPlayer = new CriAtomExPlayer(true);
             SongPreviewExPlayer = new CriAtomExPlayer();
             SeExPlayer = new CriAtomExPlayer();
             UpdateBgmVolume(PlayerPrefsValues.BgmVolume, PlayerPrefsValues.IsBgmMuted);
@@ -113,7 +113,9 @@ namespace Intense
             BgmExPlayer.Start();
         });
 
-        public void PlaySong(int id) => UniTask.Void(async () =>
+        public void PlaySong(int id) => PlaySongAsync(id).Forget();
+
+        public async UniTask<CriAtomExPlayback> PlaySongAsync(int id)
         {
             var mSoundCueName = masterDataManager.MemoryDatabase.SoundSheetNameMasterTable.First(x => x.Category == (int)ESoundCategory.Song);
             var sheet = await GetOrAddCueSheetAsync(mSoundCueName.SheetName, string.Format("sounds/song/song_{0}", id));
@@ -121,8 +123,8 @@ namespace Intense
             StopSong();
             SongExPlayer.SetCue(sheet.acb, id.ToString());
             SongExPlayer.Loop(false);
-            SongExPlayer.Start();
-        });
+            return SongExPlayer.Start();
+        }
 
         public void PlaySongPreview(int id, CancellationToken token = default) => UniTask.Void(async () =>
         {
