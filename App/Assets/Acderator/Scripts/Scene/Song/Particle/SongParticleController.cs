@@ -7,7 +7,7 @@ using UnityEngine.Pool;
 
 namespace Song
 {
-    public class SongParticleController : MonoBehaviour, IController
+    public class SongParticleController : MonoBehaviour
     {
         [SerializeField] private ParticleObject tapParticleObject;
         [SerializeField] private ParticleObject holdParticleObject;

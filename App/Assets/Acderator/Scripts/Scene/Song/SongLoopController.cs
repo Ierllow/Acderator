@@ -5,7 +5,7 @@ using Zenject;
 
 namespace Song
 {
-    public class SongLoopController : IController
+    public class SongLoopController
     {
         [Inject] private readonly SongTimeCalculator timeCalculator;
 

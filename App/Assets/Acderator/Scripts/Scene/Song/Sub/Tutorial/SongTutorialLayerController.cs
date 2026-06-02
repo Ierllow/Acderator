@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Song
 {
-    public class SongTutorialLayerController : MonoBehaviour, IController
+    public class SongTutorialLayerController : MonoBehaviour
     {
         private enum TutorialLayerState { Hidden, Intro, WaitingForTap, Fading }
 

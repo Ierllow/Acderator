@@ -22,7 +22,7 @@ namespace Song
         public static TutorialEvent ShowComplete() => new(ETutorialEventType.ShowComplete);
     }
 
-    public class SongTutorialStateController : IController
+    public class SongTutorialStateController
     {
         private ETutorialState cachedTutorialState = ETutorialState.Intro;
         private TutorialData tutorialData;

@@ -3,7 +3,7 @@ using Zenject;
 
 namespace Song
 {
-    public class NoteSpawnController : IController
+    public class NoteSpawnController
     {
         [Inject] private readonly NotesManager notesManager;
 

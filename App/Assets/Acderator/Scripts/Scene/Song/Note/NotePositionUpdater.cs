@@ -4,7 +4,7 @@ namespace Song
 {
     public record NotePositionUpdateContext(float PositionBeginY, float PositionEndY, float CurrentSec);
 
-    public class NotePositionUpdater : IController
+    public class NotePositionUpdater
     {
         [Inject] private readonly NotesManager notesManager;
 

@@ -5,7 +5,7 @@ using Zenject;
 
 namespace Song
 {
-    public sealed class FingerJudgeRequestController : IController
+    public sealed class FingerJudgeRequestController
     {
         private const int LaneNone = -1;
 

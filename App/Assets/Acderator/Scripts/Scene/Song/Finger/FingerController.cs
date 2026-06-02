@@ -8,7 +8,7 @@ namespace Song
 {
     public enum EFingerType { None, Up, Down }
 
-    public class FingerController : MonoBehaviour, IController, IInitializable
+    public class FingerController : MonoBehaviour, IInitializable
     {
         [SerializeField] private Camera choose;
         [SerializeField] private Transform hitPlane;
