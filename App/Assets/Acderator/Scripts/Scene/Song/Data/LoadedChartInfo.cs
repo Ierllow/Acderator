@@ -1,11 +1,9 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
 namespace Song
 {
-    [Serializable]
     public class LoadedChartInfo
     {
         public ELoadResult LoadResult { get; set; }
@@ -22,18 +20,6 @@ namespace Song
             SecEnd = beatEnd / (HeaderData.Tempo / 60f),
             Lane = lane,
             NoteType = noteType,
-        });
-        public void AddCurveNoteData(float beatBegin, float beatEnd, int lane, ENoteType noteType, List<Vector2> curvePointList, float curveDuration) => NoteDataList.Add(new()
-        {
-            BeatBegin = beatBegin,
-            BeatEnd = beatEnd,
-            SecBegin = beatBegin / (HeaderData.Tempo / 60f),
-            SecEnd = beatEnd / (HeaderData.Tempo / 60f),
-            Lane = lane,
-            NoteType = noteType,
-            CurvePointList = curvePointList,
-            CurveDuration = curveDuration,
-            UseMidPoint = false,
         });
         public void AddCurveNoteData(float beatBegin, float beatEnd, int lane, ENoteType noteType, List<Vector2> curvePoints, float curveDuration, bool useMidPoint) => NoteDataList.Add(new()
         {

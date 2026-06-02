@@ -29,7 +29,7 @@ namespace Song
             Container.Bind<SongTimeCalculator>().AsSingle();
             Container.BindInterfacesAndSelfTo<SongLoopController>().AsSingle();
             Container.BindInterfacesAndSelfTo<NotePositionUpdater>().AsSingle();
-            Container.BindInterfacesAndSelfTo<NoteSpawnController>().FromComponentInHierarchy().AsSingle();
+            Container.BindInterfacesAndSelfTo<NoteSpawnController>().AsSingle();
             Container.Bind<SongAssetLoader>().AsSingle();
         }
 

@@ -34,7 +34,7 @@ namespace Song
             }
         }
 
-        private readonly Dictionary<int, List<NoteBase>> aliveNotesByLaneDict;
+        private readonly Dictionary<int, List<NoteBase>> aliveNotesByLaneDict = new();
         private readonly Dictionary<NoteBase, NoteData> noteDataDict = new();
         private readonly List<NoteBase> allAliveNotesCache = new();
         private bool aliveNotesCache;
@@ -44,18 +44,12 @@ namespace Song
         {
             SongOption = songOption;
             CurrentNoteSpeed = songOption.NoteSpeed;
-            aliveNotesByLaneDict = new Dictionary<int, List<NoteBase>>(LaneCount);
-            for (var i = 0; i < LaneCount; i++) aliveNotesByLaneDict[i] = new List<NoteBase>();
         }
 
         public void Init(LoadedChartInfo loadedChartInfo)
         {
             LoadedChartInfo = loadedChartInfo;
-            NoteSpeedChangeList.Clear();
             NoteSpeedChangeList.AddRange(loadedChartInfo.HeaderData.NoteSpeedChangeList);
-            currentSpeedChangeIndex = 0;
-            CurrentNoteSpeed = SongOption.NoteSpeed;
-            UpdateNoteSpeed();
         }
 
         public void AddAliveNote(NoteBase note, NoteData data)

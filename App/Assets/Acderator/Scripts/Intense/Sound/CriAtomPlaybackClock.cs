@@ -4,15 +4,15 @@ namespace Intense
 {
     public sealed class CriAtomPlaybackClock
     {
-        private CriAtomExPlayback? playback;
+        private CriAtomExPlayback playback;
 
         public void Start(CriAtomExPlayback playback) => this.playback = playback;
 
-        public void Stop() => playback = null;
+        public void Stop() => playback = default;
 
         public float GetTimeSec(CriAtomExPlayer fallbackPlayer)
         {
-            if (fallbackPlayer == null) return 0f;
+            if (fallbackPlayer == default) return 0f;
 
             if (playback is { } currentPlayback && currentPlayback.GetStatus() != CriAtomExPlayback.Status.Removed)
             {

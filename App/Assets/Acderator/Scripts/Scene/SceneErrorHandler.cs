@@ -16,7 +16,7 @@ public sealed class SceneErrorHandler : IDisposable
     private void OnLogMessageReceived(string condition, string stackTrace, LogType type)
     {
         if (type != LogType.Exception) return;
-        UniTask.Void(async () => await onError());
+        onError().Forget();
     }
 
     public void Dispose() => Application.logMessageReceived -= OnLogMessageReceived;

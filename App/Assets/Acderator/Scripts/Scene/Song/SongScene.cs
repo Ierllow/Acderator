@@ -124,7 +124,7 @@ namespace Song
                 songManagerResolver.Notes.Init(loadResult.ChartInfo);
                 songManagerResolver.Factory.Init();
                 var leadInSec = songManagerResolver.Notes.GetInitialSpawnLeadInSec(notesLineController.LaneLength);
-                songControllerResolver.Spawner.Init(loadResult.ChartInfo.NoteDataList, notesLineController.LaneLength);
+                songControllerResolver.Spawner.Init(notesLineController.LaneLength);
                 songLayerController.Init(sceneContext.SongInfo.Sid);
                 await backTelopLayerController.FadeIn();
                 songControllerResolver.Loop.StartLeadIn(leadInSec);

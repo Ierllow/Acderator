@@ -1,15 +1,11 @@
 using R3;
-using System.Collections.Generic;
-using UnityEngine;
 using Zenject;
 
 namespace Song
 {
-    public class NoteSpawnController : MonoBehaviour, IController
+    public class NoteSpawnController : IController
     {
         [Inject] private readonly NotesManager notesManager;
-
-        private readonly List<NoteData> noteDataList = new();
 
         private float laneLength;
         private int nextSpawnIndex;
@@ -17,16 +13,11 @@ namespace Song
         private readonly Subject<NoteData> noteFactorySubject = new();
         public Observable<NoteData> NoteFactoryAsObservable => noteFactorySubject;
 
-        public void Init(List<NoteData> noteDataList, float laneLength)
-        {
-            this.laneLength = laneLength;
-            this.noteDataList.Clear();
-            this.noteDataList.AddRange(noteDataList);
-            nextSpawnIndex = 0;
-        }
+        public void Init(float laneLength) => this.laneLength = laneLength;
 
         public void UpdateSpawn()
         {
+            var noteDataList = notesManager.LoadedChartInfo.NoteDataList;
             while (nextSpawnIndex < noteDataList.Count)
             {
                 var noteData = noteDataList[nextSpawnIndex];

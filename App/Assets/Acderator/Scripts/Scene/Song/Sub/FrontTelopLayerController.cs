@@ -16,7 +16,7 @@ namespace Song
         [SerializeField] private Image inputBlocker;
         [SerializeField] private TextMeshProUGUI resultText;
 
-        public void ShowMissMask() => UniTask.Void(async () => await UniTask.Delay(10, cancellationToken: destroyCancellationToken).SetAutoInActive(missMask));
+        public void ShowMissMask() => UniTask.Delay(10, cancellationToken: destroyCancellationToken).SetAutoInActive(missMask).Forget();
 
         public async UniTask CountDownStart() => await countDownBar.CountDown().SetAutoInActive(countDownBar.gameObject, inputBlocker);
 

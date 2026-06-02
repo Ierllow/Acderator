@@ -1,7 +1,7 @@
 using Intense;
 using R3;
 using System;
-using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using Zenject;
@@ -76,7 +76,6 @@ namespace Song
         private void FingerDown(int pointerId, Vector2 screenPosition)
         {
             if ((ignoreStartedOverGui || ignoreIsOverGui) && IsPointerOverGui(pointerId)) return;
-
             if (!TryGetLane(screenPosition, out var lane)) return;
 
             touchStateManager.Set(pointerId, new TouchStateManager.TouchState(screenPosition, lane));
@@ -99,13 +98,14 @@ namespace Song
 
         private bool TryHandleHoldCross(int pointerId, int previousLane, int currentLane)
         {
-            if (currentLane < 0 || previousLane == currentLane) return false;
+            if (previousLane == currentLane) return false;
             if (!notesManager.TryGetNote(EFingerType.Up, currentLane, out var note)) return false;
 
             if (!TryApplyJudgement(note, EFingerType.Up, currentLane, true, out var fingerInfo)) return false;
             touchStateManager.Remove(pointerId);
 
-            judgmentSubject.OnNext(fingerInfo.WithTappingLanes(GetTappingLanes()));
+            var tappingLaneList = notesManager.AliveNoteList.Where(x => x.IsActive || x.IsTapping).Select(x => notesManager.GetNoteData(x).Lane).ToList();
+            judgmentSubject.OnNext(fingerInfo.WithTappingLanes(tappingLaneList));
             return true;
         }
 
@@ -120,7 +120,7 @@ namespace Song
             }
 
             var lane = touchState.Lane;
-            var fingerInfo = CreateFingerInfo(EFingerType.Up, lane);
+            var fingerInfo = GetFingerInfo(EFingerType.Up, lane);
             if (notesManager.TryGetNote(EFingerType.Up, lane, out var note))
             {
                 TryApplyJudgement(note, EFingerType.Up, lane, true, out fingerInfo);
@@ -147,7 +147,7 @@ namespace Song
 
         private void EmitLaneInput(EFingerType fingerType, int lane)
         {
-            var fingerInfo = CreateFingerInfo(fingerType, lane);
+            var fingerInfo = GetFingerInfo(fingerType, lane);
             if (notesManager.TryGetNote(fingerType, lane, out var note))
             {
                 TryApplyJudgement(note, fingerType, lane, false, out fingerInfo);
@@ -169,12 +169,6 @@ namespace Song
         private bool TryEmitMiss(NoteBase note, float currentSec)
         {
             if (!noteJudgeController.IsMissed(note, currentSec, out var missEnd)) return false;
-            EmitMiss(note, missEnd);
-            return true;
-        }
-
-        private void EmitMiss(NoteBase note, bool missEnd)
-        {
             var noteData = notesManager.GetNoteData(note);
             if (notesManager.RemoveNote(note)) note.Final();
 
@@ -186,6 +180,7 @@ namespace Song
                 Lane = LaneNone,
                 MissInfo = (true, missEnd),
             });
+            return true;
         }
 
         private void EmitPerfect(NoteBase note, EFingerType fingerType)
@@ -203,7 +198,7 @@ namespace Song
 
         private bool TryApplyJudgement(NoteBase note, EFingerType fingerType, int lane, bool allowMiss, out FingerInfo fingerInfo)
         {
-            fingerInfo = CreateFingerInfo(fingerType, lane);
+            fingerInfo = GetFingerInfo(fingerType, lane);
             if (!noteJudgeController.TryJudge(note, fingerType, allowMiss, out var judgementType)) return false;
 
             note.OnJudgedNote(fingerType, judgementType);
@@ -218,22 +213,9 @@ namespace Song
             return true;
         }
 
-        private FingerInfo CreateFingerInfo(EFingerType fingerType, int lane) => new() { FingerType = fingerType, Lane = lane };
+        private FingerInfo GetFingerInfo(EFingerType fingerType, int lane) => new() { FingerType = fingerType, Lane = lane };
 
         private bool IsPointerOverGui(int pointerId) => EventSystem.current != null && EventSystem.current.IsPointerOverGameObject(pointerId);
-
-        private List<int> GetTappingLanes()
-        {
-            var aliveNotes = notesManager.AliveNoteList;
-            var tappingLanes = new List<int>(aliveNotes.Count);
-            for (var i = 0; i < aliveNotes.Count; i++)
-            {
-                var note = aliveNotes[i];
-                if (!note.IsActive || !note.IsTapping) continue;
-                tappingLanes.Add(notesManager.GetNoteData(note).Lane);
-            }
-            return tappingLanes;
-        }
     }
 
     internal sealed class PointerInput

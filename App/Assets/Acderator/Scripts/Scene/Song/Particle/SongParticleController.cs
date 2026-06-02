@@ -1,6 +1,7 @@
 using Cysharp.Threading.Tasks;
 using Intense;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Pool;
 
@@ -102,22 +103,12 @@ namespace Song
                 playingHoldParticleDict.Add(particleInfo.lane, holdParticle);
             }
             if (playingHoldParticleDict.TryGetValue(particleInfo.lane, out var playing)
-                && !TappingLanesContains(particleInfo.tappingLanes, particleInfo.lane))
+                && !particleInfo.tappingLanes.Any(x => x == particleInfo.lane))
             {
                 holdParticlePool.Release(playing);
                 playingHoldParticleDict.Remove(particleInfo.lane);
                 await SpawnJudgeEffect(parentX, childX, particleInfo.judgeType);
             }
-        }
-
-        private bool TappingLanesContains(IReadOnlyList<int> lanes, int lane)
-        {
-            if (lanes == null) return false;
-            for (var i = 0; i < lanes.Count; i++)
-            {
-                if (lanes[i] == lane) return true;
-            }
-            return false;
         }
 
         private void StopHoldEffect(int lane)
