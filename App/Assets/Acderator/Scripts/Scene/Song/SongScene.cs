@@ -42,7 +42,7 @@ namespace Song
             songControllerResolver.Loop.SongLoopUpdateAsObservable.Subscribe(OnSongLoopNext).RegisterTo(destroyCancellationToken);
             songControllerResolver.Spawner.NoteFactoryAsObservable.Select(x => (songManagerResolver.Factory.SpawnNote(x), x)).Where(x => x.Item1 != null).Subscribe(x => songManagerResolver.Notes.AddAliveNote(x.Item1, x.x)).RegisterTo(destroyCancellationToken);
             songControllerResolver.Loop.SongLeadInCompletedAsObservable.Where(_ => !sceneContext.IsTutorial()).Subscribe(_ => songControllerResolver.Loop.UpdateState(ESongState.Playing)).RegisterTo(destroyCancellationToken);
-            songControllerResolver.Finger.JudgmentAsObservable.Subscribe(FingerSubscribeNext).RegisterTo(destroyCancellationToken);
+            songControllerResolver.FingerJudgeRequest.JudgmentAsObservable.Subscribe(FingerSubscribeNext).RegisterTo(destroyCancellationToken);
             songControllerResolver.Finger.EveryUseTouchChanged.Subscribe(notesLineController.SetLaneLightActiveAll).RegisterTo(destroyCancellationToken);
             songPopupLayerController.ClosedPausePopupAsAsyncEnumerable.TakeWhile(_ => sceneContext.IsNormal()).SubscribeAwait(ClosedPausePopupSubscribeNext).RegisterTo(destroyCancellationToken);
             songPopupLayerController.EverySceneTypeChanged.Where(s => s.IsResult()).SubscribeAwait(async (s, _) => await sceneManager.ChangeSceneAsync(s, sceneContext.ToResultSceneContext(songLayerController.CurrentScore, songLayerController.JudgeCountDict))).RegisterTo(destroyCancellationToken);
@@ -204,7 +204,7 @@ namespace Song
             songManagerResolver.Notes.UpdateNoteSpeed();
             songControllerResolver.Spawner.UpdateSpawn();
             songControllerResolver.PositionUpdater.UpdatePositions();
-            if (songControllerResolver.Loop.IsPlaying()) songControllerResolver.Finger.Judge(sec);
+            if (songControllerResolver.Loop.IsPlaying()) songControllerResolver.FingerJudgeRequest.Judge(sec);
             if (songManagerResolver.SongSound.IsPlayEnd()) songControllerResolver.Loop.UpdateState(ESongState.End);
         }
 

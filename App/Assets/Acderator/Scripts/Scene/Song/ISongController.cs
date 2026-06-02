@@ -1,5 +1,3 @@
-using R3;
-
 namespace Song
 {
     public interface IController { }
@@ -11,9 +9,7 @@ namespace Song
 
     public interface IFingerController : IController
     {
-        Observable<FingerInfo> JudgmentAsObservable { get; }
         void Init();
         void UpdateInput();
-        void Judge(float currentSec);
     }
 }

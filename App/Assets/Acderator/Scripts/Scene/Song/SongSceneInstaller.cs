@@ -44,6 +44,7 @@ namespace Song
             Container.Bind<PointerInput>().AsSingle();
             Container.Bind<LaneDetector>().AsSingle();
             Container.Bind<TouchStateManager>().AsSingle();
+            Container.BindInterfacesAndSelfTo<FingerJudgeRequestController>().AsSingle();
             Container.BindInterfacesAndSelfTo<FingerController>().FromComponentInHierarchy().AsSingle();
         }
 
