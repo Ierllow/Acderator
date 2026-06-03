@@ -1,4 +1,5 @@
 using Intense.Api;
+using Intense.Asset;
 using UnityEditor;
 
 public class _MenuItem
