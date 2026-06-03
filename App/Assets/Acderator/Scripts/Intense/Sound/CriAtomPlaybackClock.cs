@@ -14,9 +14,9 @@ namespace Intense
         {
             if (fallbackPlayer == default) return 0f;
 
-            if (playback is { } currentPlayback && currentPlayback.GetStatus() != CriAtomExPlayback.Status.Removed)
+            if (playback.GetStatus() != CriAtomExPlayback.Status.Removed)
             {
-                var syncedTime = currentPlayback.GetTimeSyncedWithAudio();
+                var syncedTime = playback.GetTimeSyncedWithAudio();
                 if (syncedTime > 0) return syncedTime.ToSeconds();
             }
 
