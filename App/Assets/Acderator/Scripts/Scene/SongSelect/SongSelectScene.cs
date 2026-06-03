@@ -25,10 +25,10 @@ namespace SongSelect
 
         [Inject] private readonly SongSelectSceneContext sceneContext;
         [Inject] private readonly MasterDataManager masterDataManager;
-        [Inject] private readonly SoundManager soundManager;
         [Inject] private readonly AssetBundleManager assetBundleManager;
         [Inject] private readonly NetworkManager networkManager;
         [Inject] private readonly ScoreManager scoreManager;
+        [Inject] private readonly SongSelectSoundController soundController;
         [Inject] private readonly Song.TutorialSceneContextBuilder tutorialSceneContextBuilder;
 
         private void Start() => StartSubscribes();
@@ -45,7 +45,7 @@ namespace SongSelect
             songSelectDetail.SetData(songListView.SelectedGroup, songListView.SelectedDifficulty);
             backgroundImage.SetAtlasFormat("{0}", masterDataManager.MemoryDatabase.SongMasterTable.FindByGroup(songListView.SelectedGroup).Bg, "songselect/bg");
             orderButton.SetButtonText(songListView.CurrentOrderText);
-            soundManager.PlaySongPreview(songListView.SelectedGroup, destroyCancellationToken);
+            soundController.PlayPreview(songListView.SelectedGroup, destroyCancellationToken);
             await UniTask.WhenAll(
                 UniTask.Delay(500, cancellationToken: destroyCancellationToken),
                 sceneManager.FadeInAsync());
@@ -53,6 +53,7 @@ namespace SongSelect
 
         public override void OnDeleteScene()
         {
+            soundController.StopPreview();
             songListView.Save();
             base.OnDeleteScene();
         }
@@ -90,7 +91,7 @@ namespace SongSelect
         {
             songSelectDetail.SetData(cell.MSong.Group, songListView.SelectedDifficulty);
             backgroundImage.SetAtlasFormat("{0}", masterDataManager.MemoryDatabase.SongMasterTable.FindByGroup(cell.MSong.Group).Bg);
-            soundManager.PlaySongPreview(cell.MSong.Group, destroyCancellationToken);
+            soundController.PlayPreview(cell.MSong.Group, destroyCancellationToken);
         }
 
         private void SelectedDifficultChanged(Toggle toggle)

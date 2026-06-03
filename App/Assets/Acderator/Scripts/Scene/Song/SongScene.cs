@@ -70,13 +70,19 @@ namespace Song
         {
             if (!pauseStatus) return;
             if (!sceneContext.IsNormal()) return;
-            if (songManagerResolver.SongSound.IsPlayEnd() || songManagerResolver.Notes.AliveNoteList.IsAliveNotes()) return;
+            if (songManagerResolver.SongSound.IsPlayEnd || songManagerResolver.Notes.AliveNoteList.IsAliveNotes()) return;
 
             songControllerResolver.Loop.UpdateState(ESongState.Stop);
             songPopupLayerController.OnOpenPausePopup(!sceneContext.IsAuto());
         }
 
         public override void OnCreateScene() => LoadAssets().Forget();
+
+        public override void OnDeleteScene()
+        {
+            songManagerResolver.SongSound.StopSong();
+            base.OnDeleteScene();
+        }
 
         protected override async UniTask OnErrorScene()
         {
@@ -137,7 +143,7 @@ namespace Song
 
         private void OnPlayingSong()
         {
-            if (songManagerResolver.SongSound.HasStarted())
+            if (songManagerResolver.SongSound.HasStarted)
             {
                 songManagerResolver.SongSound.PauseSong(false);
                 songControllerResolver.Finger.TrySetUseTouch(true);
@@ -192,7 +198,7 @@ namespace Song
         private void UpdateSongProgressNext()
         {
             songControllerResolver.Finger.UpdateInput();
-            songControllerResolver.Loop.Tick(songManagerResolver.SongSound.GetTimeSec());
+            songControllerResolver.Loop.Tick(songManagerResolver.SongSound.TimeSec);
             songControllerResolver.TutorialState?.ChangeState(songControllerResolver.Loop.IsPlaying());
             songControllerResolver.TutorialState?.Tick();
             songControllerResolver.Tutorial?.AdvanceByTapIfPossible(!songControllerResolver.Loop.IsPlaying());
@@ -205,7 +211,7 @@ namespace Song
             songControllerResolver.Spawner.UpdateSpawn();
             songControllerResolver.PositionUpdater.UpdatePositions();
             if (songControllerResolver.Loop.IsPlaying()) songControllerResolver.FingerJudgeRequest.Judge(sec);
-            if (songManagerResolver.SongSound.IsPlayEnd()) songControllerResolver.Loop.UpdateState(ESongState.End);
+            if (songManagerResolver.SongSound.IsPlayEnd) songControllerResolver.Loop.UpdateState(ESongState.End);
         }
 
         private void FingerSubscribeNext(FingerInfo fingerInfo)

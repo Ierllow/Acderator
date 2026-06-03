@@ -1,5 +1,6 @@
 using Intense;
 using Intense.UI;
+using Song;
 using System;
 using TMPro;
 using UnityEngine;
@@ -23,7 +24,9 @@ namespace Element.UI
         [SerializeField] private Slider BgmSlider;
         [SerializeField] private Slider SeSlider;
 
-        [Inject] private readonly SoundManager soundManager;
+        [Inject] private readonly BgmVolumeController bgmVolumeController;
+        [Inject] private readonly SeVolumeController seVolumeController;
+        [Inject] private readonly SongVolumeController songVolumeController;
 
         private void Start()
         {
@@ -58,14 +61,16 @@ namespace Element.UI
                 case ConfigType.Bgm:
                     PlayerPrefsValues.Set(PlayerPrefsKey.BgmVolume, BgmSlider.value);
                     PlayerPrefsValues.Set(PlayerPrefsKey.BgmMute, BgmSlider.value == 0);
-                    soundManager.UpdateBgmVolume(BgmSlider.value, BgmSlider.value == 0);
-                    soundManager.UpdateSongVolume(SeSlider.value, SeSlider.value == 0);
+                    PlayerPrefsValues.Set(PlayerPrefsKey.SongVolume, BgmSlider.value);
+                    PlayerPrefsValues.Set(PlayerPrefsKey.SongMute, BgmSlider.value == 0);
+                    bgmVolumeController.UpdateVolume(BgmSlider.value, BgmSlider.value == 0);
+                    songVolumeController.UpdateVolume(BgmSlider.value, BgmSlider.value == 0);
                     BgmNum.SetText(string.Format("{0}%", Math.Round(BgmSlider.value * 100)));
                     break;
                 case ConfigType.Se:
                     PlayerPrefsValues.Set(PlayerPrefsKey.SeVolume, SeSlider.value);
                     PlayerPrefsValues.Set(PlayerPrefsKey.SeMute, SeSlider.value == 0);
-                    soundManager.UpdateSeVolume(SeSlider.value, SeSlider.value == 0);
+                    seVolumeController.UpdateVolume(SeSlider.value, SeSlider.value == 0);
                     SeNum.SetText(string.Format("{0}%", Math.Round(SeSlider.value * 100)));
                     break;
                 default:

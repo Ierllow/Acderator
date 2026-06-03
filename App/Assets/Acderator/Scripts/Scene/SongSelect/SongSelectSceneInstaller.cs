@@ -12,6 +12,7 @@ namespace SongSelect
             Error.ThrowArgumentNullException(songSelectSceneContext, nameof(songSelectSceneContext));
             Container.Bind<SongSelectSortController>().AsSingle();
             Container.Bind<SongSelectCellListController>().AsSingle();
+            Container.Bind<SongSelectSoundController>().AsSingle();
             Container.Bind<Song.TutorialSceneContextBuilder>().AsSingle();
         }
     }
