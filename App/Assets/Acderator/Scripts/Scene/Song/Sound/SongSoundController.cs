@@ -6,6 +6,7 @@ namespace Song
 {
     public sealed class SongSoundController
     {
+        [Inject] private readonly SoundManager soundManager;
         [Inject] private readonly CriAtomCueSheetLoader cueSheetLoader;
         [Inject] private readonly SoundSheetNameResolver soundSheetNameResolver;
         [Inject] private readonly SongVolumeController songVolumeController;
@@ -27,6 +28,8 @@ namespace Song
         });
 
         public void PauseSong(bool isPause) => songExPlayer.Pause(isPause);
+
+        public void PlaySe(ESeType type) => soundManager.PlaySe(type);
 
         public void StopSong()
         {

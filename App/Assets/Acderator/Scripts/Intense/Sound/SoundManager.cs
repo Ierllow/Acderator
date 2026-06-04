@@ -23,10 +23,10 @@ namespace Intense
                 case EBgmType.None:
                     break;
                 case EBgmType.Stop:
-                    StopBgm();
+                    bgmPlayer.Stop();
                     break;
                 default:
-                    StopBgm();
+                    bgmPlayer.Stop();
                     PlayBgm(bgmType, true);
                     break;
             }
@@ -51,7 +51,5 @@ namespace Intense
             var sheet = await cueSheetLoader.GetOrAddCueSheetAsync(mSoundCueName.SheetName, "sounds/bgm/bgm");
             bgmPlayer.Play(sheet, mSoundCueName.CueName, isLoop);
         });
-
-        public void StopBgm() => bgmPlayer.Stop();
     }
 }

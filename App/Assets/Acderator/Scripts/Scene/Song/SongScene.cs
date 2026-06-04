@@ -47,7 +47,7 @@ namespace Song
             songPopupLayerController.ClosedPausePopupAsAsyncEnumerable.TakeWhile(_ => sceneContext.IsNormal()).SubscribeAwait(ClosedPausePopupSubscribeNext).RegisterTo(destroyCancellationToken);
             songPopupLayerController.EverySceneTypeChanged.Where(s => s.IsResult()).SubscribeAwait(async (s, _) => await sceneManager.ChangeSceneAsync(s, sceneContext.ToResultSceneContext(songLayerController.CurrentScore, songLayerController.JudgeCountDict))).RegisterTo(destroyCancellationToken);
             songLayerController.OnTapPauseButtonAsObservable.TakeWhile(_ => !songControllerResolver.Loop.IsEnd()).SubscribeAwait(async (_, __) => await OnTapPauseButton()).RegisterTo(destroyCancellationToken);
-            songControllerResolver.TutorialState?.TutorialEventAsObservable.Subscribe(TutorialEventSubscribeNext).RegisterTo(destroyCancellationToken);
+            songManagerResolver.TutorialState?.TutorialEventAsObservable.Subscribe(TutorialEventSubscribeNext).RegisterTo(destroyCancellationToken);
             songControllerResolver.Tutorial?.TutorialIntroCompletedSubject.Subscribe(_ => songControllerResolver.Loop.UpdateState(ESongState.Playing)).RegisterTo(destroyCancellationToken);
             songControllerResolver.Tutorial?.TutorialStepCompletedSubject.Subscribe(_ => TutorialStepCompletedSubscribeNext()).RegisterTo(destroyCancellationToken);
             songControllerResolver.Tutorial?.TutorialCompletedSubject.Subscribe(_ => songControllerResolver.Loop.UpdateState(ESongState.End)).RegisterTo(destroyCancellationToken);
@@ -70,7 +70,7 @@ namespace Song
         {
             if (!pauseStatus) return;
             if (!sceneContext.IsNormal()) return;
-            if (songManagerResolver.SongSound.IsPlayEnd || songManagerResolver.Notes.AliveNoteList.IsAliveNotes()) return;
+            if (songControllerResolver.Sound.IsPlayEnd || songManagerResolver.Notes.AliveNoteList.IsAliveNotes()) return;
 
             songControllerResolver.Loop.UpdateState(ESongState.Stop);
             songPopupLayerController.OnOpenPausePopup(!sceneContext.IsAuto());
@@ -80,7 +80,7 @@ namespace Song
 
         public override void OnDeleteScene()
         {
-            songManagerResolver.SongSound.StopSong();
+            songControllerResolver.Sound.StopSong();
             base.OnDeleteScene();
         }
 
@@ -134,7 +134,7 @@ namespace Song
                 songLayerController.Init(sceneContext.SongInfo.Sid);
                 await backTelopLayerController.FadeIn();
                 songControllerResolver.Loop.StartLeadIn(leadInSec);
-                songControllerResolver.TutorialState?.ShowIntro();
+            songManagerResolver.TutorialState?.ShowIntro();
                 return;
 
             }
@@ -143,18 +143,18 @@ namespace Song
 
         private void OnPlayingSong()
         {
-            if (songManagerResolver.SongSound.HasStarted)
+            if (songControllerResolver.Sound.HasStarted)
             {
-                songManagerResolver.SongSound.PauseSong(false);
+                songControllerResolver.Sound.PauseSong(false);
                 songControllerResolver.Finger.TrySetUseTouch(true);
                 return;
             }
-            songManagerResolver.SongSound.PlaySong(sceneContext.SongInfo.Group);
+            songControllerResolver.Sound.PlaySong(sceneContext.SongInfo.Group);
         }
 
         private void OnStopSong()
         {
-            songManagerResolver.SongSound.PauseSong(true);
+            songControllerResolver.Sound.PauseSong(true);
             songControllerResolver.Finger.TrySetUseTouch(false);
         }
 
@@ -198,9 +198,9 @@ namespace Song
         private void UpdateSongProgressNext()
         {
             songControllerResolver.Finger.UpdateInput();
-            songControllerResolver.Loop.Tick(songManagerResolver.SongSound.TimeSec);
-            songControllerResolver.TutorialState?.ChangeState(songControllerResolver.Loop.IsPlaying());
-            songControllerResolver.TutorialState?.Tick();
+            songControllerResolver.Loop.Tick(songControllerResolver.Sound.TimeSec);
+            songManagerResolver.TutorialState?.ChangeState(songControllerResolver.Loop.IsPlaying());
+            songManagerResolver.TutorialState?.Tick();
             songControllerResolver.Tutorial?.AdvanceByTapIfPossible(!songControllerResolver.Loop.IsPlaying());
         }
 
@@ -211,7 +211,7 @@ namespace Song
             songControllerResolver.Spawner.UpdateSpawn();
             songControllerResolver.PositionUpdater.UpdatePositions();
             if (songControllerResolver.Loop.IsPlaying()) songControllerResolver.FingerJudgeRequest.Judge(sec);
-            if (songManagerResolver.SongSound.IsPlayEnd) songControllerResolver.Loop.UpdateState(ESongState.End);
+            if (songControllerResolver.Sound.IsPlayEnd) songControllerResolver.Loop.UpdateState(ESongState.End);
         }
 
         private void FingerSubscribeNext(FingerInfo fingerInfo)
@@ -225,7 +225,7 @@ namespace Song
                 frontTelopLayerController.ShowMissMask();
                 return;
             }
-            songManagerResolver.Sound.PlaySe(fingerInfo.ToSeType());
+            songControllerResolver.Sound.PlaySe(fingerInfo.ToSeType());
         }
 
         private async UniTask OnTapPauseButton()
@@ -283,7 +283,7 @@ namespace Song
 
         private void TutorialStepCompletedSubscribeNext()
         {
-            songControllerResolver.TutorialState.CompleteCurrentStep();
+            songManagerResolver.TutorialState.CompleteCurrentStep();
             songControllerResolver.Loop.UpdateState(ESongState.Playing);
         }
 

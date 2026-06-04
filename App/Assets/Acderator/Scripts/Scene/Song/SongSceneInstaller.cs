@@ -52,7 +52,7 @@ namespace Song
         {
             Container.Bind<TutorialMessageResolver>().AsSingle();
             Container.BindInterfacesAndSelfTo<SongTutorialLayerController>().FromComponentInHierarchy().AsSingle();
-            Container.BindInterfacesAndSelfTo<SongTutorialStateController>().AsSingle();
+            Container.BindInterfacesAndSelfTo<SongTutorialStateManager>().AsSingle();
         }
     }
 

@@ -22,7 +22,7 @@ namespace Song
         public static TutorialEvent ShowComplete() => new(ETutorialEventType.ShowComplete);
     }
 
-    public class SongTutorialStateController
+    public class SongTutorialStateManager
     {
         private ETutorialState cachedTutorialState = ETutorialState.Intro;
         private TutorialData tutorialData;
@@ -34,7 +34,7 @@ namespace Song
         private readonly Subject<TutorialEvent> tutorialEventSubject = new();
         public Observable<TutorialEvent> TutorialEventAsObservable => tutorialEventSubject;
 
-        public SongTutorialStateController(TutorialData tutorialData) => this.tutorialData = tutorialData;
+        public SongTutorialStateManager(TutorialData tutorialData) => this.tutorialData = tutorialData;
 
         public void UpdateState(ETutorialState currentState) => cachedTutorialState = currentState;
 

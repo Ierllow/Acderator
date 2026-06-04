@@ -13,26 +13,8 @@ namespace Intense
 
         public SoundSheetNameMaster Song => masterDataManager.MemoryDatabase.SoundSheetNameMasterTable.First(x => x.Category == SongCategory);
 
-        public SoundSheetNameMaster FindBgm(EBgmType type)
-        {
-            var id = type switch
-            {
-                EBgmType.GameResult => 2,
-                EBgmType.GameResultFailed => 3,
-                _ => (int)type,
-            };
-            return masterDataManager.MemoryDatabase.SoundSheetNameMasterTable.First(x => x.Category == BgmCategory && x.Id == id);
-        }
+        public SoundSheetNameMaster FindBgm(EBgmType type) => masterDataManager.MemoryDatabase.SoundSheetNameMasterTable.First(x => x.Category == BgmCategory && x.Id == (int)type);
 
-        public SoundSheetNameMaster FindSe(ESeType type)
-        {
-            var id = type switch
-            {
-                ESeType.Tap => 0,
-                ESeType.Flick => 1,
-                _ => (int)type,
-            };
-            return masterDataManager.MemoryDatabase.SoundSheetNameMasterTable.First(x => x.Category == SeCategory && x.Id == id);
-        }
+        public SoundSheetNameMaster FindSe(ESeType type) => masterDataManager.MemoryDatabase.SoundSheetNameMasterTable.First(x => x.Category == SeCategory && x.Id == (int)type);
     }
 }
