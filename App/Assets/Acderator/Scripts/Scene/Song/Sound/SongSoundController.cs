@@ -8,7 +8,7 @@ namespace Song
     {
         [Inject] private readonly SoundManager soundManager;
         [Inject] private readonly CriAtomCueSheetLoader cueSheetLoader;
-        [Inject] private readonly SoundSheetNameResolver soundSheetNameResolver;
+        [Inject] private readonly SongSoundSheetNameResolver soundSheetNameResolver;
         [Inject] private readonly SongVolumeController songVolumeController;
 
         private readonly CriAtomSoundPlayer songExPlayer = new(true);

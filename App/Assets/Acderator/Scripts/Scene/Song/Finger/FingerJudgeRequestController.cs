@@ -114,8 +114,6 @@ namespace Song
         {
             if (!noteJudgeController.IsMissed(note, currentSec, out var missEnd)) return false;
             var noteData = notesManager.GetNoteData(note);
-            if (notesManager.RemoveNote(note)) note.Final();
-
             judgmentSubject.OnNext(new FingerInfo
             {
                 NoteBase = note,

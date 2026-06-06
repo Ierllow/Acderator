@@ -21,6 +21,7 @@ namespace Intense
             Container.Bind<ScoreManager>().AsSingle().NonLazy();
             Container.Bind<CriAtomCueSheetLoader>().AsSingle().NonLazy();
             Container.Bind<SoundSheetNameResolver>().AsSingle().NonLazy();
+            Container.Bind<SongSoundSheetNameResolver>().AsSingle().NonLazy();
             Container.Bind<BgmVolumeController>().AsSingle().NonLazy();
             Container.Bind<SeVolumeController>().AsSingle().NonLazy();
             Container.Bind<SongVolumeController>().AsSingle().NonLazy();

@@ -17,19 +17,6 @@ namespace Song
             sequence.Play();
         }
 
-        public override void OnJudgedNote(EFingerType fingerType, EJudgementType judgmentType = EJudgementType.None)
-        {
-            switch (fingerType)
-            {
-                case EFingerType.Down:
-                    IsTapping = judgmentType != EJudgementType.None;
-                    break;
-                case EFingerType.Up:
-                    Final();
-                    break;
-                default:
-                    break;
-            }
-        }
+        public override void OnJudgedNote(EFingerType fingerType, EJudgementType judgmentType = EJudgementType.None) => IsTapping = fingerType == EFingerType.Down && judgmentType != EJudgementType.None;
     }
 }

@@ -29,9 +29,6 @@ namespace Song
                     IsTapping = true;
                     trailSprite.color = tappingTrailColor;
                     break;
-                case EFingerType.Up:
-                    Final();
-                    break;
                 default:
                     break;
             }

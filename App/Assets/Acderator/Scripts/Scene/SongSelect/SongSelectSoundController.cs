@@ -12,7 +12,7 @@ namespace SongSelect
     {
         [Inject] private readonly MasterDataManager masterDataManager;
         [Inject] private readonly CriAtomCueSheetLoader cueSheetLoader;
-        [Inject] private readonly SoundSheetNameResolver soundSheetNameResolver;
+        [Inject] private readonly SongSoundSheetNameResolver soundSheetNameResolver;
         [Inject] private readonly SongVolumeController songVolumeController;
 
         private readonly CriAtomSoundPlayer songPreviewExPlayer = new();
