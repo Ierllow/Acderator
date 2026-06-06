@@ -24,7 +24,7 @@ namespace Result
         [SerializeField] private GameObject cautionTextRoot;
 
         [Inject] private readonly ResultSceneContext sceneContext;
-        [Inject] private readonly AssetBundleManager assetBundleManager;
+        [Inject] private readonly AddressableAssetManager addressableAssetManager;
         [Inject] private readonly MasterDataManager masterDataManager;
         [Inject] private readonly SoundManager soundManager;
         [Inject] private readonly NetworkManager networkManager;
@@ -37,10 +37,15 @@ namespace Result
 
         public override void OnCreateScene() => UniTask.Void(async () =>
         {
-            sceneContext.ResultSceneBundlePathList.ForEach(assetBundleManager.AddLoadAssets);
-            await assetBundleManager.LoadAssetsAsync(sceneManager.CurrentSceneType, destroyCancellationToken);
-            resultDetail.Setup(masterDataManager.MemoryDatabase.SongMasterTable.FindBySid(sceneContext.ResultInfo.Sid), sceneContext.ResultInfo);
-            backgroundImage.SetAtlasFormat("{0}", masterDataManager.MemoryDatabase.ResultMasterTable.First().Rid, "gameresult/bg");
+            await addressableAssetManager.LoadAssetsAsync(sceneManager.CurrentSceneType, destroyCancellationToken);
+            var song = masterDataManager.MemoryDatabase.SongMasterTable.FindBySid(sceneContext.ResultInfo.Sid);
+            var rank = (int)ScoreUtils.ToRank(sceneContext.ResultInfo.CurrentScore);
+            resultDetail.Setup(
+                song,
+                sceneContext.ResultInfo,
+                addressableAssetManager.GetSprite(song.Group.ToString()),
+                addressableAssetManager.GetSprite(string.Format("icon_result_rank_{0}", rank)));
+            backgroundImage.SetSprite(addressableAssetManager.GetSprite(masterDataManager.MemoryDatabase.ResultMasterTable.First().Rid.ToString()));
             backgroundImage.color = PaletteStore.Instance.ColorPalette.GetActiveValue((ScoreUtils.IsClear(sceneContext.ResultInfo.CurrentScore) ? ColorEntry.White : ColorEntry.LightWhite).ToEntryId()).Value;
             cautionTextRoot.SetActive(sceneContext.ResultInfo.IsAuto);
             retryButton.gameObject.SetActive(!sceneContext.ResultInfo.IsAuto);

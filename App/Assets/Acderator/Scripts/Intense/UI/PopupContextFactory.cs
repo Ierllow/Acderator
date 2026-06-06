@@ -1,6 +1,5 @@
 using Cysharp.Threading.Tasks;
 using Element.UI;
-using Intense.Asset;
 using System;
 
 namespace Intense.UI
@@ -9,12 +8,11 @@ namespace Intense.UI
     {
         public static CommonPopupContext CreateAssetErrorPopupContext(
             AutoResetUniTaskCompletionSource<ECommonPopupTapKind> completionSource,
-            EAssetBundleErrorKind kind,
             Action<PopupContext> openPopup = null,
             Func<UniTask> moveTitleScene = null) => new()
             {
                 Title = "エラー",
-                Text = kind.GetErrorMessage() + "\n 再度実行しますか。",
+                Text = "エラーが発生しました。\n 再度実行しますか。",
                 PositiveText = "リトライ",
                 NegativeText = "キャンセル",
                 PositiveCallback = () => completionSource.TrySetResult(ECommonPopupTapKind.Positive),

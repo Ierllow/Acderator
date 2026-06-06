@@ -1,4 +1,5 @@
 using Intense;
+using Intense.Asset;
 using System.Collections.Generic;
 
 namespace Song
@@ -15,29 +16,14 @@ namespace Song
         public override int FrameRate { get; } = 60;
         public override EBgmType BgmType { get; } = EBgmType.Stop;
 
-        public List<string> SongBundlePathList => SongMode == ESongMode.Tutorial ? TutorialBundlePathList : NormalBundlePathList;
-
-        private List<string> NormalBundlePathList => new()
+        public IReadOnlyList<AddressableAssetAddress> DynamicAssetAddressList => new[]
         {
-            "song/rank",
-            "song/difficulty",
-            "song/bg",
-            "sounds/song/songse",
-            "song/particle/judgetext",
-            SongBundlePath,
-            SongChartBundlePath,
+            SongAddress,
+            SongChartAddress,
         };
-        private List<string> TutorialBundlePathList => new()
-        {
-            "song/bg",
-            "sounds/song/songse",
-            "song/particle/judgetext",
-            SongBundlePath,
-            SongChartBundlePath,
-        };
-        public string SongChartBundlePath => string.Format("charts/{0}", SongInfo.Sid);
+        public AddressableAssetAddress SongChartAddress => DynamicAssetAddresses.SongChart(SongInfo.Sid);
 
-        public string SongBundlePath => string.Format("sounds/song/song_{0}", SongInfo.Group);
+        public AddressableAssetAddress SongAddress => DynamicAssetAddresses.Song(SongInfo.Group);
 
         SongSceneContext() { }
 

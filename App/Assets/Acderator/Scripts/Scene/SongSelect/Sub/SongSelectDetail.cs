@@ -1,5 +1,6 @@
 using Cysharp.Threading.Tasks;
 using Cysharp.Threading.Tasks.Linq;
+using Intense.Asset;
 using Intense.Data;
 using Intense.Master;
 using Intense.UI;
@@ -27,10 +28,10 @@ namespace SongSelect
 
         private List<SongMaster> mSongList;
 
-        public void SetData(int group, int selectedDifficulty)
+        public void SetData(int group, int selectedDifficulty, Sprite jacket)
         {
             mSongList = masterDataManager.MemoryDatabase.SongMasterTable.Where(x => x.Group == group).ToList();
-            atlas.SetAtlasFormat("{0}", group, "song/jacket");
+            atlas.SetSprite(jacket);
             foreach (var (toggle, index) in toggles.Select((x, i) => (x, i)))
             {
                 toggle.SetToggleText(mSongList[index].Difficulty.ToString());
@@ -38,14 +39,13 @@ namespace SongSelect
             }
         }
 
-        public void UpdateInfo(int selectedDifficulty, int score, int percentNum)
+        public void UpdateInfo(int selectedDifficulty, int score, int percentNum, Sprite rankSprite)
         {
             if (mSongList == default) return;
 
-            var sid = mSongList.First(x => x.Difficulty == selectedDifficulty).Sid;
             hightScore.SetText("{0:D7}", score);
             percent.SetText(string.Format("{0:F1}{1}", percentNum, "%"));
-            rank.SetAtlasFormat("icon_result_rank_{0}", (int)ScoreUtils.ToRank(score, true), "song/rank");
+            rank.SetSprite(rankSprite);
         }
     }
 }

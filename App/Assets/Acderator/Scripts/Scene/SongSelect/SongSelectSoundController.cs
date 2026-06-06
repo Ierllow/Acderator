@@ -1,5 +1,6 @@
 using Cysharp.Threading.Tasks;
 using Intense;
+using Intense.Asset;
 using Intense.Master;
 using Song;
 using System;
@@ -25,7 +26,7 @@ namespace SongSelect
             songPreviewCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(token);
             var previewToken = songPreviewCancellationTokenSource.Token;
             var mSoundCueName = soundSheetNameResolver.Song;
-            var sheet = await cueSheetLoader.GetOrAddCueSheetAsync(mSoundCueName.SheetName, string.Format("sounds/song/song_{0}", group));
+            var sheet = await cueSheetLoader.GetOrAddCueSheetAsync(mSoundCueName.SheetName, DynamicAssetAddresses.Song(group));
             var songSelectMaster = masterDataManager.MemoryDatabase.SongSelectMasterTable.FindByGroup(group);
             songVolumeController.Register(songPreviewExPlayer);
             songPreviewExPlayer.AttachFader();

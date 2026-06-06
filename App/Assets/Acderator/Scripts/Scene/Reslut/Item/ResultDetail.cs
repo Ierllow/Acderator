@@ -1,4 +1,5 @@
 using Intense;
+using Intense.Asset;
 using Intense.Data;
 using Intense.Master;
 using Intense.UI;
@@ -22,9 +23,9 @@ namespace Result
         [SerializeField] private TextMeshProUGUI badNum;
         [SerializeField] private TextMeshProUGUI missNum;
 
-        public void Setup(SongMaster mSong, ResultInfo resultInfo)
+        public void Setup(SongMaster mSong, ResultInfo resultInfo, Sprite jacketSprite, Sprite rankSprite)
         {
-            jacket.SetAtlasFormat("{0}", mSong.Group, "song/jacket");
+            jacket.SetSprite(jacketSprite);
             songName.SetText(mSong.Name);
             composer.SetText(mSong.Composer);
             perfectNum.SetText("{0:D3}", resultInfo.JudgeCountDict.GetValueOrDefault(EJudgementType.Perfect));
@@ -34,7 +35,7 @@ namespace Result
             missNum.SetText("{0:D3}", resultInfo.JudgeCountDict.GetValueOrDefault(EJudgementType.Miss));
             score.SetText("{0:D7}", resultInfo.CurrentScore);
             highScore.SetText(string.Format("<color={0}>High Score</color> {1:D7}", "#C58EF1", (int)resultInfo.HighScore));
-            rank.SetAtlasFormat("icon_result_rank_{0}", (int)ScoreUtils.ToRank(resultInfo.CurrentScore), "song/rank");
+            rank.SetSprite(rankSprite);
         }
     }
 }

@@ -1,9 +1,12 @@
 using Cysharp.Threading.Tasks;
 using Intense;
+using Intense.Asset;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Pool;
+using Zenject;
 
 namespace Song
 {
@@ -13,6 +16,8 @@ namespace Song
         [SerializeField] private ParticleObject holdParticleObject;
         [SerializeField] private ParticleObject judgeParticleObject;
         [SerializeField] private Transform particlePoolTransform;
+
+        [Inject] private readonly AddressableAssetManager addressableAssetManager;
 
         private ObjectPool<ParticleObject> tapParticlePool;
         private ObjectPool<ParticleObject> holdParticlePool;
@@ -79,7 +84,11 @@ namespace Song
         private async UniTask SpawnJudgeEffect(float parentX, float childX, EJudgementType judgementType)
         {
             var judgeParticle = judgeParticlePool.Get();
-            judgeParticle.Emit(parentX, childX, judgementType);
+            judgeParticle.Emit(
+                parentX,
+                childX,
+                judgementType,
+                addressableAssetManager.GetSprite(string.Format("judgetext_{0}", (int)judgementType)));
             await UniTask.WaitWhile(() => judgeParticle.IsPlaying, cancellationToken: destroyCancellationToken);
             judgeParticlePool.Release(judgeParticle);
         }

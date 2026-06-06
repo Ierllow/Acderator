@@ -26,7 +26,7 @@ namespace Intense
         [SerializeField] private Header header;
 
         [Inject] private readonly ZenjectSceneLoader zenjectSceneLoader;
-        [Inject] private readonly AssetBundleManager assetBundleManager;
+        [Inject] private readonly AddressableAssetManager addressableAssetManager;
         [Inject] private readonly SoundManager soundManager;
         [Inject] private readonly Loading loading;
 
@@ -74,7 +74,7 @@ namespace Intense
 
                 if (!sameScene)
                 {
-                    await assetBundleManager.UnloadAssetsAsync(sceneBaseDict.Select(x => x.Key).ToList());
+                    await addressableAssetManager.UnloadAssetsAsync(sceneBaseDict.Select(x => x.Key).ToList());
                     await Resources.UnloadUnusedAssets();
                 }
 

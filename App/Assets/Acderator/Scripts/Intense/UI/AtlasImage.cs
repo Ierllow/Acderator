@@ -1,46 +1,27 @@
-using Cysharp.Threading.Tasks;
-using Intense.Asset;
 using UnityEngine;
 using UnityEngine.U2D;
 using UnityEngine.UI;
-using Zenject;
 
 namespace Intense.UI
 {
     public class AtlasImage : Image
     {
-        [Inject] private readonly AssetBundleManager assetBundleManager;
-
         [SerializeField] protected SpriteAtlas m_Atlas;
         [SerializeField] protected string m_SpriteName;
 
-        protected override void OnEnable()
+        protected override void Awake()
         {
-            base.OnEnable();
+            base.Awake();
             if (m_Atlas == null || string.IsNullOrEmpty(m_SpriteName)) return;
-            sprite = m_Atlas.GetSprite(m_SpriteName);
+            SetAtlas(m_SpriteName);
         }
 
-        public virtual void SetAtlas(string spriteName, string atlasName = "") => UniTask.Void(async () =>
+        public virtual void SetAtlas(string spriteName)
         {
-            if (string.IsNullOrEmpty(atlasName))
-            {
-                sprite = default;
-                return;
-            }
+            m_SpriteName = spriteName;
+            SetSprite(m_Atlas?.GetSprite(spriteName));
+        }
 
-            var obj = await assetBundleManager.GetLoadedObjectAsync(atlasName);
-            if (obj is SpriteAtlas atlasSprite)
-            {
-                m_Atlas = atlasSprite;
-                m_SpriteName = spriteName;
-                sprite = m_Atlas.GetSprite(m_SpriteName);
-            }
-        });
-    }
-
-    public static class AtlasImageExtensions
-    {
-        public static void SetAtlasFormat<T>(this AtlasImage atlasImage, string format, T arg0, string atlasName = "") => atlasImage.SetAtlas(string.Format(format, arg0), atlasName);
+        public void SetSprite(Sprite value) => sprite = value;
     }
 }

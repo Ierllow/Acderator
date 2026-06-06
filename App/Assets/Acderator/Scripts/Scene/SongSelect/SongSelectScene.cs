@@ -25,7 +25,7 @@ namespace SongSelect
 
         [Inject] private readonly SongSelectSceneContext sceneContext;
         [Inject] private readonly MasterDataManager masterDataManager;
-        [Inject] private readonly AssetBundleManager assetBundleManager;
+        [Inject] private readonly AddressableAssetManager addressableAssetManager;
         [Inject] private readonly NetworkManager networkManager;
         [Inject] private readonly ScoreManager scoreManager;
         [Inject] private readonly SongSelectSoundController soundController;
@@ -42,8 +42,9 @@ namespace SongSelect
         {
             await LoadAssets();
             songListView.Init();
-            songSelectDetail.SetData(songListView.SelectedGroup, songListView.SelectedDifficulty);
-            backgroundImage.SetAtlasFormat("{0}", masterDataManager.MemoryDatabase.SongMasterTable.FindByGroup(songListView.SelectedGroup).Bg, "songselect/bg");
+            var selectedSong = masterDataManager.MemoryDatabase.SongMasterTable.FindByGroup(songListView.SelectedGroup);
+            songSelectDetail.SetData(songListView.SelectedGroup, songListView.SelectedDifficulty, addressableAssetManager.GetSprite(songListView.SelectedGroup.ToString()));
+            backgroundImage.SetSprite(addressableAssetManager.GetSprite(selectedSong.Bg.ToString()));
             orderButton.SetButtonText(songListView.CurrentOrderText);
             soundController.PlayPreview(songListView.SelectedGroup, destroyCancellationToken);
             await UniTask.WhenAll(
@@ -61,8 +62,11 @@ namespace SongSelect
         private async UniTask LoadAssets()
         {
             var groupList = masterDataManager.MemoryDatabase.SongMasterTable.Select(x => x.Group).ToList();
-            sceneContext.SongSelectBundleNameList(groupList).ForEach(assetBundleManager.AddLoadAssets);
-            await assetBundleManager.LoadAssetsAsync(sceneManager.CurrentSceneType, destroyCancellationToken);
+            foreach (var address in sceneContext.DynamicAssetAddressList(groupList))
+            {
+                addressableAssetManager.AddLoad(address);
+            }
+            await addressableAssetManager.LoadAssetsAsync(sceneManager.CurrentSceneType, destroyCancellationToken);
         }
 
         private async UniTask TapDecideButton()
@@ -89,8 +93,8 @@ namespace SongSelect
 
         private void SelectedCellChanged(SongSelectCell cell)
         {
-            songSelectDetail.SetData(cell.MSong.Group, songListView.SelectedDifficulty);
-            backgroundImage.SetAtlasFormat("{0}", masterDataManager.MemoryDatabase.SongMasterTable.FindByGroup(cell.MSong.Group).Bg);
+            songSelectDetail.SetData(cell.MSong.Group, songListView.SelectedDifficulty, addressableAssetManager.GetSprite(cell.MSong.Group.ToString()));
+            backgroundImage.SetSprite(addressableAssetManager.GetSprite(cell.MSong.Bg.ToString()));
             soundController.PlayPreview(cell.MSong.Group, destroyCancellationToken);
         }
 
@@ -98,7 +102,12 @@ namespace SongSelect
         {
             songListView.UpdateSelectedDifficulty(int.Parse(toggle.name));
             var persent = scoreManager.GetScore(songListView.SelectedCellListSid) % masterDataManager.MemoryDatabase.SongMasterTable.FindBySid(songListView.SelectedCellListSid).Score / 10000;
-            songSelectDetail.UpdateInfo(songListView.SelectedDifficulty, scoreManager.GetScore(songListView.SelectedCellListSid), persent);
+            var rank = (int)ScoreUtils.ToRank(scoreManager.GetScore(songListView.SelectedCellListSid), true);
+            songSelectDetail.UpdateInfo(
+                songListView.SelectedDifficulty,
+                scoreManager.GetScore(songListView.SelectedCellListSid),
+                persent,
+                addressableAssetManager.GetSprite(string.Format("icon_result_rank_{0}", rank)));
         }
     }
 }

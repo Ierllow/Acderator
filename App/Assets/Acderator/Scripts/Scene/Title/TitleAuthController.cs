@@ -17,7 +17,7 @@ namespace Title
         [Inject] private readonly NetworkManager networkManager;
         [Inject] private readonly MasterDataManager masterDataManager;
         [Inject] private readonly ScoreManager scoreManager;
-        [Inject] private readonly AssetBundleManager assetBundleManager;
+        [Inject] private readonly AddressableAssetManager addressableAssetManager;
         [Inject] private readonly PopupManager popupManager;
         [Inject] private readonly IApiSession apiSession;
 
@@ -70,8 +70,7 @@ namespace Title
 
         private async UniTask LoadAssets(CancellationToken token)
         {
-            assetBundleManager.NotExistAssetBundleName.ForEach(assetBundleManager.AddLoadAssets);
-            await assetBundleManager.LoadAssetsAsync(ESceneType.Title, token);
+            await addressableAssetManager.LoadAssetsAsync(ESceneType.Title, token);
         }
     }
 }

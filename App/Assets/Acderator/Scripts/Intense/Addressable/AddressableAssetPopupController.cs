@@ -1,22 +1,18 @@
 using Cysharp.Threading.Tasks;
 using Element.UI;
 using Intense.UI;
-using UnityEngine.Networking;
 using Zenject;
 
 namespace Intense.Asset
 {
-    internal class AssetBundlePopupController
+    internal sealed class AddressableAssetPopupController
     {
         [Inject] private readonly PopupManager popupManager;
 
-        public async UniTask<bool> TryRetryAssetErrorAsync(UnityWebRequest.Result result)
+        public async UniTask<bool> TryRetryAssetErrorAsync()
         {
             var completionSource = AutoResetUniTaskCompletionSource<ECommonPopupTapKind>.Create();
-            var kind = result == UnityWebRequest.Result.ProtocolError
-                ? EAssetBundleErrorKind.ProtocolError
-                : EAssetBundleErrorKind.ConnectionError;
-            var popupContext = PopupContextFactory.CreateAssetErrorPopupContext(completionSource, kind);
+            var popupContext = PopupContextFactory.CreateAssetErrorPopupContext(completionSource);
             popupManager.OpenPopup(popupContext);
             return await completionSource.Task == ECommonPopupTapKind.Positive;
         }
@@ -25,7 +21,8 @@ namespace Intense.Asset
         {
             if (fileSize <= 0) return true;
 
-            var context = PopupContextFactory.CreateDownloadSizeConfirmPopupContext(fileSize.GetFileSize(), fileSize.GetFileSizeType().GetText());
+            var (value, unit) = fileSize.ToDisplayFileSize();
+            var context = PopupContextFactory.CreateDownloadSizeConfirmPopupContext(value, unit);
             popupManager.OpenPopup(context);
 
             var popup = popupManager.CurrentOpenPopup as DownloadSizeConfPopup;

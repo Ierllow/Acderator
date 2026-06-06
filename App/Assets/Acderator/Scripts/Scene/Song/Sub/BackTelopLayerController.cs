@@ -13,9 +13,9 @@ namespace Song
         [SerializeField] private SongIntroView songIntroView;
         [SerializeField] private Image fadeImage;
 
-        public async UniTask ShowSongIntro(SongInfo songInfo)
+        public async UniTask ShowSongIntro(SongInfo songInfo, Sprite jacket, Sprite difficulty)
         {
-            songIntroView.Show(songInfo);
+            songIntroView.Show(songInfo, jacket, difficulty);
             songInfoCanvas.alpha = 1f;
 
             await songInfoCanvas.DOFade(0f, 2f).SetDelay(5f).WithCancellation(destroyCancellationToken);
@@ -23,7 +23,7 @@ namespace Song
             await UniTask.NextFrame();
         }
 
-        public void SetBackgroundImage(int bg) => backgroundImage.SetAtlas(bg.ToString(), "song/bg");
+        public void SetBackgroundImage(Sprite background) => backgroundImage.SetSprite(background);
 
         public async UniTask FadeIn() => await fadeImage.DOFade(0.0f, 2f);
 

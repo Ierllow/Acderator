@@ -22,11 +22,11 @@ namespace Song
             particle.Emit(1);
         }
 
-        public void Emit(float xParentPosition, float xChildPosition, EJudgementType type)
+        public void Emit(float xParentPosition, float xChildPosition, EJudgementType type, Sprite judgeSprite)
         {
             if (type == EJudgementType.None) return;
 
-            atlas.SetAtlasFormat("judgetext_{0}", (int)type, "song/particle/judgetext");
+            atlas.SetSprite(judgeSprite);
             particleSystemRenderer.material.mainTexture = atlas.mainTexture;
             particle.transform.localPosition = new(xChildPosition, particle.transform.localPosition.y, particle.transform.localPosition.z);
             Emit(xParentPosition);

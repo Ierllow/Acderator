@@ -16,23 +16,23 @@ namespace Song
 
     public sealed class SongAssetLoader
     {
-        [Inject] private readonly AssetBundleManager assetBundleManager;
+        [Inject] private readonly AddressableAssetManager addressableAssetManager;
         [Inject] private readonly SongSceneContext sceneContext;
 
-        public async UniTask LoadBundles(ESceneType sceneType, CancellationToken token)
+        public async UniTask LoadAssetsAsync(ESceneType sceneType, CancellationToken token)
         {
-            foreach (var path in sceneContext.SongBundlePathList)
+            foreach (var address in sceneContext.DynamicAssetAddressList)
             {
-                assetBundleManager.AddLoadAssets(path);
+                addressableAssetManager.AddLoad(address);
             }
-            await assetBundleManager.LoadAssetsAsync(sceneType, token);
+            await addressableAssetManager.LoadAssetsAsync(sceneType, token);
         }
 
         public async UniTask<SongLoadResult> LoadChart()
         {
             var loadedChartInfo = new LoadedChartInfo();
 
-            var chartAsset = await assetBundleManager.GetLoadedObjectAsync(sceneContext.SongChartBundlePath);
+            var chartAsset = await addressableAssetManager.LoadAssetAsync<TextAsset>(sceneContext.SongChartAddress);
             if (chartAsset is not TextAsset textAsset)
             {
                 return new SongLoadResult { LoadResult = ELoadResult.InvalidAsset, ChartInfo = loadedChartInfo };

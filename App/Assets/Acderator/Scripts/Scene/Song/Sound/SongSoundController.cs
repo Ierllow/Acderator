@@ -1,5 +1,6 @@
 using Cysharp.Threading.Tasks;
 using Intense;
+using Intense.Asset;
 using Zenject;
 
 namespace Song
@@ -21,7 +22,7 @@ namespace Song
         public void PlaySong(int id) => UniTask.Void(async () =>
         {
             var mSoundCueName = soundSheetNameResolver.Song;
-            var sheet = await cueSheetLoader.GetOrAddCueSheetAsync(mSoundCueName.SheetName, string.Format("sounds/song/song_{0}", id));
+            var sheet = await cueSheetLoader.GetOrAddCueSheetAsync(mSoundCueName.SheetName, DynamicAssetAddresses.Song(id));
             songVolumeController.Register(songExPlayer);
             var playback = songExPlayer.Play(sheet, id.ToString());
             playbackClock.Start(playback);

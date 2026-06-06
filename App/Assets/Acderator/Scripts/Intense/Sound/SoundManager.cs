@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using Intense.Asset;
 using Zenject;
 
 namespace Intense
@@ -9,6 +10,7 @@ namespace Intense
     public class SoundManager : IInitializable
     {
         [Inject] private readonly CriAtomCueSheetLoader cueSheetLoader;
+        [Inject] private readonly AddressableAssetManager addressableAssetManager;
         [Inject] private readonly SoundSheetNameResolver soundSheetNameResolver;
         [Inject] private readonly BgmVolumeController bgmVolumeController;
         [Inject] private readonly SeVolumeController seVolumeController;
@@ -41,14 +43,14 @@ namespace Intense
         public void PlaySe(ESeType type) => UniTask.Void(async () =>
         {
             var mSoundCueName = soundSheetNameResolver.FindSe(type);
-            var sheet = await cueSheetLoader.GetOrAddCueSheetAsync(mSoundCueName.SheetName, "sounds/song/songse");
+            var sheet = await cueSheetLoader.GetOrAddCueSheetAsync(mSoundCueName.SheetName, addressableAssetManager.Config.SongSe);
             sePlayer.Play(sheet, mSoundCueName.CueName);
         });
 
         public void PlayBgm(EBgmType type, bool isLoop = true) => UniTask.Void(async () =>
         {
             var mSoundCueName = soundSheetNameResolver.FindBgm(type);
-            var sheet = await cueSheetLoader.GetOrAddCueSheetAsync(mSoundCueName.SheetName, "sounds/bgm/bgm");
+            var sheet = await cueSheetLoader.GetOrAddCueSheetAsync(mSoundCueName.SheetName, addressableAssetManager.Config.Bgm);
             bgmPlayer.Play(sheet, mSoundCueName.CueName, isLoop);
         });
     }

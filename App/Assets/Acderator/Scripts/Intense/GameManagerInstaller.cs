@@ -15,7 +15,7 @@ namespace Intense
             Container.Bind<SceneManager>().FromComponentInHierarchy().AsSingle().NonLazy();
             Container.Bind<Loading>().FromComponentInHierarchy().AsSingle().NonLazy();
             Container.Bind<NetworkManager>().FromComponentInHierarchy().AsSingle().NonLazy();
-            Container.Bind<AssetBundleManager>().FromComponentInHierarchy().AsSingle().NonLazy();
+            Container.BindInterfacesAndSelfTo<AddressableAssetManager>().FromComponentInHierarchy().AsSingle().NonLazy();
             Container.Bind<IApiSession>().To<ApiSession>().AsSingle().NonLazy();
             Container.Bind<MasterDataManager>().AsSingle().NonLazy();
             Container.Bind<ScoreManager>().AsSingle().NonLazy();
@@ -29,7 +29,7 @@ namespace Intense
             Container.Bind<PopupManager>().AsSingle().NonLazy();
             Container.Bind<SceneErrorPopupController>().AsSingle();
             Container.Bind<SceneErrorHandler>().AsTransient();
-            Container.Bind<AssetBundlePopupController>().AsTransient();
+            Container.Bind<AddressableAssetPopupController>().AsTransient();
         }
     }
 }

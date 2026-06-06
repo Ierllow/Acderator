@@ -901,6 +901,12 @@ MonoBehaviour:
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
   m_Atlas: {fileID: 0}
+  m_AtlasReference:
+    m_AssetGUID: 
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_SubObjectGUID: 
+    m_EditorAssetChanged: 0
   m_SpriteName: 3
 --- !u!222 &564220243
 CanvasRenderer:
@@ -1088,6 +1094,12 @@ MonoBehaviour:
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
   m_Atlas: {fileID: 0}
+  m_AtlasReference:
+    m_AssetGUID: 
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_SubObjectGUID: 
+    m_EditorAssetChanged: 0
   m_SpriteName: 
 --- !u!1 &637202095
 GameObject:
@@ -2966,6 +2978,12 @@ MonoBehaviour:
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
   m_Atlas: {fileID: 4343727234628468602, guid: 414cbd96ca9ffcd4b8aa5ea6301f6897, type: 2}
+  m_AtlasReference:
+    m_AssetGUID: 
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_SubObjectGUID: 
+    m_EditorAssetChanged: 0
   m_SpriteName: D
 --- !u!1 &1976581630
 GameObject:
@@ -3204,6 +3222,10 @@ PrefabInstance:
     - target: {fileID: 5146527889886647903, guid: 4ea0c69ed56094a4b8803439317ea023, type: 3}
       propertyPath: m_fontColor32.rgba
       value: 4278190080
+      objectReference: {fileID: 0}
+    - target: {fileID: 5146527889886647903, guid: 4ea0c69ed56094a4b8803439317ea023, type: 3}
+      propertyPath: 'm_ActiveFontFeatures.Array.data[0]'
+      value: 1801810542
       objectReference: {fileID: 0}
     - target: {fileID: 5146527890833775208, guid: 4ea0c69ed56094a4b8803439317ea023, type: 3}
       propertyPath: m_Name

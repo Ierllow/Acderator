@@ -2,9 +2,11 @@ using Cysharp.Threading.Tasks;
 using Cysharp.Threading.Tasks.Linq;
 using Intense;
 using Intense.Api;
+using Intense.Asset;
 using Intense.Attribute;
 using Intense.UI;
 using R3;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Zenject;
@@ -28,6 +30,7 @@ namespace Song
         [Inject] private readonly SongManagerResolver songManagerResolver;
         [Inject] private readonly SongSceneContext sceneContext;
         [Inject] private readonly SongAssetLoader songAssetLoader;
+        [Inject] private readonly AddressableAssetManager addressableAssetManager;
 
         protected override void Awake()
         {
@@ -94,19 +97,22 @@ namespace Song
         private UniTask LoadIntro() => sceneContext.IsRestart switch
         {
             true => sceneManager.FadeInAsync().AddWatcherTo(failFastExceptionWatcher),
-            _ => UniTask.WhenAll(backTelopLayerController.ShowSongIntro(sceneContext.SongInfo)),
+            _ => UniTask.WhenAll(backTelopLayerController.ShowSongIntro(
+                sceneContext.SongInfo,
+                addressableAssetManager.GetSprite(sceneContext.SongInfo.Group.ToString()),
+                addressableAssetManager.GetSprite(string.Format("difficulty_{0}", sceneContext.SongInfo.Difficulty)))),
         };
 
         private async UniTask LoadAssets()
         {
             if (!sceneContext.IsRestart)
             {
-                await songAssetLoader.LoadBundles(sceneManager.CurrentSceneType, destroyCancellationToken).AddWatcherTo(failFastExceptionWatcher);
+                await songAssetLoader.LoadAssetsAsync(sceneManager.CurrentSceneType, destroyCancellationToken).AddWatcherTo(failFastExceptionWatcher);
             }
             await (LoadIntro(), sceneManager.FadeInAsync());
             songLayerController.Show(sceneContext.IsAuto());
             await notesLineController.Show().AddWatcherTo(failFastExceptionWatcher);
-            backTelopLayerController.SetBackgroundImage(sceneContext.SongInfo.Bg);
+            backTelopLayerController.SetBackgroundImage(addressableAssetManager.GetSprite(sceneContext.SongInfo.Bg.ToString()));
             songControllerResolver.Loop.UpdateState(ESongState.Ready);
         }
 

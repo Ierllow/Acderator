@@ -1,5 +1,5 @@
 using Intense.UI;
-using System.Collections.Generic;
+using System;
 using System.Linq;
 using UnityEditor;
 using UnityEditor.AnimatedValues;
@@ -11,23 +11,30 @@ using UnityEngine.UI;
 [CustomEditor(typeof(AtlasImage), true), CanEditMultipleObjects]
 public class AtlasImageEditor : ImageEditor
 {
+    private const string CloneSuffix = "(Clone)";
+    private const string SpriteNameLabel = "SpriteName";
+
     private SerializedProperty atlas;
     private SerializedProperty spriteName;
+    private SerializedProperty sprite;
+    private SerializedProperty imageType;
 
     private AnimBool showSpriteName;
+    private string[] spriteNames = Array.Empty<string>();
 
-    private string[] atlasSpriteNames;
-    private int spriteNameIndex = 0;
+    private bool HasAtlas => atlas.objectReferenceValue is SpriteAtlas;
 
     protected override void OnEnable()
     {
         atlas = serializedObject.FindProperty("m_Atlas");
         spriteName = serializedObject.FindProperty("m_SpriteName");
-        showSpriteName = new AnimBool(atlas.objectReferenceValue != null);
+        sprite = serializedObject.FindProperty("m_Sprite");
+        imageType = serializedObject.FindProperty("m_Type");
+
+        showSpriteName = new AnimBool(HasAtlas);
         showSpriteName.valueChanged.AddListener(Repaint);
 
-        ResetAtlasSpriteNames();
-        ResetSpriteNameIndex();
+        RefreshSpriteNames();
         base.OnEnable();
     }
 
@@ -40,10 +47,11 @@ public class AtlasImageEditor : ImageEditor
     public override void OnInspectorGUI()
     {
         serializedObject.Update();
-        AtlasGUI();
 
-        showSpriteName.target = atlas.objectReferenceValue != null;
-        if (EditorGUILayout.BeginFadeGroup(showSpriteName.faded)) SpriteNameGUI();
+        DrawAtlasField();
+
+        showSpriteName.target = HasAtlas;
+        if (EditorGUILayout.BeginFadeGroup(showSpriteName.faded)) DrawSpriteNamePopup();
         EditorGUILayout.EndFadeGroup();
 
         serializedObject.ApplyModifiedProperties();
@@ -51,93 +59,64 @@ public class AtlasImageEditor : ImageEditor
         base.OnInspectorGUI();
     }
 
-    protected virtual void AtlasGUI()
+    protected virtual void DrawAtlasField()
     {
         EditorGUI.BeginChangeCheck();
         EditorGUILayout.PropertyField(atlas);
 
         if (EditorGUI.EndChangeCheck())
         {
-            ResetAtlasSpriteNames();
-            ResetSpriteNameIndex();
+            RefreshSpriteNames();
+            SelectSpriteName(spriteName.stringValue);
         }
     }
 
-    private void ResetSpriteNameIndex()
+    protected virtual void DrawSpriteNamePopup()
     {
-        if (atlasSpriteNames?.Length == 0) return;
+        if (spriteNames.Length == 0) return;
 
-        var currentName = spriteName.stringValue;
-        var tempIndex = 0;
-        for (var i = 0; i < atlasSpriteNames.Length; i++)
-        {
-            if (currentName == atlasSpriteNames[i])
-            {
-                tempIndex = i;
-                break;
-            }
-        }
-        spriteNameIndex = tempIndex;
-        spriteName.stringValue = atlasSpriteNames[spriteNameIndex];
+        var index = IndexOfSpriteName(spriteName.stringValue);
+
+        EditorGUI.BeginChangeCheck();
+        index = EditorGUILayout.Popup(SpriteNameLabel, index, spriteNames);
+        if (EditorGUI.EndChangeCheck()) SelectSpriteName(spriteNames[index]);
+    }
+
+    private void SelectSpriteName(string name)
+    {
+        if (spriteNames.Length == 0) return;
+
+        spriteName.stringValue = spriteNames[IndexOfSpriteName(name)];
         UpdateSourceImage();
     }
 
-    private void ResetAtlasSpriteNames()
-    {
-        var newAtlas = atlas.objectReferenceValue as SpriteAtlas;
-        if (newAtlas)
-        {
-            atlasSpriteNames = GetAllSprite(newAtlas).Select(x => x.name.Replace("(Clone)", "")).ToArray();
-        }
-    }
+    private int IndexOfSpriteName(string name) => Mathf.Max(0, Array.IndexOf(spriteNames, name));
 
-    protected virtual void SpriteNameGUI()
-    {
-        EditorGUI.BeginChangeCheck();
-        if (atlasSpriteNames != null)
-        {
-            spriteNameIndex = EditorGUILayout.Popup("SpriteName", spriteNameIndex, atlasSpriteNames);
-        }
-
-        if (EditorGUI.EndChangeCheck())
-        {
-            spriteName.stringValue = atlasSpriteNames[spriteNameIndex];
-            UpdateSourceImage();
-        }
-    }
+    private void RefreshSpriteNames() => spriteNames = atlas.objectReferenceValue is SpriteAtlas spriteAtlas ? GetSpriteNames(spriteAtlas) : Array.Empty<string>();
 
     protected virtual void UpdateSourceImage()
     {
-        var type = serializedObject.FindProperty("m_Type");
-        var sprite = serializedObject.FindProperty("m_Sprite");
+        if (atlas.objectReferenceValue is not SpriteAtlas spriteAtlas) return;
 
-        if (atlas.objectReferenceValue is not SpriteAtlas currentAtlas) return;
-
-        var newSprite = currentAtlas.GetSprite(spriteName.stringValue);
-
+        var newSprite = spriteAtlas.GetSprite(spriteName.stringValue);
         sprite.objectReferenceValue = newSprite;
-        if (newSprite)
+        if (newSprite == null) return;
+
+        var hasBorder = newSprite.border.SqrMagnitude() > 0;
+        var currentType = (Image.Type)imageType.enumValueIndex;
+
+        imageType.enumValueIndex = (int)((hasBorder, currentType) switch
         {
-            var oldType = (Image.Type)type.enumValueIndex;
-            if (newSprite.border.SqrMagnitude() > 0)
-            {
-                type.enumValueIndex = (int)Image.Type.Sliced;
-            }
-            else if (oldType == Image.Type.Sliced)
-            {
-                type.enumValueIndex = (int)Image.Type.Simple;
-            }
-        }
+            (true, _) => Image.Type.Sliced,
+            (false, Image.Type.Sliced) => Image.Type.Simple,
+            _ => currentType,
+        });
     }
 
-    private static IEnumerable<Sprite> GetAllSprite(SpriteAtlas spriteAtlas)
+    private static string[] GetSpriteNames(SpriteAtlas spriteAtlas)
     {
-        var spriteArray = new Sprite[spriteAtlas.spriteCount];
-
-        spriteAtlas.GetSprites(spriteArray);
-        foreach (var sprite in spriteArray)
-        {
-            yield return sprite;
-        }
+        var sprites = new Sprite[spriteAtlas.spriteCount];
+        spriteAtlas.GetSprites(sprites);
+        return sprites.Select(x => x.name.Replace(CloneSuffix, string.Empty)).ToArray();
     }
 }

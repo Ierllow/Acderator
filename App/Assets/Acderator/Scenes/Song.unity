@@ -3074,6 +3074,12 @@ MonoBehaviour:
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
   m_Atlas: {fileID: 0}
+  m_AtlasReference:
+    m_AssetGUID: 
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_SubObjectGUID: 
+    m_EditorAssetChanged: 0
   m_SpriteName: 1
 --- !u!1 &903195508
 GameObject:
@@ -4272,6 +4278,12 @@ MonoBehaviour:
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
   m_Atlas: {fileID: 4343727234628468602, guid: 36afdfcb0fcf36949b4c81750a0f4e67, type: 2}
+  m_AtlasReference:
+    m_AssetGUID: 
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_SubObjectGUID: 
+    m_EditorAssetChanged: 0
   m_SpriteName: radial_slider
 --- !u!95 &1233453092
 Animator:
@@ -4508,6 +4520,12 @@ MonoBehaviour:
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
   m_Atlas: {fileID: 0}
+  m_AtlasReference:
+    m_AssetGUID: 
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_SubObjectGUID: 
+    m_EditorAssetChanged: 0
   m_SpriteName: icon_result_rank_1
 --- !u!1 &1413050354
 GameObject:
@@ -5083,6 +5101,12 @@ MonoBehaviour:
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
   m_Atlas: {fileID: 0}
+  m_AtlasReference:
+    m_AssetGUID: 
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_SubObjectGUID: 
+    m_EditorAssetChanged: 0
   m_SpriteName: 
 --- !u!1 &1520155915
 GameObject:

@@ -11,10 +11,10 @@ namespace Song
         [SerializeField] private TextMeshProUGUI songName;
         [SerializeField] private TextMeshProUGUI composer;
 
-        public void Show(SongInfo songInfo)
+        public void Show(SongInfo songInfo, Sprite jacket, Sprite difficulty)
         {
-            atlas.SetAtlasFormat("{0}", songInfo.Group);
-            difficultyImage.SetAtlasFormat("difficulty_{0}", songInfo.Difficulty, "song/difficulty");
+            atlas.SetSprite(jacket);
+            difficultyImage.SetSprite(difficulty);
             songName.SetText(songInfo.Name);
             composer.SetText(songInfo.Composer);
         }
