@@ -1,9 +1,7 @@
 # Acderator
 
 Acderator is a rhythm game made with Unity.
-
-View [Acderator](App/Assets/Acderator) for more information.
-
+  
 ## Getting Started
 
 ### Requirements
@@ -30,7 +28,8 @@ dotnet run --project CodingRuleChecker.csproj
 dotnet format whitespace --folder --verify-no-changes --include Assets/Acderator
 ```
 
-The coding rule checker validates C# files under `Assets/Acderator`, excluding generated master data under `Assets/Acderator/Scripts/Intense/Master`.
+The coding rule checker validates C# files under `Assets/Acderator`,   
+excluding generated master data under `Assets/Acderator/Scripts/Intense/Master`.  
 
 It checks:
 
@@ -46,11 +45,7 @@ dotnet run --project CodingRuleChecker.csproj -- --fix
 ```
 
 Generated `bin` and `obj` directories should not be committed.
-
-## CI
-
-GitHub Actions runs Unity CI plus the local C# coding rule checker. The coding rule check is scoped to changed C# files, with generated master data excluded.
-
+  
 ## Project Status
 
 - [ ] Update ConfigPopup UI
@@ -59,7 +54,6 @@ GitHub Actions runs Unity CI plus the local C# coding rule checker. The coding r
 ## Credits
 
 - [Ched](https://github.com/paralleltree/Ched)
-- [DOTween](https://assetstore.unity.com/packages/tools/visual-scripting/dotween-pro-32416)
 - [MasterMemory](https://github.com/Cysharp/MasterMemory)
 - [R3](https://github.com/Cysharp/R3)
 - [UIEffect](https://github.com/mob-sakai/UIEffect)
