@@ -23,9 +23,7 @@ namespace Intense.Asset
 
             var (value, unit) = fileSize.ToDisplayFileSize();
             var context = PopupContextFactory.CreateDownloadSizeConfirmPopupContext(value, unit);
-            popupManager.OpenPopup(context);
-
-            var popup = popupManager.CurrentOpenPopup as DownloadSizeConfPopup;
+            var popup = popupManager.OpenPopup(context);
             await UniTask.WaitUntil(() => popup.IsClose);
             return popup.IsConfirm;
         }

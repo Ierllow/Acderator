@@ -2,8 +2,10 @@ using System;
 
 namespace Intense.UI
 {
-    public class PopupContext
+    public abstract class PopupContext
     {
         public Action NegativeCallback { get; init; }
     }
+
+    public abstract class PopupContext<TPopup> : PopupContext where TPopup : PopupBase { }
 }

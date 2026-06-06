@@ -9,9 +9,9 @@ using Zenject;
 
 namespace Element.UI
 {
-    public sealed class ConfigPopupContext : PopupContext { }
+    public sealed class ConfigPopupContext : PopupContext<ConfigPopup> { }
 
-    public class ConfigPopup : PopupBase
+    public class ConfigPopup : PopupBase<ConfigPopupContext>
     {
         private enum ConfigType { NoteSpeed = 1, Offset, Bgm, Se }
 
@@ -40,7 +40,7 @@ namespace Element.UI
             SeNum.SetText(string.Format("{0}%", Math.Round(SeSlider.value * 100)));
         }
 
-        public void Open(ConfigPopupContext configPopupContext)
+        public override void Open(ConfigPopupContext configPopupContext)
         {
             closeCallback = configPopupContext.NegativeCallback;
             base.Open(closeCallback);

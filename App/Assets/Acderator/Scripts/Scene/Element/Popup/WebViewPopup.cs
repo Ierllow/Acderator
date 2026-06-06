@@ -3,19 +3,19 @@ using UnityEngine;
 
 namespace Element.UI
 {
-    public sealed class WebViewPopupContext : PopupContext
+    public sealed class WebViewPopupContext : PopupContext<WebViewPopup>
     {
         public string TitleText { get; init; }
         public string Url { get; init; }
     }
 
-    public class WebViewPopup : PopupBase
+    public class WebViewPopup : PopupBase<WebViewPopupContext>
     {
         [SerializeField] private WebViewObject webViewObject;
 
         private string url;
 
-        public void Open(WebViewPopupContext context)
+        public override void Open(WebViewPopupContext context)
         {
             closeCallback = context.NegativeCallback;
             url = context.Url;

@@ -15,6 +15,8 @@ namespace Intense.UI
         protected Action openCallback;
         protected Action closeCallback;
 
+        public Action<PopupBase> DestroyedCallback { private get; set; }
+
         public virtual void Open(Action callback = null)
         {
             closeCallback = callback;
@@ -22,6 +24,10 @@ namespace Intense.UI
         }
 
         public virtual void Close() => popupAnimation.Play("close_popup");
+
+        public virtual void Open(PopupContext context) { }
+
+        protected virtual void OnDestroy() => DestroyedCallback?.Invoke(this);
 
         protected virtual void FinishOpnePopupScale()
         {
@@ -109,5 +115,12 @@ namespace Intense.UI
 
         }
 #endif
+    }
+
+    public abstract class PopupBase<TContext> : PopupBase where TContext : PopupContext
+    {
+        public abstract void Open(TContext context);
+
+        public sealed override void Open(PopupContext context) => Open((TContext)context);
     }
 }

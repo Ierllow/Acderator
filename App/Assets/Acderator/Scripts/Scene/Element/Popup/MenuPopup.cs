@@ -8,12 +8,12 @@ using Zenject;
 
 namespace Element.UI
 {
-    public sealed class MenuPopupContext : PopupContext
+    public sealed class MenuPopupContext : PopupContext<MenuPopup>
     {
         public new Action<ESceneType> NegativeCallback { get; init; }
     }
 
-    public class MenuPopup : PopupBase
+    public class MenuPopup : PopupBase<MenuPopupContext>
     {
         [SerializeField] private CommonButton configButton;
         [SerializeField] private CommonButton deleteAccountButton;
@@ -33,7 +33,7 @@ namespace Element.UI
             titleSceneButton.OnTapButtonAsObservable.SubscribeLock(_ => TapTitleSceneButton()).RegisterTo(destroyCancellationToken);
         }
 
-        public void Open(MenuPopupContext menuPopupContext)
+        public override void Open(MenuPopupContext menuPopupContext)
         {
             closeCallback = menuPopupContext.NegativeCallback;
             base.Open();

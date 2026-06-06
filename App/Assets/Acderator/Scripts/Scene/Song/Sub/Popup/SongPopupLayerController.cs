@@ -127,10 +127,10 @@ namespace Song
             Open(popupContext);
         }
 
-        private void Open(PopupContext popupContext)
+        private void Open<TPopup>(PopupContext<TPopup> popupContext) where TPopup : PopupBase
         {
-            popupManager.OpenPopup(popupContext);
-            popupManager.CurrentOpenPopup.transform.SetParent(transform);
+            var popup = popupManager.OpenPopup(popupContext);
+            popup.transform.SetParent(transform);
         }
     }
 }

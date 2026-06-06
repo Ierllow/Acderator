@@ -5,20 +5,20 @@ using UnityEngine;
 
 namespace Element.UI
 {
-    public sealed class DownloadSizeConfPopupContext : PopupContext
+    public sealed class DownloadSizeConfPopupContext : PopupContext<DownloadSizeConfPopup>
     {
         public double FileSize { get; init; }
         public string Size { get; init; }
     }
 
-    public class DownloadSizeConfPopup : PopupBase
+    public class DownloadSizeConfPopup : PopupBase<DownloadSizeConfPopupContext>
     {
         [SerializeField] private TextMeshProUGUI text;
 
         public bool IsConfirm { get; private set; } = false;
         public bool IsClose { get; private set; } = false;
 
-        public void Open(DownloadSizeConfPopupContext context) => UniTask.Void(async () =>
+        public override void Open(DownloadSizeConfPopupContext context) => UniTask.Void(async () =>
         {
             text.SetText(string.Format("ゲームデータのダウンロードを行います \nよろしいですか(サイズ{0}{1})", context.FileSize, context.Size));
             base.Open(closeCallback);

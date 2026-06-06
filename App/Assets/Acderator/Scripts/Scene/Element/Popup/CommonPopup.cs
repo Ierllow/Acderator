@@ -8,7 +8,7 @@ namespace Element.UI
     public enum ECommonPopupTapKind { None = 0, Positive, Negative }
     public enum EButtonType { Close, Both }
 
-    public sealed class CommonPopupContext : PopupContext
+    public sealed class CommonPopupContext : PopupContext<CommonPopup>
     {
         public string Title { get; init; }
         public string Text { get; init; }
@@ -18,7 +18,7 @@ namespace Element.UI
         public EButtonType ButtonType { get; init; }
     }
 
-    public class CommonPopup : PopupBase
+    public class CommonPopup : PopupBase<CommonPopupContext>
     {
         [SerializeField] private TextMeshProUGUIEx text;
         [SerializeField] private TextMeshProUGUI positiveText;
@@ -27,7 +27,7 @@ namespace Element.UI
 
         private Action positiveCallback;
 
-        public void Open(CommonPopupContext context)
+        public override void Open(CommonPopupContext context)
         {
             positiveCallback = context.PositiveCallback;
             closeCallback = context.NegativeCallback;
