@@ -1,3 +1,5 @@
+#nullable enable
+
 using DG.Tweening;
 using Intense.Master;
 using R3;
@@ -12,13 +14,13 @@ namespace Song
 
         private const float FadeOutDuration = 0.35f;
 
-        [SerializeField] private TutorialTextView tutorialTextView;
-        [SerializeField] private GameObject tutorialOverlay;
-        [SerializeField] private CanvasGroup bodyCanvasGroup;
+        [SerializeField] private TutorialTextView tutorialTextView = default!;
+        [SerializeField] private GameObject tutorialOverlay = default!;
+        [SerializeField] private CanvasGroup bodyCanvasGroup = default!;
 
-        private TutorialStepMaster currentStep;
+        private TutorialStepMaster? currentStep;
         private TutorialLayerState currentState = TutorialLayerState.Hidden;
-        private Tween fadeTween;
+        private Tween? fadeTween;
 
         public readonly Subject<Unit> TutorialCompletedSubject = new();
         public readonly Subject<Unit> TutorialIntroCompletedSubject = new();
@@ -35,11 +37,11 @@ namespace Song
         {
             switch (tutorialEvent.Type)
             {
-                case ETutorialEventType.ShowIntro:
-                    ShowTutorialIntro((TutorialMaster)tutorialEvent.Data);
+                case ETutorialEventType.ShowIntro when tutorialEvent.Data is TutorialMaster tutorial:
+                    ShowTutorialIntro(tutorial);
                     break;
-                case ETutorialEventType.ShowStep:
-                    ShowTutorialStep((TutorialStepMaster)tutorialEvent.Data);
+                case ETutorialEventType.ShowStep when tutorialEvent.Data is TutorialStepMaster tutorialStep:
+                    ShowTutorialStep(tutorialStep);
                     break;
                 case ETutorialEventType.ShowComplete:
                     ShowTutorialComplete();
@@ -51,7 +53,7 @@ namespace Song
 
         private void ShowTutorialIntro(TutorialMaster tutorial)
         {
-            currentStep = default;
+            currentStep = null;
             currentState = TutorialLayerState.Intro;
             tutorialOverlay.SetActive(true);
             ShowBody();
@@ -69,7 +71,7 @@ namespace Song
 
         private void ShowTutorialComplete()
         {
-            currentStep = default;
+            currentStep = null;
             currentState = TutorialLayerState.WaitingForTap;
             tutorialOverlay.SetActive(true);
             ShowBody();
@@ -114,7 +116,7 @@ namespace Song
             fadeTween = bodyCanvasGroup.DOFade(0f, FadeOutDuration).SetLink(gameObject).OnComplete(() =>
             {
                 Hide();
-                onComplete?.Invoke();
+                onComplete.Invoke();
             });
         }
 

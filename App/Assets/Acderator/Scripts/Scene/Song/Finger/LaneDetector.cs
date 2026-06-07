@@ -1,3 +1,5 @@
+#nullable enable
+
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -5,9 +7,9 @@ namespace Song
 {
     public sealed class LaneDetector
     {
-        private Camera camera;
-        private Transform hitPlane;
-        private IReadOnlyList<Transform> laneTargets;
+        private Camera camera = default!;
+        private Transform hitPlane = default!;
+        private IReadOnlyList<Transform> laneTargets = default!;
         private float planeDistance;
 
         public void Init(Camera camera, Transform hitPlane, IReadOnlyList<Transform> laneTargets)

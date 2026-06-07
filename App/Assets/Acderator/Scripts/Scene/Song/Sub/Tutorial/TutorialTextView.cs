@@ -1,3 +1,5 @@
+#nullable enable
+
 using Intense.Master;
 using TMPro;
 using UnityEngine;
@@ -7,9 +9,9 @@ namespace Song
 {
     public class TutorialTextView : MonoBehaviour
     {
-        [SerializeField] private TextMeshProUGUI descriptionText;
+        [SerializeField] private TextMeshProUGUI descriptionText = default!;
 
-        [Inject] private readonly TutorialMessageResolver tutorialMessageResolver;
+        [Inject] private readonly TutorialMessageResolver tutorialMessageResolver = default!;
 
         public void ShowIntro(TutorialMaster tutorial) => descriptionText.SetText(tutorial.Description);
 

@@ -1,3 +1,5 @@
+#nullable enable
+
 using Intense;
 using Intense.Master;
 using R3;
@@ -9,7 +11,7 @@ namespace Song
 {
     public class HpBarController
     {
-        [Inject] private readonly MasterDataManager masterDataManager;
+        [Inject] private readonly MasterDataManager masterDataManager = default!;
 
         private int currentHpNum;
         private int baseHp;

@@ -1,3 +1,5 @@
+#nullable enable
+
 using Intense.Master;
 
 namespace Song

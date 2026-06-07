@@ -1,3 +1,5 @@
+#nullable enable
+
 using Intense.UI;
 using R3;
 using System;
@@ -9,9 +11,9 @@ namespace Song
 
     public class PausePopup : PopupBase
     {
-        [SerializeField] private CommonButton resumeButton;
-        [SerializeField] private CommonButton restartButton;
-        [SerializeField] private CommonButton quitButton;
+        [SerializeField] private CommonButton resumeButton = default!;
+        [SerializeField] private CommonButton restartButton = default!;
+        [SerializeField] private CommonButton quitButton = default!;
 
         public EPopupTapKind TapKind { get; private set; }
 

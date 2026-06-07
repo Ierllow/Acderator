@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,16 +13,16 @@ namespace Song
         [Serializable]
         private class NotePrefabs
         {
-            public SingleNote singleNote;
-            public LongNote longNote;
-            public FlickNote flickNote;
-            public CurveNote curveNote;
+            public SingleNote singleNote = default!;
+            public LongNote longNote = default!;
+            public FlickNote flickNote = default!;
+            public CurveNote curveNote = default!;
         }
 
-        [SerializeField] private Transform[] parents;
-        [SerializeField] private NotePrefabs notePrefabs;
+        [SerializeField] private Transform[] parents = default!;
+        [SerializeField] private NotePrefabs notePrefabs = default!;
 
-        private ObjectPool<NoteBase>[,] pools;
+        private ObjectPool<NoteBase>[,]? pools;
         private readonly Dictionary<NoteBase, NoteData> noteDict = new();
 
         public IReadOnlyList<Transform> LaneParents => parents;
@@ -59,16 +61,16 @@ namespace Song
             maxSize: 10
         );
 
-        public NoteBase SpawnNote(NoteData noteData)
+        public NoteBase? SpawnNote(NoteData noteData)
         {
-            if (pools == null) return default;
+            if (pools == null) return null;
 
             var type = (int)noteData.NoteType;
             var lane = noteData.Lane;
-            if (type < 0 || type >= pools.GetLength(0) || lane < 0 || lane >= pools.GetLength(1)) return default;
+            if (type < 0 || type >= pools.GetLength(0) || lane < 0 || lane >= pools.GetLength(1)) return null;
 
             var pool = pools[type, lane];
-            if (pool == null) return default;
+            if (pool == null) return null;
 
             var note = pool.Get();
             noteDict[note] = noteData;

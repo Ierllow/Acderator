@@ -1,3 +1,5 @@
+#nullable enable
+
 using Intense;
 using Intense.Data;
 using R3;
@@ -9,11 +11,11 @@ namespace Song
 {
     public class SongLayerController : MonoBehaviour
     {
-        [SerializeField] private ComboView comboView;
-        [SerializeField] private SongPlayingFieldView songPlayingFieldView;
-        [SerializeField] private HpBar hpBar;
+        [SerializeField] private ComboView comboView = default!;
+        [SerializeField] private SongPlayingFieldView songPlayingFieldView = default!;
+        [SerializeField] private HpBar hpBar = default!;
 
-        [Inject] private readonly SongGameLogic songGameLogic;
+        [Inject] private readonly SongGameLogic songGameLogic = default!;
 
         private const int MinClearHpPercent = 70;
 

@@ -1,3 +1,5 @@
+#nullable enable
+
 using R3;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -9,18 +11,18 @@ namespace Song
 
     public class FingerController : MonoBehaviour, IInitializable
     {
-        [SerializeField] private Camera choose;
-        [SerializeField] private Transform hitPlane;
+        [SerializeField] private Camera choose = default!;
+        [SerializeField] private Transform hitPlane = default!;
         [SerializeField] private bool ignoreIsOverGui;
         [SerializeField] private bool ignoreStartedOverGui = true;
         [SerializeField] private float swipeThreshold = 50f;
 
-        [Inject] private readonly NotesManager notesManager;
-        [Inject] private readonly NoteFactory noteFactory;
-        [Inject] private readonly FingerJudgeRequestController judgeRequestController;
-        [Inject] private readonly PointerInput pointerInput;
-        [Inject] private readonly LaneDetector laneDetector;
-        [Inject] private readonly TouchStateManager touchStateManager;
+        [Inject] private readonly NotesManager notesManager = default!;
+        [Inject] private readonly NoteFactory noteFactory = default!;
+        [Inject] private readonly FingerJudgeRequestController judgeRequestController = default!;
+        [Inject] private readonly PointerInput pointerInput = default!;
+        [Inject] private readonly LaneDetector laneDetector = default!;
+        [Inject] private readonly TouchStateManager touchStateManager = default!;
 
         private bool useTouch;
 

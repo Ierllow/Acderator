@@ -1,3 +1,5 @@
+#nullable enable
+
 using Zenject;
 
 namespace Song
@@ -6,7 +8,7 @@ namespace Song
 
     public class NotePositionUpdater
     {
-        [Inject] private readonly NotesManager notesManager;
+        [Inject] private readonly NotesManager notesManager = default!;
 
         public void UpdatePositions()
         {

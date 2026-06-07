@@ -1,3 +1,5 @@
+#nullable enable
+
 using Cysharp.Threading.Tasks;
 using Intense;
 using Intense.Asset;
@@ -12,16 +14,16 @@ namespace Song
 {
     public class SongParticleController : MonoBehaviour
     {
-        [SerializeField] private ParticleObject tapParticleObject;
-        [SerializeField] private ParticleObject holdParticleObject;
-        [SerializeField] private ParticleObject judgeParticleObject;
-        [SerializeField] private Transform particlePoolTransform;
+        [SerializeField] private ParticleObject tapParticleObject = default!;
+        [SerializeField] private ParticleObject holdParticleObject = default!;
+        [SerializeField] private ParticleObject judgeParticleObject = default!;
+        [SerializeField] private Transform particlePoolTransform = default!;
 
-        [Inject] private readonly AddressableAssetManager addressableAssetManager;
+        [Inject] private readonly AddressableAssetManager addressableAssetManager = default!;
 
-        private ObjectPool<ParticleObject> tapParticlePool;
-        private ObjectPool<ParticleObject> holdParticlePool;
-        private ObjectPool<ParticleObject> judgeParticlePool;
+        private ObjectPool<ParticleObject> tapParticlePool = default!;
+        private ObjectPool<ParticleObject> holdParticlePool = default!;
+        private ObjectPool<ParticleObject> judgeParticlePool = default!;
 
         private readonly Dictionary<int, ParticleObject> playingHoldParticleDict = new();
 
@@ -44,8 +46,10 @@ namespace Song
 
         public void UpdateParticles(FingerInfo fingerInfo)
         {
+            if (fingerInfo.NoteData == null) return;
+
             if (fingerInfo.IsMissed) StopHoldEffect(fingerInfo.NoteData.Lane);
-            else UpdateParticles((fingerInfo.FingerType, fingerInfo.NoteData.NoteType, fingerInfo.JudgmentType, fingerInfo.NoteData.Lane, fingerInfo.TappingLanes));
+            else UpdateParticles((fingerInfo.FingerType, fingerInfo.NoteData.NoteType, fingerInfo.JudgmentType, fingerInfo.NoteData.Lane, fingerInfo.TappingLanes ?? Array.Empty<int>()));
         }
 
         private void UpdateParticles((EFingerType, ENoteType, EJudgementType, int, IReadOnlyList<int>) particleInfo)

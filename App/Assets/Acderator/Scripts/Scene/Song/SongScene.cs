@@ -1,3 +1,5 @@
+#nullable enable
+
 using Cysharp.Threading.Tasks;
 using Cysharp.Threading.Tasks.Linq;
 using Intense;
@@ -6,7 +8,6 @@ using Intense.Asset;
 using Intense.Attribute;
 using Intense.UI;
 using R3;
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Zenject;
@@ -19,18 +20,18 @@ namespace Song
     [SceneType(ESceneType.Song)]
     public class SongScene : SceneBase
     {
-        [RequiredField, SerializeField] private SongLayerController songLayerController;
-        [RequiredField, SerializeField] private FrontTelopLayerController frontTelopLayerController;
-        [RequiredField, SerializeField] private BackTelopLayerController backTelopLayerController;
-        [RequiredField, SerializeField] private SongPopupLayerController songPopupLayerController;
-        [RequiredField, SerializeField] private NotesLineController notesLineController;
-        [RequiredField, SerializeField] private FailFastExceptionWatcher failFastExceptionWatcher;
+        [RequiredField, SerializeField] private SongLayerController songLayerController = default!;
+        [RequiredField, SerializeField] private FrontTelopLayerController frontTelopLayerController = default!;
+        [RequiredField, SerializeField] private BackTelopLayerController backTelopLayerController = default!;
+        [RequiredField, SerializeField] private SongPopupLayerController songPopupLayerController = default!;
+        [RequiredField, SerializeField] private NotesLineController notesLineController = default!;
+        [RequiredField, SerializeField] private FailFastExceptionWatcher failFastExceptionWatcher = default!;
 
-        [Inject] private readonly SongControllerResolver songControllerResolver;
-        [Inject] private readonly SongManagerResolver songManagerResolver;
-        [Inject] private readonly SongSceneContext sceneContext;
-        [Inject] private readonly SongAssetLoader songAssetLoader;
-        [Inject] private readonly AddressableAssetManager addressableAssetManager;
+        [Inject] private readonly SongControllerResolver songControllerResolver = default!;
+        [Inject] private readonly SongManagerResolver songManagerResolver = default!;
+        [Inject] private readonly SongSceneContext sceneContext = default!;
+        [Inject] private readonly SongAssetLoader songAssetLoader = default!;
+        [Inject] private readonly AddressableAssetManager addressableAssetManager = default!;
 
         protected override void Awake()
         {
@@ -43,7 +44,7 @@ namespace Song
             songControllerResolver.Loop.EveryUpdateSongStateWhere.Subscribe(_ => UpdateSongProgressNext()).RegisterTo(destroyCancellationToken);
             songControllerResolver.Loop.EverySongStateChanged.SubscribeAwait(ChangeStateNext).RegisterTo(destroyCancellationToken);
             songControllerResolver.Loop.SongLoopUpdateAsObservable.Subscribe(OnSongLoopNext).RegisterTo(destroyCancellationToken);
-            songControllerResolver.Spawner.NoteFactoryAsObservable.Select(x => (songManagerResolver.Factory.SpawnNote(x), x)).Where(x => x.Item1 != null).Subscribe(x => songManagerResolver.Notes.AddAliveNote(x.Item1, x.x)).RegisterTo(destroyCancellationToken);
+            songControllerResolver.Spawner.NoteFactoryAsObservable.Select(x => (songManagerResolver.Factory.SpawnNote(x), x)).Where(x => x.Item1 != null).Subscribe(x => songManagerResolver.Notes.AddAliveNote(x.Item1!, x.x)).RegisterTo(destroyCancellationToken);
             songControllerResolver.Loop.SongLeadInCompletedAsObservable.Where(_ => !sceneContext.IsTutorial()).Subscribe(_ => songControllerResolver.Loop.UpdateState(ESongState.Playing)).RegisterTo(destroyCancellationToken);
             songControllerResolver.FingerJudgeRequest.JudgmentAsObservable.Subscribe(FingerSubscribeNext).RegisterTo(destroyCancellationToken);
             songControllerResolver.Finger.EveryUseTouchChanged.Subscribe(notesLineController.SetLaneLightActiveAll).RegisterTo(destroyCancellationToken);
@@ -140,7 +141,7 @@ namespace Song
                 songLayerController.Init(sceneContext.SongInfo.Sid);
                 await backTelopLayerController.FadeIn();
                 songControllerResolver.Loop.StartLeadIn(leadInSec);
-            songManagerResolver.TutorialState?.ShowIntro();
+                songManagerResolver.TutorialState?.ShowIntro();
                 return;
 
             }
@@ -187,7 +188,7 @@ namespace Song
 
         private async UniTask EndNormalSong()
         {
-            await frontTelopLayerController.ShowResult(songLayerController.GetSongResult(songManagerResolver.Notes.LoadedChartInfo.NoteCount));
+            await frontTelopLayerController.ShowResult(songLayerController.GetSongResult(songManagerResolver.Notes.LoadedChartInfo!.NoteCount));
 
             var request = new ScoreSubmitRequest { SessionId = sceneContext.SessionId, Score = songLayerController.CurrentScore };
             var response = await songManagerResolver.Network.RequestAsync(request);
@@ -275,7 +276,7 @@ namespace Song
             songControllerResolver.Loop.UpdateState(ESongState.Stop);
             if (await songPopupLayerController.OpenTutorialSkipConfirm())
             {
-                songControllerResolver.Tutorial.CompleteTutorial();
+                songControllerResolver.Tutorial?.CompleteTutorial();
                 return;
             }
             songControllerResolver.Loop.UpdateState(ESongState.Playing);
@@ -284,12 +285,12 @@ namespace Song
         private void TutorialEventSubscribeNext(TutorialEvent tutorialEvent)
         {
             songControllerResolver.Loop.UpdateState(ESongState.Stop);
-            songControllerResolver.Tutorial.UpdateTutorial(tutorialEvent);
+            songControllerResolver.Tutorial?.UpdateTutorial(tutorialEvent);
         }
 
         private void TutorialStepCompletedSubscribeNext()
         {
-            songManagerResolver.TutorialState.CompleteCurrentStep();
+            songManagerResolver.TutorialState?.CompleteCurrentStep();
             songControllerResolver.Loop.UpdateState(ESongState.Playing);
         }
 

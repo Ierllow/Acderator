@@ -1,3 +1,5 @@
+#nullable enable
+
 using Intense;
 using Intense.Master;
 using R3;
@@ -9,7 +11,7 @@ namespace Song
 {
     public class ScoreController
     {
-        [Inject] private readonly MasterDataManager masterDataManager;
+        [Inject] private readonly MasterDataManager masterDataManager = default!;
 
         private readonly ReactiveProperty<float> currentScore = new(0f);
         public ReadOnlyReactiveProperty<float> CurrentScore => currentScore;

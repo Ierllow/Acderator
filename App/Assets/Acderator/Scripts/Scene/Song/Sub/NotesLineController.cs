@@ -1,3 +1,5 @@
+#nullable enable
+
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using System.Collections.Generic;
@@ -8,8 +10,8 @@ namespace Song
 {
     public class NotesLineController : MonoBehaviour
     {
-        [SerializeField] private GameObject[] laneLights;
-        [SerializeField] private GameObject noteLineRoot;
+        [SerializeField] private GameObject[] laneLights = default!;
+        [SerializeField] private GameObject noteLineRoot = default!;
 
         public float LaneLength => 38.49f;
 
@@ -19,7 +21,7 @@ namespace Song
             await noteLineRoot.transform.DOMoveZ(0f, 1f).WithCancellation(destroyCancellationToken);
         }
 
-        private List<(GameObject, int)> laneLightTuple;
+        private List<(GameObject, int)>? laneLightTuple;
         public void SetLaneLightActive(int lane, EFingerType fingerType)
         {
             laneLightTuple ??= laneLights.Select((ll, index) => (ll, index)).ToList();

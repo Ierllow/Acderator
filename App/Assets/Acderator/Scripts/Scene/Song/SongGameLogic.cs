@@ -1,3 +1,5 @@
+#nullable enable
+
 using Intense;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,10 +9,10 @@ namespace Song
 {
     public class SongGameLogic
     {
-        [Inject] private readonly ScoreController scoreController;
-        [Inject] private readonly ComboController comboController;
-        [Inject] private readonly HpBarController hpBarController;
-        [Inject] private readonly NotesManager notesManager;
+        [Inject] private readonly ScoreController scoreController = default!;
+        [Inject] private readonly ComboController comboController = default!;
+        [Inject] private readonly HpBarController hpBarController = default!;
+        [Inject] private readonly NotesManager notesManager = default!;
 
         private readonly Dictionary<EJudgementType, int> judgeCountDict = new()
         {
@@ -29,13 +31,13 @@ namespace Song
 
         public void Init(int sid)
         {
-            scoreController.Init(sid, notesManager.LoadedChartInfo.NoteCount);
+            scoreController.Init(sid, notesManager.LoadedChartInfo!.NoteCount);
             hpBarController.Init(sid);
         }
 
         public void UpdateGameLogic(FingerInfo fingerInfo)
         {
-            if (fingerInfo.NoteBase == default) return;
+            if (fingerInfo.NoteBase == null || fingerInfo.NoteData == null) return;
             if (!notesManager.AliveNoteList.Any(x => x == fingerInfo.NoteBase)) return;
 
             var noteType = fingerInfo.NoteData.NoteType == ENoteType.Flick;
@@ -55,7 +57,7 @@ namespace Song
                 if (fingerInfo.NoteData.NoteType == ENoteType.Long && fingerInfo.FingerType == EFingerType.Down) return;
                 notesManager.RemoveNote(fingerInfo.NoteBase);
             }
-            if (notesManager.SongOption.IsAuto) hpBarController.UpdateHp(fingerInfo.JudgmentType, notesManager.LoadedChartInfo.NoteCount);
+            if (notesManager.SongOption.IsAuto) hpBarController.UpdateHp(fingerInfo.JudgmentType, notesManager.LoadedChartInfo!.NoteCount);
         }
     }
 }

@@ -1,3 +1,5 @@
+#nullable enable
+
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Intense.UI;
@@ -8,8 +10,8 @@ namespace Song
 {
     public class CountDownBar : MonoBehaviour
     {
-        [SerializeField] private AtlasImage sliderRing;
-        [SerializeField] private TextMeshProUGUI restTimeText;
+        [SerializeField] private AtlasImage sliderRing = default!;
+        [SerializeField] private TextMeshProUGUI restTimeText = default!;
 
         public async UniTask CountDown()
         {

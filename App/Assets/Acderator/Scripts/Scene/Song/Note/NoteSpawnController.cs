@@ -1,3 +1,5 @@
+#nullable enable
+
 using R3;
 using Zenject;
 
@@ -5,7 +7,7 @@ namespace Song
 {
     public class NoteSpawnController
     {
-        [Inject] private readonly NotesManager notesManager;
+        [Inject] private readonly NotesManager notesManager = default!;
 
         private float laneLength;
         private int nextSpawnIndex;
@@ -17,7 +19,9 @@ namespace Song
 
         public void UpdateSpawn()
         {
-            var noteDataList = notesManager.LoadedChartInfo.NoteDataList;
+            var noteDataList = notesManager.LoadedChartInfo?.NoteDataList;
+            if (noteDataList == null) return;
+
             while (nextSpawnIndex < noteDataList.Count)
             {
                 var noteData = noteDataList[nextSpawnIndex];

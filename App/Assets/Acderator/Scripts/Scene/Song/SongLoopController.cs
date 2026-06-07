@@ -1,3 +1,5 @@
+#nullable enable
+
 using Cysharp.Threading.Tasks;
 using Cysharp.Threading.Tasks.Linq;
 using R3;
@@ -7,7 +9,7 @@ namespace Song
 {
     public class SongLoopController
     {
-        [Inject] private readonly SongTimeCalculator timeCalculator;
+        [Inject] private readonly SongTimeCalculator timeCalculator = default!;
 
         private readonly Subject<float> songLoopUpdateSubject = new();
 

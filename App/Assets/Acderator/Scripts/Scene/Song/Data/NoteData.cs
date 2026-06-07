@@ -1,3 +1,5 @@
+#nullable enable
+
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -12,7 +14,7 @@ namespace Song
         public float SecEnd { get; init; }
         public int Lane { get; init; }
         public ENoteType NoteType { get; init; }
-        public List<Vector2> CurvePointList { get; init; }
+        public List<Vector2> CurvePointList { get; init; } = new();
         public float CurveDuration { get; init; }
         public bool UseMidPoint { get; init; }
     }

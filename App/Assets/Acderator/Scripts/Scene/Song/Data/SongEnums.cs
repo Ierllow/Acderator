@@ -1,3 +1,5 @@
+#nullable enable
+
 namespace Song
 {
     public enum ESongMode

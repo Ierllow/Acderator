@@ -1,3 +1,5 @@
+#nullable enable
+
 using Intense;
 using Intense.UI;
 using UnityEngine;
@@ -6,10 +8,10 @@ namespace Song
 {
     public class ParticleObject : MonoBehaviour
     {
-        [SerializeField] private AtlasImage atlas;
-        [SerializeField] private ParticleSystemRenderer particleSystemRenderer;
+        [SerializeField] private AtlasImage atlas = default!;
+        [SerializeField] private ParticleSystemRenderer particleSystemRenderer = default!;
 
-        private ParticleSystem particle;
+        private ParticleSystem particle = default!;
 
         public bool IsPlaying => particle.isPlaying;
 

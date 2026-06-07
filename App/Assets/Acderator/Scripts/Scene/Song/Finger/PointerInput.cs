@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using UnityEngine;
 
@@ -7,9 +9,9 @@ namespace Song
     {
         private const int MousePointerId = -1;
 
-        private Action<int, Vector2> fingerDown;
-        private Action<int, Vector2> fingerUpdate;
-        private Action<int, Vector2> fingerUp;
+        private Action<int, Vector2> fingerDown = default!;
+        private Action<int, Vector2> fingerUpdate = default!;
+        private Action<int, Vector2> fingerUp = default!;
 
         public void SetCallbacks(Action<int, Vector2> fingerDown, Action<int, Vector2> fingerUpdate, Action<int, Vector2> fingerUp)
         {

@@ -1,3 +1,5 @@
+#nullable enable
+
 using Cysharp.Threading.Tasks;
 using Cysharp.Threading.Tasks.Linq;
 using Element.UI;
@@ -13,11 +15,11 @@ namespace Song
     {
         private enum EType { None, Pause, Error, ScoreError, ScoreData, TutorialSkip }
 
-        [SerializeField] private PausePopup pausePopup;
-        [SerializeField] private ScoreErrorPopup errorPopup;
+        [SerializeField] private PausePopup pausePopup = default!;
+        [SerializeField] private ScoreErrorPopup errorPopup = default!;
 
-        [Inject] private readonly PopupManager popupManager;
-        [Inject] private readonly SceneManager sceneManager;
+        [Inject] private readonly PopupManager popupManager = default!;
+        [Inject] private readonly SceneManager sceneManager = default!;
 
         public IUniTaskAsyncEnumerable<EPopupTapKind> ClosedPausePopupAsAsyncEnumerable => UniTaskAsyncEnumerable.EveryValueChanged(pausePopup, x => x.TapKind);
         public Observable<ESceneType> EverySceneTypeChanged => asyncSceneTypeSubject.Where(x => x != ESceneType.None);

@@ -1,3 +1,5 @@
+#nullable enable
+
 using Intense.Internal;
 using Zenject;
 
@@ -62,7 +64,7 @@ namespace Song
         {
             var songSceneContext = sceneContext as SongSceneContext;
             Error.ThrowArgumentNullException(songSceneContext, nameof(songSceneContext));
-            return songSceneContext;
+            return songSceneContext!;
         }
     }
 }

@@ -1,3 +1,5 @@
+#nullable enable
+
 using Intense;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,14 +8,14 @@ namespace Song
 {
     public class CurveNote : NoteBase
     {
-        [SerializeField] private SpriteRenderer beginSprite;
-        [SerializeField] private SpriteRenderer trailSprite;
-        [SerializeField] private SpriteRenderer endSprite;
-        [SerializeField] private LineRenderer curveLineRenderer;
+        [SerializeField] private SpriteRenderer beginSprite = default!;
+        [SerializeField] private SpriteRenderer trailSprite = default!;
+        [SerializeField] private SpriteRenderer endSprite = default!;
+        [SerializeField] private LineRenderer curveLineRenderer = default!;
         [SerializeField] private Color32 tappingTrailColor;
         [SerializeField] private int curveSegments = 21;
 
-        private List<Vector2> curvePointList;
+        private List<Vector2> curvePointList = new();
         private float curveDuration;
         private float secBegin;
         private bool useMidPoint;

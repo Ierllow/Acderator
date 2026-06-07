@@ -1,3 +1,5 @@
+#nullable enable
+
 using Intense;
 using System;
 using UnityEngine;
@@ -10,7 +12,7 @@ namespace Song
 
         public bool IsActive => gameObject.activeSelf;
 
-        public Action<NoteBase> Finalized;
+        public Action<NoteBase>? Finalized;
 
         private void OnDisable()
         {

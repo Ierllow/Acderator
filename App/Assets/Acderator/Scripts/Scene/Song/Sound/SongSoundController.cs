@@ -1,3 +1,5 @@
+#nullable enable
+
 using Cysharp.Threading.Tasks;
 using Intense;
 using Intense.Asset;
@@ -7,10 +9,10 @@ namespace Song
 {
     public sealed class SongSoundController
     {
-        [Inject] private readonly SoundManager soundManager;
-        [Inject] private readonly CriAtomCueSheetLoader cueSheetLoader;
-        [Inject] private readonly SongSoundSheetNameResolver soundSheetNameResolver;
-        [Inject] private readonly SongVolumeController songVolumeController;
+        [Inject] private readonly SoundManager soundManager = default!;
+        [Inject] private readonly CriAtomCueSheetLoader cueSheetLoader = default!;
+        [Inject] private readonly SongSoundSheetNameResolver soundSheetNameResolver = default!;
+        [Inject] private readonly SongVolumeController songVolumeController = default!;
 
         private readonly CriAtomSoundPlayer songExPlayer = new(true);
         private readonly SongPlaybackClock playbackClock = new();

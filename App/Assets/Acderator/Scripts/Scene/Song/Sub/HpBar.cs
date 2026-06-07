@@ -1,3 +1,5 @@
+#nullable enable
+
 using DG.Tweening;
 using R3;
 using TMPro;
@@ -9,10 +11,10 @@ namespace Song
 {
     public class HpBar : MonoBehaviour
     {
-        [SerializeField] private Image gaugeImage;
-        [SerializeField] private TextMeshProUGUI percent;
+        [SerializeField] private Image gaugeImage = default!;
+        [SerializeField] private TextMeshProUGUI percent = default!;
 
-        [Inject] private readonly HpBarController hpBarController;
+        [Inject] private readonly HpBarController hpBarController = default!;
 
         private void Start() => hpBarController.CurrentHpPercent.Subscribe(currentHp =>
         {

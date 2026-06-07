@@ -1,5 +1,8 @@
+#nullable enable
+
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Song
 {
@@ -12,9 +15,9 @@ namespace Song
 
         public float CurrentSec { get; private set; } = default;
         public float CurrentBeat { get; private set; } = default;
-        public LoadedChartInfo LoadedChartInfo { get; private set; } = default;
+        public LoadedChartInfo? LoadedChartInfo { get; private set; }
         public List<NoteSpeedChange> NoteSpeedChangeList { get; } = new();
-        public SongOption SongOption { get; init; } = default;
+        public SongOption SongOption { get; }
         public float CurrentNoteSpeed { get; private set; } = default;
 
         public IReadOnlyList<NoteBase> AliveNoteList
@@ -76,25 +79,25 @@ namespace Song
         public void UpdateBeat(float sec)
         {
             CurrentSec = sec;
-            CurrentBeat = LoadedChartInfo != default ? sec * ((LoadedChartInfo.HeaderData?.Tempo ?? 0) / 60f) : 0;
+            CurrentBeat = sec * ((LoadedChartInfo?.HeaderData.Tempo ?? 0) / 60f);
         }
 
-        public bool TryGetNote(EFingerType type, int lane, out NoteBase note) => TryGetNearestNote(lane, type switch
+        public bool TryGetNote(EFingerType type, int lane, [NotNullWhen(true)] out NoteBase? note) => TryGetNearestNote(lane, type switch
         {
             EFingerType.Down => NoteSearchMode.Down,
             _ => NoteSearchMode.Up,
         }, out note);
 
-        public bool TryGetFlickNote(int lane, out NoteBase note) => TryGetNearestNote(lane, NoteSearchMode.Flick, out note);
+        public bool TryGetFlickNote(int lane, [NotNullWhen(true)] out NoteBase? note) => TryGetNearestNote(lane, NoteSearchMode.Flick, out note);
 
-        private bool TryGetNearestNote(int lane, NoteSearchMode mode, out NoteBase note)
+        private bool TryGetNearestNote(int lane, NoteSearchMode mode, [NotNullWhen(true)] out NoteBase? note)
         {
-            note = default;
+            note = null;
             if (lane < 0 || lane >= LaneCount) return false;
 
             var laneNoteList = aliveNotesByLaneDict[lane];
             var bestDiff = float.MaxValue;
-            var bestNote = default(NoteBase);
+            NoteBase? bestNote = null;
 
             for (var i = 0; i < laneNoteList.Count; i++)
             {
@@ -120,15 +123,11 @@ namespace Song
             return note != null;
         }
 
-        private float GetSearchDiffSec(NoteData noteData, NoteSearchMode mode)
+        private float GetSearchDiffSec(NoteData noteData, NoteSearchMode mode) => Math.Abs(mode switch
         {
-            var targetSec = mode switch
-            {
-                NoteSearchMode.Up => GetNoteEndSec(noteData),
-                _ => noteData.SecBegin,
-            };
-            return Math.Abs(targetSec - CurrentSec + SongOption.TapTiming * 0.1f);
-        }
+            NoteSearchMode.Up => GetNoteEndSec(noteData),
+            _ => noteData.SecBegin,
+        } - CurrentSec + SongOption.TapTiming * 0.1f);
 
         private float GetNoteEndSec(NoteData noteData) => noteData.NoteType switch
         {
@@ -156,7 +155,7 @@ namespace Song
 
         public float GetInitialSpawnLeadInSec(float laneLength)
         {
-            var bpm = LoadedChartInfo?.HeaderData?.Tempo ?? 0;
+            var bpm = LoadedChartInfo?.HeaderData.Tempo ?? 0;
             var speed = CurrentNoteSpeed;
             var speedSec = speed * (bpm / 60f);
             return speedSec <= 0 ? 0f : laneLength / speedSec;

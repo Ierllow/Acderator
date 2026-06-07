@@ -1,3 +1,5 @@
+#nullable enable
+
 using DG.Tweening;
 using Intense.Data;
 using Intense.UI;
@@ -10,14 +12,14 @@ namespace Song
 {
     public class SongPlayingFieldView : MonoBehaviour
     {
-        [SerializeField] private CommonButton pauseButton;
-        [SerializeField] private CanvasGroup pauseButtonCanvasGroup;
-        [SerializeField] private TextMeshProUGUI scoreText;
-        [SerializeField] private CanvasGroup autoText;
+        [SerializeField] private CommonButton pauseButton = default!;
+        [SerializeField] private CanvasGroup pauseButtonCanvasGroup = default!;
+        [SerializeField] private TextMeshProUGUI scoreText = default!;
+        [SerializeField] private CanvasGroup autoText = default!;
 
         public CommonButton PauseButton => pauseButton;
 
-        [Inject] private readonly ScoreController scoreController;
+        [Inject] private readonly ScoreController scoreController = default!;
 
         private const float ScoreTweenDuration = 0.4f;
         private int displayedScore = 0;

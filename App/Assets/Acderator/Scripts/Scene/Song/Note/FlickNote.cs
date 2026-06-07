@@ -1,3 +1,5 @@
+#nullable enable
+
 using DG.Tweening;
 using Intense;
 using UnityEngine;
@@ -6,7 +8,7 @@ namespace Song
 {
     public class FlickNote : NoteBase
     {
-        [SerializeField] private SpriteRenderer arrow;
+        [SerializeField] private SpriteRenderer arrow = default!;
 
         private void Awake()
         {

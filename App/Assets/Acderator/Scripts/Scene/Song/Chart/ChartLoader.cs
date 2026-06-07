@@ -1,3 +1,5 @@
+#nullable enable
+
 using Cysharp.Threading.Tasks;
 using System;
 using System.Collections.Generic;
@@ -17,10 +19,10 @@ namespace Song
         private class ParsedLine
         {
             public int MeasureNumber { get; init; }
-            public string Type { get; init; }
+            public string Type { get; init; } = string.Empty;
             public ChartDataType DataType { get; init; }
             public int Lane { get; init; }
-            public string Body { get; init; }
+            public string Body { get; init; } = string.Empty;
         }
 
         public async UniTask LoadChart(string target, LoadedChartInfo loadedChartInfo)
@@ -77,13 +79,13 @@ namespace Song
                     var normalizedText = rawText.Replace(":", ",").Replace("\\", "").Replace("'", ",");
                     var parts = normalizedText.Split(',', StringSplitOptions.RemoveEmptyEntries);
 
-                    if (parts.Length < 3) return default(NoteSpeedChange);
+                    if (parts.Length < 3) return (NoteSpeedChange?)null;
 
                     var measure = Convert.ToInt32(parts[0]);
                     var tick = Convert.ToInt32(parts[1]);
                     var totalBeat = (measure - 1) * beat + tick / 192f * beat;
-                    return new() { Beat = (float)Math.Round(totalBeat * (60f / tempo), 2, MidpointRounding.AwayFromZero), Speed = Convert.ToDouble(parts[2]) };
-                }).Where(c => c != null).ToList();
+                    return new NoteSpeedChange { Beat = (float)Math.Round(totalBeat * (60f / tempo), 2, MidpointRounding.AwayFromZero), Speed = Convert.ToDouble(parts[2]) };
+                }).OfType<NoteSpeedChange>().ToList();
 
                 speedChangeList.AddRange(changeList);
             }

@@ -1,3 +1,5 @@
+#nullable enable
+
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -8,7 +10,7 @@ namespace Song
     {
         public ELoadResult LoadResult { get; set; }
         public List<NoteData> NoteDataList { get; } = new();
-        public HeaderData HeaderData { get; set; }
+        public HeaderData HeaderData { get; set; } = new();
 
         public int NoteCount => NoteDataList.Sum(x => x.NoteType == ENoteType.Long ? 2 : 1);
 

@@ -1,3 +1,5 @@
+#nullable enable
+
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Intense.UI;
@@ -8,10 +10,10 @@ namespace Song
 {
     public class BackTelopLayerController : MonoBehaviour
     {
-        [SerializeField] private AtlasImage backgroundImage;
-        [SerializeField] private CanvasGroup songInfoCanvas;
-        [SerializeField] private SongIntroView songIntroView;
-        [SerializeField] private Image fadeImage;
+        [SerializeField] private AtlasImage backgroundImage = default!;
+        [SerializeField] private CanvasGroup songInfoCanvas = default!;
+        [SerializeField] private SongIntroView songIntroView = default!;
+        [SerializeField] private Image fadeImage = default!;
 
         public async UniTask ShowSongIntro(SongInfo songInfo, Sprite jacket, Sprite difficulty)
         {

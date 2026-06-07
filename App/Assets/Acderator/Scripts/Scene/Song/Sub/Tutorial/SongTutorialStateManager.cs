@@ -1,3 +1,5 @@
+#nullable enable
+
 using Intense.Master;
 using R3;
 using UnityEngine;
@@ -9,9 +11,9 @@ namespace Song
     public class TutorialEvent
     {
         public readonly ETutorialEventType Type;
-        public readonly object Data;
+        public readonly object? Data;
 
-        TutorialEvent(ETutorialEventType type, object data = default)
+        TutorialEvent(ETutorialEventType type, object? data = null)
         {
             Type = type;
             Data = data;
@@ -83,12 +85,12 @@ namespace Song
 
             if (tutorialElapsedTime < currentStep.TriggerTime) return;
 
-            ShowCurrentStep();
+            ShowCurrentStep(currentStep);
             UpdateState(ETutorialState.None);
         }
 
         public void ShowIntro() => tutorialEventSubject.OnNext(TutorialEvent.ShowIntro(tutorialData.TutorialMaster));
-        private void ShowCurrentStep() => tutorialEventSubject.OnNext(TutorialEvent.ShowStep(tutorialData.GetCurrentStep()));
+        private void ShowCurrentStep(TutorialStepMaster currentStep) => tutorialEventSubject.OnNext(TutorialEvent.ShowStep(currentStep));
         private void ShowComplete() => tutorialEventSubject.OnNext(TutorialEvent.ShowComplete());
     }
 }

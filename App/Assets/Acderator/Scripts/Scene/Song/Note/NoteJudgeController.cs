@@ -1,3 +1,5 @@
+#nullable enable
+
 using Intense;
 using Intense.Master;
 using System;
@@ -9,8 +11,8 @@ namespace Song
 {
     public sealed class NoteJudgeController
     {
-        [Inject] private readonly MasterDataManager masterDataManager;
-        [Inject] private readonly NotesManager notesManager;
+        [Inject] private readonly MasterDataManager masterDataManager = default!;
+        [Inject] private readonly NotesManager notesManager = default!;
 
         private float? badJudgmentZone;
 

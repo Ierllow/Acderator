@@ -1,3 +1,5 @@
+#nullable enable
+
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using System;
@@ -11,10 +13,10 @@ namespace Song
 {
     public class FrontTelopLayerController : MonoBehaviour
     {
-        [SerializeField] private GameObject missMask;
-        [SerializeField] private CountDownBar countDownBar;
-        [SerializeField] private Image inputBlocker;
-        [SerializeField] private TextMeshProUGUI resultText;
+        [SerializeField] private GameObject missMask = default!;
+        [SerializeField] private CountDownBar countDownBar = default!;
+        [SerializeField] private Image inputBlocker = default!;
+        [SerializeField] private TextMeshProUGUI resultText = default!;
 
         public void ShowMissMask() => UniTask.Delay(10, cancellationToken: destroyCancellationToken).SetAutoInActive(missMask).Forget();
 

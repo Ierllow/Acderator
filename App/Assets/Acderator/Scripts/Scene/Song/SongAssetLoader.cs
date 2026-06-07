@@ -1,3 +1,5 @@
+#nullable enable
+
 using Cysharp.Threading.Tasks;
 using Intense;
 using Intense.Asset;
@@ -11,13 +13,13 @@ namespace Song
     {
         public bool IsSuccess => LoadResult == ELoadResult.None;
         public ELoadResult LoadResult { get; init; }
-        public LoadedChartInfo ChartInfo { get; init; }
+        public LoadedChartInfo ChartInfo { get; init; } = default!;
     }
 
     public sealed class SongAssetLoader
     {
-        [Inject] private readonly AddressableAssetManager addressableAssetManager;
-        [Inject] private readonly SongSceneContext sceneContext;
+        [Inject] private readonly AddressableAssetManager addressableAssetManager = default!;
+        [Inject] private readonly SongSceneContext sceneContext = default!;
 
         public async UniTask LoadAssetsAsync(ESceneType sceneType, CancellationToken token)
         {

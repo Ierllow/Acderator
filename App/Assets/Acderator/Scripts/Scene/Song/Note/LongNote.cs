@@ -1,3 +1,5 @@
+#nullable enable
+
 using Intense;
 using UnityEngine;
 
@@ -5,9 +7,9 @@ namespace Song
 {
     public class LongNote : NoteBase
     {
-        [SerializeField] private SpriteRenderer beginSprite;
-        [SerializeField] private SpriteRenderer trailSprite;
-        [SerializeField] private SpriteRenderer endSprite;
+        [SerializeField] private SpriteRenderer beginSprite = default!;
+        [SerializeField] private SpriteRenderer trailSprite = default!;
+        [SerializeField] private SpriteRenderer endSprite = default!;
         [SerializeField] private Color32 defaultTrailColor; //
         [SerializeField] private Color32 tappingTrailColor;
 

@@ -1,6 +1,9 @@
+#nullable enable
+
 using Intense;
 using R3;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using Zenject;
 
 namespace Song
@@ -9,9 +12,9 @@ namespace Song
     {
         private const int LaneNone = -1;
 
-        [Inject] private readonly NotesManager notesManager;
-        [Inject] private readonly NoteJudgeController noteJudgeController;
-        [Inject] private readonly TouchStateManager touchStateManager;
+        [Inject] private readonly NotesManager notesManager = default!;
+        [Inject] private readonly NoteJudgeController noteJudgeController = default!;
+        [Inject] private readonly TouchStateManager touchStateManager = default!;
 
         private readonly List<FingerJudgeRequest> judgeRequestList = new();
         private readonly Subject<FingerInfo> judgmentSubject = new();
@@ -97,7 +100,7 @@ namespace Song
             judgmentSubject.OnNext(fingerInfo.WithTappingLanes(GetTappingLanes()));
         }
 
-        private bool TryGetRequestedNote(FingerJudgeRequest request, out NoteBase note) => notesManager.TryGetNote(request.FingerType, request.Lane, out note);
+        private bool TryGetRequestedNote(FingerJudgeRequest request, [NotNullWhen(true)] out NoteBase? note) => notesManager.TryGetNote(request.FingerType, request.Lane, out note);
 
         private void EmitPerfect(NoteBase note)
         {

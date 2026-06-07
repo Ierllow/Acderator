@@ -1,3 +1,5 @@
+#nullable enable
+
 using Intense.UI;
 using TMPro;
 using UnityEngine;
@@ -6,7 +8,7 @@ namespace Song
 {
     public class ScoreErrorPopup : PopupBase
     {
-        [SerializeField] private TextMeshProUGUI errorText;
+        [SerializeField] private TextMeshProUGUI errorText = default!;
 
         public void Open(ELoadResult type, System.Action closeCallback)
         {
