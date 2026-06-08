@@ -15,8 +15,8 @@ namespace Intense
         [Inject] private readonly BgmVolumeController bgmVolumeController;
         [Inject] private readonly SeVolumeController seVolumeController;
 
-        private readonly CriAtomSoundPlayer bgmPlayer = new();
-        private readonly CriAtomSoundPlayer sePlayer = new();
+        private CriAtomSoundPlayer bgmPlayer;
+        private CriAtomSoundPlayer sePlayer;
 
         public void UpdateSounds(EBgmType bgmType)
         {
@@ -36,6 +36,8 @@ namespace Intense
 
         public void Initialize()
         {
+            bgmPlayer = new();
+            sePlayer = new();
             bgmVolumeController.Register(bgmPlayer);
             seVolumeController.Register(sePlayer);
         }
