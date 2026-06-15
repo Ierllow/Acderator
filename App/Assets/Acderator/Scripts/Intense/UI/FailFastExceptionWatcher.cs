@@ -5,8 +5,7 @@ using UnityEngine;
 
 namespace Intense.UI
 {
-    [DisallowMultipleComponent]
-    public sealed class FailFastExceptionWatcher : MonoBehaviour
+    public sealed class FailFastExceptionWatcher : IDisposable
     {
         private CancellationTokenSource cancellationTokenSource;
 
@@ -18,6 +17,7 @@ namespace Intense.UI
             Application.logMessageReceivedThreaded += OnLog;
             AppDomain.CurrentDomain.UnhandledException += OnUnhandled;
             UniTaskScheduler.UnobservedTaskException += OnUnobservedTaskException;
+            cancellationToken.Register(Dispose);
         }
 
         private void Fail(Exception _)
@@ -48,7 +48,7 @@ namespace Intense.UI
             if (!cancellationTokenSource.IsCancellationRequested) Fail(e);
         }
 
-        private void OnDestroy()
+        public void Dispose()
         {
             Application.logMessageReceivedThreaded -= OnLog;
             AppDomain.CurrentDomain.UnhandledException -= OnUnhandled;

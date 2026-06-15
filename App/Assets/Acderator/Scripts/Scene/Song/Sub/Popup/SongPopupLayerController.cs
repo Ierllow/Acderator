@@ -28,24 +28,6 @@ namespace Song
 
         private EType currentOpenPopupType = EType.None;
 
-        public async UniTask DetectedError(ISongError iSongError)
-        {
-            switch (iSongError)
-            {
-                case ScoreSaveError:
-                    OnOpenSaveScoreDataErrorPopup();
-                    break;
-                case ScoreLoadError scoreLoadError:
-                    OnOpenScoreErrorPopup(scoreLoadError.Result);
-                    break;
-                case AlertError:
-                    await OnOpenErrorPopup();
-                    break;
-                default:
-                    break;
-            }
-        }
-
         public void OnOpenPausePopup(bool showRestartButton)
         {
             if (currentOpenPopupType == EType.Pause) return;
@@ -78,7 +60,7 @@ namespace Song
             return await completionSource.Task == ECommonPopupTapKind.Positive;
         }
 
-        private void OnOpenScoreErrorPopup(ELoadResult loadResult)
+        public void OnOpenScoreErrorPopup(ELoadResult loadResult)
         {
             if (currentOpenPopupType == EType.ScoreError) return;
 
@@ -90,7 +72,7 @@ namespace Song
             });
         }
 
-        private async UniTask OnOpenErrorPopup()
+        public async UniTask OnOpenErrorPopup()
         {
             if (currentOpenPopupType == EType.Error) return;
 
@@ -101,7 +83,7 @@ namespace Song
             await completionSource.Task;
         }
 
-        private void OnOpenSaveScoreDataErrorPopup()
+        public void OnOpenSaveScoreDataErrorPopup()
         {
             if (currentOpenPopupType == EType.ScoreData) return;
 

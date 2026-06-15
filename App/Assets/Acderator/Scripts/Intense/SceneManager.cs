@@ -2,7 +2,6 @@ using Cysharp.Threading.Tasks;
 using Cysharp.Threading.Tasks.Linq;
 using DG.Tweening;
 using Element;
-using Intense.Asset;
 using Intense.Attribute;
 using Intense.Master;
 using Intense.UI;
@@ -26,8 +25,8 @@ namespace Intense
         [SerializeField] private Header header;
 
         [Inject] private readonly ZenjectSceneLoader zenjectSceneLoader;
-        [Inject] private readonly AddressableAssetManager addressableAssetManager;
-        [Inject] private readonly SoundManager soundManager;
+        [Inject] private readonly List<ISceneUnloadHandler> sceneUnloadHandlers;
+        [Inject] private readonly List<ISceneLoadedHandler> sceneLoadedHandlers;
         [Inject] private readonly Loading loading;
 
         public ESceneType CurrentSceneType => sceneBaseDict.Count > 0 ? sceneBaseDict.LastOrDefault().Key : default;
@@ -74,7 +73,7 @@ namespace Intense
 
                 if (!sameScene)
                 {
-                    await addressableAssetManager.UnloadAssetsAsync(sceneBaseDict.Select(x => x.Key).ToList());
+                    foreach (var handler in sceneUnloadHandlers) await handler.OnSceneUnloadingAsync();
                     await Resources.UnloadUnusedAssets();
                 }
 
@@ -83,7 +82,7 @@ namespace Intense
                 await zenjectSceneLoader.LoadSceneAsync(sceneType.ToString(), extraBindings: container => container.Bind<SceneContext>().FromInstance(context).AsSingle()).ToUniTask();
                 sceneBaseDict.GetValueOrDefault(sceneType)?.OnCreateScene();
                 Application.targetFrameRate = context.FrameRate;
-                soundManager.UpdateSounds(context.BgmType);
+                foreach (var handler in sceneLoadedHandlers) handler.OnSceneLoaded(context);
                 await UniTask.Yield();
                 return;
             }

@@ -22,7 +22,7 @@ namespace Intense
             Stop();
             exPlayer.SetCue(sheet.acb, cueName);
             exPlayer.Loop(isLoop);
-            return new CriAtomPlaybackSession(exPlayer, exPlayer.Start());
+            return new(exPlayer, exPlayer.Start());
         }
 
         public CriAtomPlaybackSession Play(CriAtomCueSheet sheet, string cueName, int startTime, bool isLoop = false)
@@ -31,7 +31,7 @@ namespace Intense
             exPlayer.SetCue(sheet.acb, cueName);
             exPlayer.SetStartTime(startTime);
             exPlayer.Loop(isLoop);
-            return new CriAtomPlaybackSession(exPlayer, exPlayer.Start());
+            return new(exPlayer, exPlayer.Start());
         }
 
         public CriAtomPlaybackSession Start() => new(exPlayer, exPlayer.Start());

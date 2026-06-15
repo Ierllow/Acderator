@@ -7,7 +7,7 @@ namespace Intense
     public enum EBgmType { Stop = -1, None, GameResult, GameResultFailed }
     public enum ESeType { Tap, Flick }
 
-    public class SoundManager : IInitializable
+    public class SoundManager : IInitializable, ISceneLoadedHandler
     {
         [Inject] private readonly CriAtomCueSheetLoader cueSheetLoader;
         [Inject] private readonly AddressableAssetManager addressableAssetManager;
@@ -18,7 +18,9 @@ namespace Intense
         private CriAtomSoundPlayer bgmPlayer;
         private CriAtomSoundPlayer sePlayer;
 
-        public void UpdateSounds(EBgmType bgmType)
+        public void OnSceneLoaded(SceneContext context) => UpdateSounds(context.BgmType);
+
+        private void UpdateSounds(EBgmType bgmType)
         {
             switch (bgmType)
             {

@@ -15,7 +15,7 @@ namespace Song
 
         public void StartLeadIn(float leadInSec)
         {
-            this.leadInSec = Mathf.Max(0f, leadInSec);
+            this.leadInSec = leadInSec;
             leadInStartRealtime = Time.realtimeSinceStartup;
             lastSec = -this.leadInSec;
             isLeadInStarted = true;

@@ -19,8 +19,8 @@ namespace Song
             public CurveNote curveNote = default!;
         }
 
-        [SerializeField] private Transform[] parents = default!;
-        [SerializeField] private NotePrefabs notePrefabs = default!;
+        [HideInInspector, SerializeField] private Transform[] parents = default!;
+        [HideInInspector, SerializeField] private NotePrefabs notePrefabs = default!;
 
         private ObjectPool<NoteBase>[,]? pools;
         private readonly Dictionary<NoteBase, NoteData> noteDict = new();

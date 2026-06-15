@@ -4,7 +4,6 @@ using Cysharp.Threading.Tasks;
 using Cysharp.Threading.Tasks.Linq;
 using Intense;
 using Intense.Api;
-using Intense.Asset;
 using Intense.Attribute;
 using Intense.UI;
 using R3;
@@ -25,13 +24,12 @@ namespace Song
         [RequiredField, SerializeField] private BackTelopLayerController backTelopLayerController = default!;
         [RequiredField, SerializeField] private SongPopupLayerController songPopupLayerController = default!;
         [RequiredField, SerializeField] private NotesLineController notesLineController = default!;
-        [RequiredField, SerializeField] private FailFastExceptionWatcher failFastExceptionWatcher = default!;
 
         [Inject] private readonly SongControllerResolver songControllerResolver = default!;
         [Inject] private readonly SongManagerResolver songManagerResolver = default!;
         [Inject] private readonly SongSceneContext sceneContext = default!;
         [Inject] private readonly SongAssetLoader songAssetLoader = default!;
-        [Inject] private readonly AddressableAssetManager addressableAssetManager = default!;
+        [Inject] private readonly FailFastExceptionWatcher failFastExceptionWatcher = default!;
 
         protected override void Awake()
         {
@@ -92,16 +90,16 @@ namespace Song
         {
             songControllerResolver.Loop.UpdateState(ESongState.Stop);
             if (!sceneManager.IsFadeIn) await sceneManager.FadeInAsync();
-            await songPopupLayerController.DetectedError(new AlertError());
+            await songPopupLayerController.OnOpenErrorPopup();
         }
 
         private UniTask LoadIntro() => sceneContext.IsRestart switch
         {
             true => sceneManager.FadeInAsync().AddWatcherTo(failFastExceptionWatcher),
-            _ => UniTask.WhenAll(backTelopLayerController.ShowSongIntro(
+            _ => backTelopLayerController.ShowSongIntro(
                 sceneContext.SongInfo,
-                addressableAssetManager.GetSprite(sceneContext.SongInfo.Group.ToString()),
-                addressableAssetManager.GetSprite(string.Format("difficulty_{0}", sceneContext.SongInfo.Difficulty)))),
+                songManagerResolver.Addressable.GetSprite(sceneContext.SongInfo.Group.ToString()),
+                songManagerResolver.Addressable.GetSprite(string.Format("difficulty_{0}", sceneContext.SongInfo.Difficulty))),
         };
 
         private async UniTask LoadAssets()
@@ -113,7 +111,7 @@ namespace Song
             await (LoadIntro(), sceneManager.FadeInAsync());
             songLayerController.Show(sceneContext.IsAuto());
             await notesLineController.Show().AddWatcherTo(failFastExceptionWatcher);
-            backTelopLayerController.SetBackgroundImage(addressableAssetManager.GetSprite(sceneContext.SongInfo.Bg.ToString()));
+            backTelopLayerController.SetBackgroundImage(songManagerResolver.Addressable.GetSprite(sceneContext.SongInfo.Bg.ToString()));
             songControllerResolver.Loop.UpdateState(ESongState.Ready);
         }
 
@@ -145,7 +143,7 @@ namespace Song
                 return;
 
             }
-            await songPopupLayerController.DetectedError(new ScoreLoadError(loadResult.LoadResult));
+            songPopupLayerController.OnOpenScoreErrorPopup(loadResult.LoadResult);
         }
 
         private void OnPlayingSong()
@@ -169,14 +167,13 @@ namespace Song
         {
             songLayerController.SetPauseButtonGrayOut(true);
             songControllerResolver.Finger.TrySetUseTouch(false);
-            var nextTask = (sceneContext.IsAuto(), sceneContext.SongMode) switch
+            switch ((sceneContext.IsAuto(), sceneContext.SongMode))
             {
-                (true, _) => ChangeResultScene(),
-                (_, ESongMode.Tutorial) => CompleteTutorial(),
-                (_, ESongMode.Normal) => EndNormalSong(),
-                _ => songPopupLayerController.DetectedError(new ScoreSaveError()),
-            };
-            await nextTask;
+                case (true, _): await ChangeResultScene(); break;
+                case (_, ESongMode.Tutorial): await CompleteTutorial(); break;
+                case (_, ESongMode.Normal): await EndNormalSong(); break;
+                default: songPopupLayerController.OnOpenSaveScoreDataErrorPopup(); break;
+            }
         }
 
         private async UniTask CompleteTutorial()
@@ -197,7 +194,7 @@ namespace Song
                 await ChangeResultScene();
                 return;
             }
-            await songPopupLayerController.DetectedError(new ScoreSaveError());
+            songPopupLayerController.OnOpenSaveScoreDataErrorPopup();
         }
 
         private UniTask ChangeResultScene() => sceneManager.ChangeSceneAsync(ESceneType.Result, sceneContext.ToResultSceneContext(songLayerController.CurrentScore, songLayerController.JudgeCountDict));

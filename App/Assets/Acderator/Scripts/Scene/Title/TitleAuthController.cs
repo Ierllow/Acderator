@@ -21,6 +21,8 @@ namespace Title
         [Inject] private readonly PopupManager popupManager;
         [Inject] private readonly IApiSession apiSession;
 
+        internal NetworkManager NetworkManager =>networkManager;
+
         public async UniTask<bool> Execute(CancellationToken token, FailFastExceptionWatcher failFastExceptionWatcher)
         {
             var request = CreateAuthRequest();

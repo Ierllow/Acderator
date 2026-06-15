@@ -7,9 +7,9 @@ namespace Intense
         private readonly CriAtomExPlayer exPlayer;
         private readonly CriAtomExPlayback playback;
 
-        public bool IsPlayerPlayEnd => exPlayer.IsPlayEnd();
-        public float PlayerTimeSec => exPlayer.GetTime().ToSeconds();
-        public float SyncedTimeSec => playback.GetTimeSyncedWithAudio().ToSeconds();
+        public bool IsPlayerPlayEnd => exPlayer.GetStatus() == CriAtomExPlayer.Status.PlayEnd;
+        public float PlayerTimeSec => exPlayer.GetTime() / 1000f;
+        public float SyncedTimeSec => playback.GetTimeSyncedWithAudio() / 1000f;
         public bool IsPlaybackRemoved => playback.GetStatus() == CriAtomExPlayback.Status.Removed;
 
         public CriAtomPlaybackSession(CriAtomExPlayer exPlayer, CriAtomExPlayback playback)

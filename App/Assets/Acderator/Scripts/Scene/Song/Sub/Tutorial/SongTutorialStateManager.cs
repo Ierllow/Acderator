@@ -27,9 +27,10 @@ namespace Song
     public class SongTutorialStateManager
     {
         private ETutorialState cachedTutorialState = ETutorialState.Intro;
-        private TutorialData tutorialData;
         private float tutorialElapsedTime;
         private bool isRunning;
+
+        private readonly TutorialData tutorialData;
 
         public bool IsCompleted => tutorialData.IsCompleted;
 

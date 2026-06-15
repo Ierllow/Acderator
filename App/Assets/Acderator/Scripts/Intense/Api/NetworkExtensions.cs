@@ -29,58 +29,31 @@ namespace Intense.Api
 
         public static bool TryGetInt(this Dictionary<string, object> dictionary, string key, out int value)
         {
-            value = 0;
-            if (!(dictionary?.TryGetValue(key, out var rawValue) ?? false)) return false;
-
-            switch (rawValue)
+            dictionary.TryGetValue(key, out var rawValue);
+            return (value = rawValue switch
             {
-                case int intValue:
-                    value = intValue;
-                    return true;
-                case uint uintValue when uintValue <= int.MaxValue:
-                    value = (int)uintValue;
-                    return true;
-                default:
-                    return false;
-            }
+                int intValue => intValue,
+                uint uintValue when uintValue <= int.MaxValue => (int)uintValue,
+                _ => default,
+            }) != default;
         }
-
         public static bool TryGetString(this Dictionary<string, object> dictionary, string key, out string value)
-        {
-            value = string.Empty;
-            if (!(dictionary?.TryGetValue(key, out var rawValue) ?? false)) return false;
+            => (value = dictionary.TryGetValue(key, out var rawValue) ? rawValue.ToString() : string.Empty) != default;
 
-            value = rawValue.ToString();
-            return true;
-        }
-
-        public static bool TryConvertDictionary(this object rawValue, out Dictionary<string, object> value)
+        public static bool TryConvertDictionary(this object rawValue, out Dictionary<string, object> value) => (value = rawValue switch
         {
-            value = default;
-            switch (rawValue)
-            {
-                case Dictionary<string, object> stringDictionary:
-                    value = stringDictionary;
-                    return true;
-                case Dictionary<object, object> objectDictionary:
-                    value = objectDictionary.Where(x => !string.IsNullOrEmpty(x.Key?.ToString())).ToDictionary(x => x.Key.ToString(), x => x.Value);
-                    return true;
-                default:
-                    return false;
-            }
-        }
+            Dictionary<string, object> stringDictionary => stringDictionary,
+            Dictionary<object, object> objectDictionary => objectDictionary.Where(x => !string.IsNullOrEmpty(x.Key?.ToString())).ToDictionary(x => x.Key.ToString(), x => x.Value),
+            _ => default
+        }) != default;
 
         public static IEnumerable<object> GetList(this Dictionary<string, object> dictionary, string key) => (dictionary?.TryGetValue(key, out var rawValue) ?? false) && rawValue is IEnumerable<object> enumerable ? enumerable : Enumerable.Empty<object>();
 
         public static void SetApiRequestHeaders(this UnityWebRequest request, string token, string masterVersion)
         {
-            var header = new Dictionary<string, string>
-            {
-                { "master", masterVersion },
-            };
             request.SetRequestHeader("Content-Type", "application/x-msgpack");
             request.SetRequestHeader("Accept", "application/x-msgpack");
-            request.SetRequestHeader("header", MessagePackSerializer.ConvertToJson(MessagePackSerializer.Serialize(header)));
+            request.SetRequestHeader("header", MessagePackSerializer.ConvertToJson(MessagePackSerializer.Serialize(new Dictionary<string, string>() { { "master", masterVersion }, })));
             if (!string.IsNullOrEmpty(token)) request.SetRequestHeader("Authorization", string.Format("Bearer {0}", token));
         }
     }

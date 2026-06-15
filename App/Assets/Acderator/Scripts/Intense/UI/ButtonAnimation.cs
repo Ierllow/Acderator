@@ -1,11 +1,10 @@
 using DG.Tweening;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.UI;
 
 namespace Intense.UI
 {
-    [DisallowMultipleComponent, RequireComponent(typeof(Button))]
+    [DisallowMultipleComponent, RequireComponent(typeof(CommonButton))]
     public class ButtonAnimation : MonoBehaviour, IPointerUpHandler, IPointerDownHandler
     {
         public void OnPointerUp(PointerEventData eventData) => transform.DOScale(Vector3.one, 0.1f).SetLink(gameObject);

@@ -1,6 +1,7 @@
 #nullable enable
 
 using Intense.Internal;
+using Intense.UI;
 using Zenject;
 
 namespace Song
@@ -33,6 +34,7 @@ namespace Song
             Container.BindInterfacesAndSelfTo<NotePositionUpdater>().AsSingle();
             Container.BindInterfacesAndSelfTo<NoteSpawnController>().AsSingle();
             Container.Bind<SongAssetLoader>().AsSingle();
+            Container.Bind<FailFastExceptionWatcher>().AsSingle();
         }
 
         private void BindSceneServices()

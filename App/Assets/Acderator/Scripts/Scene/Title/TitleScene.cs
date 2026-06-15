@@ -17,11 +17,16 @@ namespace Title
         [SerializeField] private CommonButton startButton;
         [SerializeField] private TextMeshProUGUI startText;
         [SerializeField] private TextMeshProUGUI versionText;
-        [SerializeField] private FailFastExceptionWatcher failFastExceptionWatcher;
 
         [Inject] private readonly TitleAuthController titleAuthController;
-        [Inject] private readonly NetworkManager networkManager;
         [Inject] private readonly Song.TutorialSceneContextBuilder tutorialSceneContextBuilder;
+        [Inject] private readonly FailFastExceptionWatcher failFastExceptionWatcher;
+
+        protected override void Awake()
+        {
+            failFastExceptionWatcher.Init(destroyCancellationToken);
+            base.Awake();
+        }
 
         private void Start()
         {
@@ -55,7 +60,7 @@ namespace Title
             }
 
             var request = new ScoreBeginRequest { ScoreId = scoreId };
-            var response = await networkManager.RequestAsync(request);
+            var response = await titleAuthController.NetworkManager.RequestAsync(request);
             if ((response?.IsSuccess ?? false) && tutorialSceneContextBuilder.TryBuildFirstTutorial(response.SessionId, out var tutorialContext))
             {
                 await sceneManager.ChangeSceneAsync(ESceneType.Song, tutorialContext);

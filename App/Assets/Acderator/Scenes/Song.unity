@@ -3074,12 +3074,6 @@ MonoBehaviour:
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
   m_Atlas: {fileID: 0}
-  m_AtlasReference:
-    m_AssetGUID: 
-    m_SubObjectName: 
-    m_SubObjectType: 
-    m_SubObjectGUID: 
-    m_EditorAssetChanged: 0
   m_SpriteName: 1
 --- !u!1 &903195508
 GameObject:
@@ -4278,12 +4272,6 @@ MonoBehaviour:
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
   m_Atlas: {fileID: 4343727234628468602, guid: 36afdfcb0fcf36949b4c81750a0f4e67, type: 2}
-  m_AtlasReference:
-    m_AssetGUID: 
-    m_SubObjectName: 
-    m_SubObjectType: 
-    m_SubObjectGUID: 
-    m_EditorAssetChanged: 0
   m_SpriteName: radial_slider
 --- !u!95 &1233453092
 Animator:
@@ -4520,12 +4508,6 @@ MonoBehaviour:
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
   m_Atlas: {fileID: 0}
-  m_AtlasReference:
-    m_AssetGUID: 
-    m_SubObjectName: 
-    m_SubObjectType: 
-    m_SubObjectGUID: 
-    m_EditorAssetChanged: 0
   m_SpriteName: icon_result_rank_1
 --- !u!1 &1413050354
 GameObject:
@@ -4539,7 +4521,6 @@ GameObject:
   - component: {fileID: 1413050357}
   - component: {fileID: 1413050359}
   - component: {fileID: 1413050358}
-  - component: {fileID: 1413050360}
   - component: {fileID: 1413050361}
   m_Layer: 0
   m_Name: Song
@@ -4589,7 +4570,6 @@ MonoBehaviour:
   backTelopLayerController: {fileID: 936951398}
   songPopupLayerController: {fileID: 728739110}
   notesLineController: {fileID: 2104897571}
-  failFastExceptionWatcher: {fileID: 1413050360}
 --- !u!114 &1413050358
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4634,18 +4614,6 @@ MonoBehaviour:
   _parentNewObjectsUnderSceneContext: 0
   _contractNames: []
   _parentContractNames: []
---- !u!114 &1413050360
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1413050354}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2e196b956c3ba5e44b7ff86ed0d25531, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Song.SongFailFastExceptionWatcher
 --- !u!114 &1413050361
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5101,12 +5069,6 @@ MonoBehaviour:
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
   m_Atlas: {fileID: 0}
-  m_AtlasReference:
-    m_AssetGUID: 
-    m_SubObjectName: 
-    m_SubObjectType: 
-    m_SubObjectGUID: 
-    m_EditorAssetChanged: 0
   m_SpriteName: 
 --- !u!1 &1520155915
 GameObject:

@@ -1,3 +1,4 @@
+using Intense.UI;
 using Zenject;
 
 namespace Title
@@ -6,6 +7,7 @@ namespace Title
     {
         public override void InstallBindings()
         {
+            Container.Bind<FailFastExceptionWatcher>().AsSingle();
             Container.Bind<TitleAuthController>().AsSingle();
             Container.Bind<Song.TutorialSceneContextBuilder>().AsSingle();
         }

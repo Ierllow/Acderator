@@ -1,17 +1,12 @@
 using Cysharp.Threading.Tasks;
 using Intense;
 using Intense.UI;
+using Zenject;
 
 public sealed class SceneErrorPopupController
 {
-    private readonly SceneManager sceneManager;
-    private readonly PopupManager popupManager;
-
-    public SceneErrorPopupController(SceneManager sceneManager, PopupManager popupManager)
-    {
-        this.sceneManager = sceneManager;
-        this.popupManager = popupManager;
-    }
+    [Inject] private readonly SceneManager sceneManager;
+    [Inject] private readonly PopupManager popupManager;
 
     public async UniTask Open()
     {
