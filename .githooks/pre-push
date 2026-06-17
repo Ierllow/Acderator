@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+# Replicates the CI Lint job. Aborts push on violations.
+set -euo pipefail
+
+repo_root="$(git rev-parse --show-toplevel)"
+cd "$repo_root/App"
+
+red()   { printf '\033[31m%s\033[0m\n' "$*"; }
+green() { printf '\033[32m%s\033[0m\n' "$*"; }
+
+echo "[pre-push] trailing-newline check"
+failed=0
+while IFS= read -r f; do
+  [ -s "$f" ] || continue
+  last="$(tail -c 1 "$f" | od -An -t x1 | tr -d ' \n')"
+  if [ "$last" = "0a" ] || [ "$last" = "0d" ]; then
+    red "  $f"
+    failed=1
+  fi
+done < <(git ls-files 'Assets/Acderator' 'Program.cs' | grep '\.cs$')
+if [ "$failed" -ne 0 ]; then
+  red "[pre-push] C# files must not end with a newline."
+  exit 1
+fi
+green "  ok"
+
+if command -v dotnet >/dev/null 2>&1; then
+  echo "[pre-push] dotnet format whitespace"
+  if ! dotnet format whitespace --folder --verify-no-changes --include Assets/Acderator >/tmp/_dotnet_format.log 2>&1; then
+    cat /tmp/_dotnet_format.log
+    red "[pre-push] whitespace violations. Run: dotnet format whitespace --folder --include Assets/Acderator"
+    exit 1
+  fi
+  green "  ok"
+else
+  echo "[pre-push] dotnet not found; skipping whitespace check"
+fi
+
+green "[pre-push] all checks passed"

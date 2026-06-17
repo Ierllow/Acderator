@@ -45,6 +45,16 @@ dotnet run --project CodingRuleChecker.csproj -- --fix
 ```
 
 Generated `bin` and `obj` directories should not be committed.
+
+### Git hooks
+
+Enable the repository's `pre-push` hook to run the same lint checks as CI before every `git push`:
+
+```bash
+git config core.hooksPath .githooks
+```
+
+Run once per clone. To bypass the hook temporarily, use `git push --no-verify`.
   
 ## Project Status
 
