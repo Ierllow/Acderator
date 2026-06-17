@@ -14,8 +14,16 @@ namespace Song
         public float SecEnd { get; init; }
         public int Lane { get; init; }
         public ENoteType NoteType { get; init; }
-        public List<Vector2> CurvePointList { get; init; } = new();
+        public List<CurveSegment> CurveSegmentList { get; init; } = new();
         public float CurveDuration { get; init; }
         public bool UseMidPoint { get; init; }
+    }
+
+    [System.Serializable]
+    public class CurveSegment
+    {
+        public List<Vector2> Points { get; init; } = new();
+        public float StartT { get; init; }
+        public float EndT { get; init; }
     }
 }

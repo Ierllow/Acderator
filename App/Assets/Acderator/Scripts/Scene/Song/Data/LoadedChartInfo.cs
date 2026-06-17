@@ -23,7 +23,7 @@ namespace Song
             Lane = lane,
             NoteType = noteType,
         });
-        public void AddCurveNoteData(float beatBegin, float beatEnd, int lane, ENoteType noteType, List<Vector2> curvePoints, float curveDuration, bool useMidPoint) => NoteDataList.Add(new()
+        public void AddCurveNoteData(float beatBegin, float beatEnd, int lane, ENoteType noteType, List<CurveSegment> curveSegments, float curveDuration, bool useMidPoint) => NoteDataList.Add(new()
         {
             BeatBegin = beatBegin,
             BeatEnd = beatEnd,
@@ -31,7 +31,7 @@ namespace Song
             SecEnd = beatEnd / (HeaderData.Tempo / 60f),
             Lane = lane,
             NoteType = noteType,
-            CurvePointList = curvePoints,
+            CurveSegmentList = curveSegments,
             CurveDuration = curveDuration,
             UseMidPoint = useMidPoint,
         });

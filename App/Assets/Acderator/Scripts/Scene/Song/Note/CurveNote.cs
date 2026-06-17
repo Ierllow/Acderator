@@ -15,7 +15,8 @@ namespace Song
         [SerializeField] private Color32 tappingTrailColor;
         [SerializeField] private int curveSegments = 21;
 
-        private List<Vector2> curvePointList = new();
+        private List<CurveSegment> segmentList = new();
+        private Vector2[] curveBuffer = System.Array.Empty<Vector2>();
         private float curveDuration;
         private float secBegin;
         private bool useMidPoint;
@@ -23,12 +24,15 @@ namespace Song
         public override void Init(NoteData data)
         {
             base.Init(data);
-            curvePointList = data.CurvePointList;
+            segmentList = data.CurveSegmentList;
+            var maxPoints = 0;
+            foreach (var segment in segmentList) maxPoints = Mathf.Max(maxPoints, segment.Points.Count);
+            curveBuffer = new Vector2[maxPoints];
             curveDuration = data.CurveDuration;
             secBegin = data.SecBegin;
             useMidPoint = data.UseMidPoint;
 
-            if (curvePointList.Count >= 2)
+            if (segmentList.Count > 0)
             {
                 curveLineRenderer.positionCount = curveSegments + 1;
                 curveLineRenderer.useWorldSpace = false;
@@ -47,7 +51,7 @@ namespace Song
 
         public override void UpdatePosition(NotePositionUpdateContext context)
         {
-            if (curvePointList.Count < 2) return;
+            if (segmentList.Count == 0) return;
 
             transform.localPosition = new(0, context.PositionBeginY, transform.localPosition.z);
             var curveProgress = curveDuration > 0 ? Mathf.Clamp01((context.CurrentSec - secBegin) / curveDuration) : 1f;
@@ -69,35 +73,42 @@ namespace Song
 
         private Vector2 GetCurvePosition(float t)
         {
-            if (curvePointList.Count < 2) return Vector2.zero;
+            if (segmentList.Count == 0) return Vector2.zero;
 
-            var p0 = curvePointList[0];
-            var p1 = curvePointList[1];
+            var segment = segmentList[^1];
+            foreach (var candidate in segmentList)
+            {
+                if (t > candidate.EndT) continue;
+                segment = candidate;
+                break;
+            }
 
-            if (curvePointList.Count == 2) return Vector2.Lerp(p0, p1, t);
-
-            var p2 = curvePointList.Count > 2 ? curvePointList[2] : p1;
-            if (curvePointList.Count == 3) return QuadraticBezier(p0, p1, p2, t);
-
-            var p3 = curvePointList.Count > 3 ? curvePointList[3] : p2;
-            return CubicBezier(p0, p1, p2, p3, t);
+            var span = segment.EndT - segment.StartT;
+            var localT = span > 0 ? Mathf.Clamp01((t - segment.StartT) / span) : 1f;
+            return EvaluateBezier(segment.Points, localT);
         }
 
-        private Vector2 QuadraticBezier(Vector2 p0, Vector2 p1, Vector2 p2, float t)
+        private Vector2 EvaluateBezier(List<Vector2> points, float t)
         {
-            var u = 1 - t;
-            return u * u * p0 + 2 * u * t * p1 + t * t * p2;
-        }
+            var count = points.Count;
+            if (count == 0) return Vector2.zero;
+            if (count == 1) return points[0];
+            if (count == 2) return Vector2.Lerp(points[0], points[1], t);
 
-        private Vector2 CubicBezier(Vector2 p0, Vector2 p1, Vector2 p2, Vector2 p3, float t)
-        {
-            var u = 1 - t;
-            return u * u * u * p0 + 3 * u * u * t * p1 + 3 * u * t * t * p2 + t * t * t * p3;
+            for (var i = 0; i < count; i++) curveBuffer[i] = points[i];
+            for (var step = 1; step < count; step++)
+            {
+                for (var i = 0; i < count - step; i++)
+                {
+                    curveBuffer[i] = Vector2.Lerp(curveBuffer[i], curveBuffer[i + 1], t);
+                }
+            }
+            return curveBuffer[0];
         }
 
         private void UpdateCurvePosition(float yOffset)
         {
-            if (curvePointList.Count < 2) return;
+            if (segmentList.Count == 0) return;
 
             for (var i = 0; i <= curveSegments; i++)
             {
