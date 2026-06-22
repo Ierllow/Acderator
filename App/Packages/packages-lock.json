@@ -30,13 +30,6 @@
       "dependencies": {},
       "hash": "6936f0fb4e3a2adb46ab371a1c088b7cade34577"
     },
-    "com.harumak.upalette": {
-      "version": "https://github.com/Haruma-K/uPalette.git?path=/Assets/uPalette",
-      "depth": 0,
-      "source": "git",
-      "dependencies": {},
-      "hash": "4989fb9235219679dbc7f57f73c7fa70e00922b2"
-    },
     "com.svermeulen.extenject": {
       "version": "https://github.com/svermeulen/Extenject.git?path=/UnityProject/Assets/Plugins/Zenject",
       "depth": 0,

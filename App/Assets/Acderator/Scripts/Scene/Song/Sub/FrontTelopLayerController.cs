@@ -2,12 +2,11 @@
 
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
+using Intense.UI;
 using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using uPalette.Generated;
-using uPalette.Runtime.Core;
 
 namespace Song
 {
@@ -17,6 +16,7 @@ namespace Song
         [SerializeField] private CountDownBar countDownBar = default!;
         [SerializeField] private Image inputBlocker = default!;
         [SerializeField] private TextMeshProUGUI resultText = default!;
+        [SerializeField] private ResultVisualConfig resultVisualConfig = default!;
 
         public void ShowMissMask() => UniTask.Delay(10, cancellationToken: destroyCancellationToken).SetAutoInActive(missMask).Forget();
 
@@ -26,13 +26,13 @@ namespace Song
         {
             resultText.SetText(resultType.ToString());
 
-            var gradient = PaletteStore.Instance.GradientPalette.GetActiveValue((resultType switch
+            var gradient = resultType switch
             {
-                ESongResultType.Excellent => GradientEntry.Exc,
-                ESongResultType.FullCombo or ESongResultType.Clear => GradientEntry.Clear,
-                ESongResultType.Failed => GradientEntry.Failed,
+                ESongResultType.Excellent => resultVisualConfig.ExcellentGradient,
+                ESongResultType.FullCombo or ESongResultType.Clear => resultVisualConfig.ClearGradient,
+                ESongResultType.Failed => resultVisualConfig.FailedGradient,
                 _ => throw new NotImplementedException(),
-            }).ToEntryId()).Value;
+            };
             resultText.colorGradient = new VertexGradient(gradient.Evaluate(0), gradient.Evaluate(0.33f), gradient.Evaluate(0.66f), gradient.Evaluate(1));
             var sequence = DOTween.Sequence();
             sequence = sequence.Append(resultText.DOFade(1, 1).SetEase(Ease.InOutFlash));

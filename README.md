@@ -67,7 +67,6 @@ Run once per clone. To bypass the hook temporarily, use `git push --no-verify`.
 - [MasterMemory](https://github.com/Cysharp/MasterMemory)
 - [R3](https://github.com/Cysharp/R3)
 - [UIEffect](https://github.com/mob-sakai/UIEffect)
-- [uPalette](https://github.com/Haruma-K/uPalette)
 - [UniTask](https://github.com/Cysharp/UniTask)
 - [Zenject](https://github.com/modesttree/Zenject)
 

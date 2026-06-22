@@ -4,7 +4,6 @@
     "com.cysharp.r3": "https://github.com/Cysharp/R3.git?path=src/R3.Unity/Assets/R3.Unity#1.1.12",
     "com.cysharp.unitask": "https://github.com/Cysharp/UniTask.git?path=src/UniTask/Assets/Plugins/UniTask",
     "com.github-glitchenzo.nugetforunity": "https://github.com/GlitchEnzo/NuGetForUnity.git?path=src/NuGetForUnity",
-    "com.harumak.upalette": "https://github.com/Haruma-K/uPalette.git?path=/Assets/uPalette",
     "com.svermeulen.extenject": "https://github.com/svermeulen/Extenject.git?path=/UnityProject/Assets/Plugins/Zenject",
     "com.unity.2d.sprite": "1.0.0",
     "com.unity.addressables": "3.1.0",

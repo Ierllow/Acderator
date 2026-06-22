@@ -901,12 +901,6 @@ MonoBehaviour:
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
   m_Atlas: {fileID: 0}
-  m_AtlasReference:
-    m_AssetGUID: 
-    m_SubObjectName: 
-    m_SubObjectType: 
-    m_SubObjectGUID: 
-    m_EditorAssetChanged: 0
   m_SpriteName: 3
 --- !u!222 &564220243
 CanvasRenderer:
@@ -1094,12 +1088,6 @@ MonoBehaviour:
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
   m_Atlas: {fileID: 0}
-  m_AtlasReference:
-    m_AssetGUID: 
-    m_SubObjectName: 
-    m_SubObjectType: 
-    m_SubObjectGUID: 
-    m_EditorAssetChanged: 0
   m_SpriteName: 
 --- !u!1 &637202095
 GameObject:
@@ -2679,6 +2667,7 @@ MonoBehaviour:
   quitButton: {fileID: 2101499928}
   resultDetail: {fileID: 2141556416}
   cautionTextRoot: {fileID: 754815764}
+  resultVisualConfig: {fileID: 11400000, guid: 3e1f8b7a2c9d4e5f6a1b2c3d4e5f6a7b, type: 2}
 --- !u!114 &1413050358
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2978,12 +2967,6 @@ MonoBehaviour:
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
   m_Atlas: {fileID: 4343727234628468602, guid: 414cbd96ca9ffcd4b8aa5ea6301f6897, type: 2}
-  m_AtlasReference:
-    m_AssetGUID: 
-    m_SubObjectName: 
-    m_SubObjectType: 
-    m_SubObjectGUID: 
-    m_EditorAssetChanged: 0
   m_SpriteName: D
 --- !u!1 &1976581630
 GameObject:

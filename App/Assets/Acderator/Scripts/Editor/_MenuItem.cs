@@ -1,5 +1,6 @@
 using Intense.Api;
 using Intense.Asset;
+using Intense.UI;
 using UnityEditor;
 
 public class _MenuItem
@@ -9,6 +10,7 @@ public class _MenuItem
 
     [MenuItem(SCRIPTABLE_OBJECT_ITEM_NAME_PREFIX + "NetworkConfig")] private static void NetworkConfigToAsset() => ScriptableObjectUtils.ToAsset<NetworkConfig>("Intense/Api");
     [MenuItem(SCRIPTABLE_OBJECT_ITEM_NAME_PREFIX + "AddressableAssetConfig")] private static void AddressableAssetConfigToAsset() => ScriptableObjectUtils.ToAsset<AddressableAssetConfig>("Intense/Addressable");
+    [MenuItem(SCRIPTABLE_OBJECT_ITEM_NAME_PREFIX + "ResultVisualConfig")] private static void ResultVisualConfigToAsset() => ScriptableObjectUtils.ToAsset<ResultVisualConfig>("Intense/UI");
     [MenuItem(CODE_GENERATE_ITEM_NAME_PREFIX + "MasterMemory Only")] private static void GenerateMasterMemoryOnly() => CodeGenerators.ExecuteMasterMemoryCodeGenerator();
     [MenuItem(CODE_GENERATE_ITEM_NAME_PREFIX + "MessagePack Only")] private static void GenerateMessagePackOnly() => CodeGenerators.ExecuteMessagePackCodeGenerator();
     [MenuItem(CODE_GENERATE_ITEM_NAME_PREFIX + "Generate Code All")] private static void GenerateAll() => CodeGenerators.GenerateAll();

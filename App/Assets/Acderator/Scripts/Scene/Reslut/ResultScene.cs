@@ -8,8 +8,6 @@ using Intense.Master;
 using Intense.UI;
 using R3;
 using UnityEngine;
-using uPalette.Generated;
-using uPalette.Runtime.Core;
 using Zenject;
 
 namespace Result
@@ -22,6 +20,7 @@ namespace Result
         [SerializeField] private CommonButton quitButton;
         [SerializeField] private ResultDetail resultDetail;
         [SerializeField] private GameObject cautionTextRoot;
+        [SerializeField] private ResultVisualConfig resultVisualConfig;
 
         [Inject] private readonly ResultSceneContext sceneContext;
         [Inject] private readonly AddressableAssetManager addressableAssetManager;
@@ -46,7 +45,7 @@ namespace Result
                 addressableAssetManager.GetSprite(song.Group.ToString()),
                 addressableAssetManager.GetSprite(string.Format("icon_result_rank_{0}", rank)));
             backgroundImage.SetSprite(addressableAssetManager.GetSprite(masterDataManager.MemoryDatabase.ResultMasterTable.First().Rid.ToString()));
-            backgroundImage.color = PaletteStore.Instance.ColorPalette.GetActiveValue((ScoreUtils.IsClear(sceneContext.ResultInfo.CurrentScore) ? ColorEntry.White : ColorEntry.LightWhite).ToEntryId()).Value;
+            backgroundImage.color = ScoreUtils.IsClear(sceneContext.ResultInfo.CurrentScore) ? resultVisualConfig.ClearBackgroundColor : resultVisualConfig.FailedBackgroundColor;
             cautionTextRoot.SetActive(sceneContext.ResultInfo.IsAuto);
             retryButton.gameObject.SetActive(!sceneContext.ResultInfo.IsAuto);
 
