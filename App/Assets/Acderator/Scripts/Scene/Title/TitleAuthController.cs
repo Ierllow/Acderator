@@ -19,9 +19,8 @@ namespace Title
         [Inject] private readonly ScoreManager scoreManager;
         [Inject] private readonly AddressableAssetManager addressableAssetManager;
         [Inject] private readonly PopupManager popupManager;
-        [Inject] private readonly IApiSession apiSession;
 
-        internal NetworkManager NetworkManager =>networkManager;
+        internal NetworkManager NetworkManager => networkManager;
 
         public async UniTask<bool> Execute(CancellationToken token, FailFastExceptionWatcher failFastExceptionWatcher)
         {
@@ -33,14 +32,14 @@ namespace Title
             {
                 PlayerPrefsValues.Set(PlayerPrefsKey.UserId, registerResponse.UserId);
                 PlayerPrefsValues.Set(PlayerPrefsKey.Password, registerResponse.Password);
-                apiSession.Token = registerResponse.Token;
+                networkManager.Token = registerResponse.Token;
             }
             else
             {
-                apiSession.Token = (authResponse as LoginResponse)?.Token;
+                networkManager.Token = (authResponse as LoginResponse)?.Token;
             }
 
-            await LoadAssets(token).AddWatcherTo(failFastExceptionWatcher);
+            await addressableAssetManager.LoadAssetsAsync(ESceneType.Title, token).AddWatcherTo(failFastExceptionWatcher);
             var userDataResponse = await networkManager.RequestAsync(new UserDataRequest()).AddWatcherTo(failFastExceptionWatcher);
             if (!(userDataResponse?.IsSuccess ?? false)) return await OpenNetworkErrorPopup(userDataResponse);
             scoreManager.SetScoreData(userDataResponse.ScorePairs);
@@ -56,9 +55,9 @@ namespace Title
         private async UniTask<ResponseBase> RequestAuth(RequestBase request, FailFastExceptionWatcher failFastExceptionWatcher)
         {
             var response = await networkManager.RequestAsync(request).AddWatcherTo(failFastExceptionWatcher);
-            if (response?.NetworkError != NetworkError.PreconditionFailed || response.Master is not { } master) return response;
+            if (response?.NetworkError != NetworkError.PreconditionFailed) return response;
 
-            await masterDataManager.LoadMasterAsync(master).AddWatcherTo(failFastExceptionWatcher);
+            await masterDataManager.LoadMasterAsync(response.Master).AddWatcherTo(failFastExceptionWatcher);
             return await networkManager.RequestAsync(request).AddWatcherTo(failFastExceptionWatcher);
         }
 
@@ -68,11 +67,6 @@ namespace Title
             var context = PopupContextFactory.CreateNetworkErrorPopupContext(completionSource, response?.ErrorMessage ?? "通信に失敗しました。", response?.ErrorCode ?? 0);
             popupManager.OpenPopup(context);
             return await completionSource.Task == ECommonPopupTapKind.Negative;
-        }
-
-        private async UniTask LoadAssets(CancellationToken token)
-        {
-            await addressableAssetManager.LoadAssetsAsync(ESceneType.Title, token);
         }
     }
 }

@@ -24,7 +24,6 @@ namespace Intense.Master
 
         public async UniTask LoadMasterAsync(Dictionary<string, object> masterDict)
         {
-            var completionSource = AutoResetUniTaskCompletionSource.Create();
             var builder = new DatabaseBuilder();
             var baseScore = FirstInt(masterDict, "base_score_masters", "score");
             var baseHp = FirstInt(masterDict, "base_hp_masters", "hp");
@@ -46,9 +45,8 @@ namespace Intense.Master
             builder.Append(ReadMasters(masterDict, "tutorial_step_masters", TutorialStepMaster.From));
             builder.Append(ReadMasters(masterDict, "tutorial_masters", TutorialMaster.From));
             MemoryDatabase = new(builder.Build());
-            completionSource.TrySetResult();
 
-            await completionSource.Task;
+            await UniTask.CompletedTask;
         }
 
         private List<VersionMaster> SetVersion(Dictionary<string, object> masterDict)

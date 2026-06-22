@@ -4,6 +4,7 @@ using Intense;
 using R3;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using Zenject;
 
 namespace Song
@@ -21,8 +22,6 @@ namespace Song
 
         public Observable<FingerInfo> JudgmentAsObservable => judgmentSubject;
 
-        private bool IsAuto => notesManager.SongOption.IsAuto;
-
         public void Enqueue(FingerJudgeRequest request)
         {
             judgeRequestList.RemoveAll(x => x.Frame != request.Frame);
@@ -33,26 +32,19 @@ namespace Song
 
         public void Judge(float currentSec)
         {
-            JudgeRequests();
+            foreach (var judgeRequest in judgeRequestList.Where(x => x.IsCurrentFrame()))
+            {
+                EmitJudgeRequest(judgeRequest);
+            }
+            judgeRequestList.Clear();
             var notes = notesManager.AliveNoteList;
             for (var i = notes.Count - 1; i >= 0; i--)
             {
                 var note = notes[i];
                 if (!note || !note.IsActive) continue;
-                if (TryEmitMiss(note, currentSec)) continue;
-                if (IsAuto) EmitPerfect(note);
+                if (noteJudgeController.IsMissed(note, currentSec)) { EmitMiss(note, currentSec); continue; }
+                if (notesManager.SongOption.IsAuto) EmitPerfect(note);
             }
-        }
-
-        private void JudgeRequests()
-        {
-            for (var i = 0; i < judgeRequestList.Count; i++)
-            {
-                var request = judgeRequestList[i];
-                if (!request.IsCurrentFrame()) continue;
-                EmitJudgeRequest(request);
-            }
-            judgeRequestList.Clear();
         }
 
         private void EmitJudgeRequest(FingerJudgeRequest request)
@@ -77,8 +69,8 @@ namespace Song
             if (TryGetRequestedNote(request, out var note))
             {
                 TryApplyJudgement(note, request.FingerType, request.Lane, request.AllowMiss, out fingerInfo);
+                judgmentSubject.OnNext(fingerInfo);
             }
-            judgmentSubject.OnNext(fingerInfo);
         }
 
         private void EmitSwipeJudgeRequest(FingerJudgeRequest request)
@@ -113,20 +105,14 @@ namespace Song
                 EmitPerfect(note, EFingerType.Up);
         }
 
-        private bool TryEmitMiss(NoteBase note, float currentSec)
+        private void EmitMiss(NoteBase note, float currentSec) => judgmentSubject.OnNext(new()
         {
-            if (!noteJudgeController.IsMissed(note, currentSec, out var missEnd)) return false;
-            var noteData = notesManager.GetNoteData(note);
-            judgmentSubject.OnNext(new FingerInfo
-            {
-                NoteBase = note,
-                NoteData = noteData,
-                JudgmentType = IsAuto ? EJudgementType.Perfect : EJudgementType.Miss,
-                Lane = LaneNone,
-                MissInfo = (true, missEnd),
-            });
-            return true;
-        }
+            NoteBase = note,
+            NoteData = notesManager.GetNoteData(note),
+            JudgmentType = notesManager.SongOption.IsAuto ? EJudgementType.Perfect : EJudgementType.Miss,
+            Lane = LaneNone,
+            MissInfo = (true, true),
+        });
 
         private void EmitPerfect(NoteBase note, EFingerType fingerType)
         {
@@ -158,17 +144,6 @@ namespace Song
             return true;
         }
 
-        private List<int> GetTappingLanes()
-        {
-            var aliveNotes = notesManager.AliveNoteList;
-            var tappingLaneList = new List<int>(aliveNotes.Count);
-            for (var i = 0; i < aliveNotes.Count; i++)
-            {
-                var note = aliveNotes[i];
-                if (!note || !note.IsActive || !note.IsTapping) continue;
-                tappingLaneList.Add(notesManager.GetNoteData(note).Lane);
-            }
-            return tappingLaneList;
-        }
+        private List<int> GetTappingLanes() => notesManager.AliveNoteList.Where(note => note && note.IsActive && note.IsTapping).Select(x => notesManager.GetNoteData(x).Lane).ToList();
     }
 }

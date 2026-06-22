@@ -34,6 +34,8 @@ namespace Intense.Api
         [Inject] private readonly Loading loading;
         [Inject] private readonly IApiSession apiSession;
 
+        public string Token { set => apiSession.Token = value; }
+
         public async UniTask<ResponseBase> RequestAsync(RequestBase request)
         {
             if (Application.internetReachability == NetworkReachability.NotReachable)

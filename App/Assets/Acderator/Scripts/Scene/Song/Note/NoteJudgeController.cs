@@ -67,31 +67,24 @@ namespace Song
             };
         }
 
-        public bool IsMissed(NoteBase note, float currentSec, out bool missEnd)
+        public bool IsMissed(NoteBase note, float currentSec)
         {
-            missEnd = false;
             var data = notesManager.GetNoteData(note);
-
             var beginMissed = data.SecBegin - currentSec < -BadJudgmentZone;
             return data.NoteType switch
             {
                 ENoteType.Single => beginMissed && !note.IsTapping,
                 ENoteType.Flick => IsFlickMissed(note, data, currentSec, beginMissed),
-                ENoteType.Long or ENoteType.Curve => IsHoldMissed(note, data, currentSec, beginMissed, out missEnd),
+                ENoteType.Long or ENoteType.Curve => IsHoldMissed(note, data, currentSec, beginMissed),
                 _ => false,
             };
         }
 
         private bool IsFlickMissed(NoteBase note, NoteData data, float currentSec, bool beginMissed) => !note.IsTapping ? beginMissed : data.SecEnd - currentSec < -BadJudgmentZone;
 
-        private bool IsHoldMissed(NoteBase note, NoteData data, float currentSec, bool beginMissed, out bool missEnd)
+        private bool IsHoldMissed(NoteBase note, NoteData data, float currentSec, bool beginMissed)
         {
-            missEnd = false;
-            if (!note.IsTapping)
-            {
-                missEnd = beginMissed;
-                return beginMissed;
-            }
+            if (!note.IsTapping) return false;
 
             var duration = GetHoldDuration(data);
             var endMissed = data.SecBegin + duration - currentSec < -BadJudgmentZone;

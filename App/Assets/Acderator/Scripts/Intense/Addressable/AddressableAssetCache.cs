@@ -38,10 +38,7 @@ namespace Intense.Asset
             RegisterSpriteAtlas(handle.Result);
         }
 
-        public void CacheLabel(string cacheKey, AsyncOperationHandle<IList<Object>> handle)
-        {
-            loadedLabelHandleDict[cacheKey] = handle;
-        }
+        public void CacheLabel(string cacheKey, AsyncOperationHandle<IList<Object>> handle) => loadedLabelHandleDict[cacheKey] = handle;
 
         public void UnloadAll()
         {

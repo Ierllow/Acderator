@@ -7,8 +7,8 @@ using System.Collections.Generic;
 
 namespace Master.Tables
 {
-   public sealed partial class ResultMasterTable : TableBase<ResultMaster>
-   {
+    public sealed partial class ResultMasterTable : TableBase<ResultMaster>
+    {
         readonly Func<ResultMaster, int> primaryIndexSelector;
 
 

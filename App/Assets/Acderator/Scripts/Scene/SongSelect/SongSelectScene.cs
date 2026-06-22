@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using Cysharp.Threading.Tasks.Linq;
 using Intense;
 using Intense.Api;
 using Intense.Asset;
@@ -6,6 +7,7 @@ using Intense.Attribute;
 using Intense.Data;
 using Intense.Master;
 using Intense.UI;
+using R3;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
@@ -31,7 +33,14 @@ namespace SongSelect
         [Inject] private readonly SongSelectSoundController soundController;
         [Inject] private readonly Song.TutorialSceneContextBuilder tutorialSceneContextBuilder;
 
-        private void Start() => StartSubscribes();
+        private void Start()
+        {
+            autoButton.SetToggleTextAsAsyncEnumerableForEachAsync(isOn => isOn ? "オートON" : "オートOFF");
+            decideButton.OnTapButtonAsObservable.SubscribeLockAwait(async (_, __) => await TapDecideButton()).RegisterTo(destroyCancellationToken);
+            orderButton.OnTapButtonAsObservable.SubscribeLock(_ => TapOrderButton()).RegisterTo(destroyCancellationToken);
+            songListView.EverySelectedCellChanged.Skip(1).Subscribe(SelectedCellChanged).RegisterTo(destroyCancellationToken);
+            songSelectDetail.EveryToggleChanged.Skip(1).Where(x => x != null).Subscribe(SelectedDifficultChanged).RegisterTo(destroyCancellationToken);
+        }
 
         private void OnApplicationPause(bool pauseStatus)
         {
@@ -104,7 +113,6 @@ namespace SongSelect
             var persent = scoreManager.GetScore(songListView.SelectedCellListSid) % masterDataManager.MemoryDatabase.SongMasterTable.FindBySid(songListView.SelectedCellListSid).Score / 10000;
             var rank = (int)ScoreUtils.ToRank(scoreManager.GetScore(songListView.SelectedCellListSid), true);
             songSelectDetail.UpdateInfo(
-                songListView.SelectedDifficulty,
                 scoreManager.GetScore(songListView.SelectedCellListSid),
                 persent,
                 addressableAssetManager.GetSprite(string.Format("icon_result_rank_{0}", rank)));

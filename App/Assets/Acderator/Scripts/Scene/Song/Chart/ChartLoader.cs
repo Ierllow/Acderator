@@ -46,8 +46,6 @@ namespace Song
                 loadedChartInfo.LoadResult = ELoadResult.Unknown;
                 return;
             }
-
-            var completionSource = AutoResetUniTaskCompletionSource.Create();
             try
             {
                 var lineList = target.Split('\n', StringSplitOptions.RemoveEmptyEntries).ToList();
@@ -60,14 +58,12 @@ namespace Song
                 {
                     loadedChartInfo.LoadResult = ELoadResult.Unknown;
                 }
-                completionSource.TrySetResult();
             }
             catch
             {
                 loadedChartInfo.LoadResult = ELoadResult.Exception;
-                completionSource.TrySetResult();
             }
-            await completionSource.Task;
+            await UniTask.CompletedTask;
         }
 
         private void LoadHeaderData(LoadedChartInfo loadedChartInfo, List<string> lineList)

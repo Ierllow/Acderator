@@ -212,10 +212,7 @@ namespace Intense.Asset
         }
 
         private async UniTask<EAddressableOperationResult> WaitForCompletionAsync(AsyncOperationHandle handle, CancellationToken cancellationToken)
-        {
-            var isCanceled = await UniTask.WaitUntil(() => handle.IsDone, cancellationToken: cancellationToken).SuppressCancellationThrow();
-            return GetOperationResult(handle, isCanceled);
-        }
+            => GetOperationResult(handle, await UniTask.WaitUntil(() => handle.IsDone, cancellationToken: cancellationToken).SuppressCancellationThrow());
 
         private EAddressableOperationResult GetOperationResult(AsyncOperationHandle operation, bool isCanceled) => (isCanceled, operation.Status) switch
         {

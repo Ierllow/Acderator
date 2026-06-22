@@ -27,7 +27,8 @@ namespace Song
             laneLightTuple ??= laneLights.Select((ll, index) => (ll, index)).ToList();
             foreach (var (ll, index) in laneLightTuple)
             {
-                var value = index == lane && fingerType == EFingerType.Down;
+                if (index != lane) continue;
+                var value = fingerType == EFingerType.Down;
                 ll.SetActive(value);
             }
         }

@@ -1,7 +1,5 @@
 using Cysharp.Threading.Tasks;
 using Cysharp.Threading.Tasks.Linq;
-using Intense.Asset;
-using Intense.Data;
 using Intense.Master;
 using Intense.UI;
 using System.Collections.Generic;
@@ -39,7 +37,7 @@ namespace SongSelect
             }
         }
 
-        public void UpdateInfo(int selectedDifficulty, int score, int percentNum, Sprite rankSprite)
+        public void UpdateInfo(int score, int percentNum, Sprite rankSprite)
         {
             if (mSongList == default) return;
 
