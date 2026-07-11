@@ -106,10 +106,17 @@ MonoBehaviour:
     - default
     - song/jacket
     - song/rank
+    - song/hud
+    - song/lane
+    - song/note
+    - song/effect
+    - song/prefab/note
+    - song/prefab/effect
     - song/difficulty
     - song/bg
     - song/particle/judgetext
-    - songselect/bg
+    - songselect/banner
+    - songselect/prefab/item
     - result/bg
     - sounds/song/songse
     - sounds/bgm/bgm

@@ -34,7 +34,6 @@ RectTransform:
   - {fileID: 7283010348397394541}
   - {fileID: 8504401493241036455}
   m_Father: {fileID: 9076820422412396839}
-  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -100,7 +99,6 @@ RectTransform:
   m_Children:
   - {fileID: 1106845157422126470}
   m_Father: {fileID: 3105517322864391414}
-  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
@@ -213,9 +211,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7aee7445402da1e4d9e7ce3a823e0610, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scaleShrink: 0.9
-  duration: 0.1
-  isEnable: 1
 --- !u!114 &1543421662648680267
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -231,6 +226,7 @@ MonoBehaviour:
   button: {fileID: 4830980112024372163}
   buttonText: {fileID: 3336986464073891370}
   uIEffect: {fileID: 0}
+  grayFactory: 0.4
 --- !u!1 &2097295954751133107
 GameObject:
   m_ObjectHideFlags: 0
@@ -262,7 +258,6 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2281695436145567316}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -335,20 +330,23 @@ MonoBehaviour:
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_enableWordWrapping: 1
+  m_TextWrappingMode: 1
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 1
+  m_ActiveFontFeatures: 00000000
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
+  m_EmojiFallbackSupport: 1
   m_parseCtrlCharacters: 1
   m_isOrthographic: 1
   m_isCullingEnabled: 0
@@ -397,7 +395,6 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 9076820422412396839}
-  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
@@ -470,20 +467,23 @@ MonoBehaviour:
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_enableWordWrapping: 0
+  m_TextWrappingMode: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 1
+  m_ActiveFontFeatures: 00000000
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
+  m_EmojiFallbackSupport: 1
   m_parseCtrlCharacters: 1
   m_isOrthographic: 1
   m_isCullingEnabled: 0
@@ -532,7 +532,6 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2909346421492417811}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -605,20 +604,23 @@ MonoBehaviour:
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_enableWordWrapping: 1
+  m_TextWrappingMode: 1
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 1
+  m_ActiveFontFeatures: 00000000
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
+  m_EmojiFallbackSupport: 1
   m_parseCtrlCharacters: 1
   m_isOrthographic: 1
   m_isCullingEnabled: 0
@@ -669,7 +671,6 @@ RectTransform:
   - {fileID: 4429877994727731963}
   - {fileID: 3105517322864391414}
   m_Father: {fileID: 7586649577222044899}
-  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -711,7 +712,6 @@ RectTransform:
   m_Children:
   - {fileID: 3963748088634448585}
   m_Father: {fileID: 3105517322864391414}
-  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
@@ -824,9 +824,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7aee7445402da1e4d9e7ce3a823e0610, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scaleShrink: 0.9
-  duration: 0.1
-  isEnable: 1
 --- !u!114 &2636446951786486280
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -842,6 +839,7 @@ MonoBehaviour:
   button: {fileID: 6235007352480719744}
   buttonText: {fileID: 5757779765612411796}
   uIEffect: {fileID: 0}
+  grayFactory: 0.4
 --- !u!1 &4474507817665766359
 GameObject:
   m_ObjectHideFlags: 0
@@ -873,7 +871,6 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 9076820422412396839}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -950,7 +947,6 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 7586649577222044899}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -1082,7 +1078,6 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 7283010348397394541}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -1155,20 +1150,23 @@ MonoBehaviour:
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_enableWordWrapping: 1
+  m_TextWrappingMode: 1
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 1
+  m_ActiveFontFeatures: 00000000
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
+  m_EmojiFallbackSupport: 1
   m_parseCtrlCharacters: 1
   m_isOrthographic: 1
   m_isCullingEnabled: 0
@@ -1221,7 +1219,6 @@ RectTransform:
   m_Children:
   - {fileID: 8119566746586209107}
   m_Father: {fileID: 3105517322864391414}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
@@ -1334,9 +1331,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7aee7445402da1e4d9e7ce3a823e0610, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scaleShrink: 0.9
-  duration: 0.1
-  isEnable: 1
 --- !u!114 &613290753550306166
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1352,6 +1346,7 @@ MonoBehaviour:
   button: {fileID: 198996713075625493}
   buttonText: {fileID: 6983682384605710570}
   uIEffect: {fileID: 0}
+  grayFactory: 0.4
 --- !u!1 &5212863801465548919
 GameObject:
   m_ObjectHideFlags: 0
@@ -1383,7 +1378,6 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 8504401493241036455}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -1456,20 +1450,23 @@ MonoBehaviour:
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_enableWordWrapping: 1
+  m_TextWrappingMode: 1
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 1
+  m_ActiveFontFeatures: 00000000
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
+  m_EmojiFallbackSupport: 1
   m_parseCtrlCharacters: 1
   m_isOrthographic: 1
   m_isCullingEnabled: 0
@@ -1522,7 +1519,6 @@ RectTransform:
   m_Children:
   - {fileID: 5479131069370862635}
   m_Father: {fileID: 3105517322864391414}
-  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
@@ -1635,9 +1631,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7aee7445402da1e4d9e7ce3a823e0610, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scaleShrink: 0.9
-  duration: 0.1
-  isEnable: 1
 --- !u!114 &4746421522215719474
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1653,6 +1646,7 @@ MonoBehaviour:
   button: {fileID: 6471055100486915831}
   buttonText: {fileID: 7331930922475108906}
   uIEffect: {fileID: 0}
+  grayFactory: 0.4
 --- !u!1 &6433698343920974376
 GameObject:
   m_ObjectHideFlags: 0
@@ -1666,6 +1660,7 @@ GameObject:
   - component: {fileID: 4703340267014068593}
   - component: {fileID: 8304647597508591561}
   - component: {fileID: 5221529705323669965}
+  - component: {fileID: 6927166441714905458}
   m_Layer: 5
   m_Name: CloseButton
   m_TagString: Untagged
@@ -1687,7 +1682,6 @@ RectTransform:
   m_Children:
   - {fileID: 4006210905630158426}
   m_Father: {fileID: 9076820422412396839}
-  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
@@ -1800,9 +1794,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7aee7445402da1e4d9e7ce3a823e0610, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scaleShrink: 0.9
-  duration: 0.1
-  isEnable: 1
+--- !u!114 &6927166441714905458
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6433698343920974376}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7d662ace6522b4c4bafdf1db54b13909, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Intense.UI.CommonButton
+  button: {fileID: 0}
+  buttonText: {fileID: 0}
+  uIEffect: {fileID: 0}
+  grayFactory: 0.4
 --- !u!1 &7661804967179514357
 GameObject:
   m_ObjectHideFlags: 0
@@ -1834,7 +1841,6 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4429877994727731963}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -1907,20 +1913,23 @@ MonoBehaviour:
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_enableWordWrapping: 1
+  m_TextWrappingMode: 1
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 1
+  m_ActiveFontFeatures: 00000000
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
+  m_EmojiFallbackSupport: 1
   m_parseCtrlCharacters: 1
   m_isOrthographic: 1
   m_isCullingEnabled: 0
@@ -1974,7 +1983,6 @@ RectTransform:
   - {fileID: 3283710887523552666}
   - {fileID: 9076820422412396839}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -2043,10 +2051,10 @@ MonoBehaviour:
   m_BlockingObjects: 0
   m_BlockingMask:
     serializedVersion: 2
-    m_Bits: 55
+    m_Bits: 4294967295
 --- !u!95 &4814843653545607563
 Animator:
-  serializedVersion: 5
+  serializedVersion: 7
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -2060,6 +2068,7 @@ Animator:
   m_ApplyRootMotion: 0
   m_LinearVelocityBlending: 0
   m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
@@ -2086,3 +2095,4 @@ MonoBehaviour:
   deleteAccountButton: {fileID: 2636446951786486280}
   licenseButton: {fileID: 4746421522215719474}
   titleSceneButton: {fileID: 1543421662648680267}
+  networkConfigObject: {fileID: 0}

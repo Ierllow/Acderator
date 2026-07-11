@@ -1,5 +1,6 @@
 using Cysharp.Threading.Tasks;
 using EnhancedUI.EnhancedScroller;
+using Intense.Asset;
 using Intense.Internal;
 using Intense.Master;
 using UnityEngine;
@@ -15,6 +16,10 @@ namespace SongSelect
         [Inject] private readonly SongSelectCellListController songSelectCellListController;
         [Inject] private readonly SongSelectSortController songSelectSortController;
         [Inject] private readonly MasterDataManager masterDataManager;
+        [Inject] private readonly AddressableAssetManager addressableAssetManager;
+        [Inject] private readonly AddressablePrefabResolver addressablePrefabResolver;
+
+        private EnhancedScrollerCellView resolvedCellPrefab;
 
         public int SelectedGroup => songSelectCellListController.SelectedGroup;
         public int SelectedDifficulty => songSelectCellListController.SelectedDifficulty;
@@ -25,10 +30,15 @@ namespace SongSelect
 
         public void Init()
         {
+            resolvedCellPrefab = addressablePrefabResolver.GetComponentOrFallback("SongSelectItem", cellPrefab);
+            Error.ThrowArgumentNullException(resolvedCellPrefab, nameof(resolvedCellPrefab));
+
             scroller.Delegate ??= this;
             scroller.cellViewVisibilityChanged = (cellView) =>
             {
                 var cell = (SongSelectCell)cellView;
+                if (cell.MSong == null) return;
+
                 cell.SetSelectedCell(cell.MSong.Group == songSelectCellListController.SelectedGroup);
             };
             scroller.cellViewInstantiated = (_, cellView) =>
@@ -51,9 +61,10 @@ namespace SongSelect
 
         public EnhancedScrollerCellView GetCellView(EnhancedScroller _, int dataIndex, int __)
         {
-            var cellView = scroller.GetCellView(cellPrefab) as SongSelectCell;
+            var cellView = scroller.GetCellView(resolvedCellPrefab) as SongSelectCell;
+            Error.ThrowArgumentNullException(cellView, nameof(cellView));
             var group = songSelectCellListController.SongGroupList[dataIndex];
-            cellView.Setup(masterDataManager.MemoryDatabase.SongMasterTable.FindByGroup(group), songSelectCellListController.ChangeSelectedCell);
+            cellView.Setup(masterDataManager.MemoryDatabase.SongMasterTable.FindByGroup(group), songSelectCellListController.ChangeSelectedCell, addressableAssetManager.GetSprite);
             return cellView;
         }
 

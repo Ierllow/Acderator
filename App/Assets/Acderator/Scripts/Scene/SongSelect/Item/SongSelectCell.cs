@@ -15,18 +15,25 @@ namespace SongSelect
 
         public Action<SongSelectCell> selected;
 
+        private Func<string, Sprite> spriteResolver;
+
         public SongMaster MSong { get; private set; }
 
-        public void Setup(SongMaster mSong, Action<SongSelectCell> selected)
+        public void Setup(SongMaster mSong, Action<SongSelectCell> selected, Func<string, Sprite> spriteResolver)
         {
             this.selected = selected;
+            this.spriteResolver = spriteResolver;
             MSong = mSong;
             SetSelectedCell(true);
             songName.SetText(mSong.Name);
             composer.SetText(mSong.Composer);
         }
 
-        public void SetSelectedCell(bool value) => bg.SetAtlas(value ? "song_selected" : "song_not_selected");
+        public void SetSelectedCell(bool value)
+        {
+            bg.SetAtlas(value ? "song_selected" : "song_not_selected");
+            bg.ResolveSprite(spriteResolver);
+        }
 
         public void OnTapCell() => selected?.Invoke(this);
     }

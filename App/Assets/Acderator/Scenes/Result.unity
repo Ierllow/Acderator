@@ -2966,7 +2966,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
-  m_Atlas: {fileID: 4343727234628468602, guid: 414cbd96ca9ffcd4b8aa5ea6301f6897, type: 2}
+  m_Atlas: {fileID: 0}
   m_SpriteName: D
 --- !u!1 &1976581630
 GameObject:

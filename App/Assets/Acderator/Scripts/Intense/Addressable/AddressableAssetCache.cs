@@ -32,6 +32,8 @@ namespace Intense.Asset
             return false;
         }
 
+        public List<Object> LoadedAssets => loadedAssetHandleDict.Values.Select(handle => handle.Result).Concat(loadedLabelHandleDict.Values.SelectMany(handle => handle.Result)).ToList();
+
         public void CacheAsset(string cacheKey, AsyncOperationHandle<Object> handle)
         {
             loadedAssetHandleDict[cacheKey] = handle;
@@ -50,7 +52,7 @@ namespace Intense.Asset
             RefreshSpriteAtlases();
         }
 
-        public Sprite GetSprite(string spriteName) => spriteAtlasSet.FirstOrDefault(sprite => sprite != null).GetSprite(spriteName);
+        public Sprite GetSprite(string spriteName) => spriteAtlasSet.Select(atlas => atlas?.GetSprite(spriteName)).FirstOrDefault(sprite => sprite != null);
 
         public void RegisterSpriteAtlas(Object asset)
         {

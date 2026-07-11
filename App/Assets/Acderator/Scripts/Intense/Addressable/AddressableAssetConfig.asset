@@ -15,9 +15,16 @@ MonoBehaviour:
   songSelectLabels:
   - m_LabelString: song/jacket
   - m_LabelString: song/rank
-  - m_LabelString: songselect/bg
+  - m_LabelString: songselect/banner
+  - m_LabelString: songselect/prefab/item
   songLabels:
   - m_LabelString: song/rank
+  - m_LabelString: song/hud
+  - m_LabelString: song/lane
+  - m_LabelString: song/note
+  - m_LabelString: song/effect
+  - m_LabelString: song/prefab/note
+  - m_LabelString: song/prefab/effect
   - m_LabelString: song/difficulty
   - m_LabelString: song/bg
   - m_LabelString: song/particle/judgetext
@@ -40,4 +47,5 @@ MonoBehaviour:
     m_SubObjectGUID:
     m_EditorAssetChanged: 0
   assetServerUrlPropertyName: Acderator.AssetServerUrl
+  assetServerUrl:
   loadCoolDownMilliseconds: 500

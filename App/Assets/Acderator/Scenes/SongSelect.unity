@@ -199,7 +199,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
-  m_Atlas: {fileID: 4343727234628468602, guid: 414cbd96ca9ffcd4b8aa5ea6301f6897, type: 2}
+  m_Atlas: {fileID: 0}
   m_SpriteName: New
 --- !u!1 &116632961
 GameObject:
@@ -1533,7 +1533,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   scroller: {fileID: 1805820318}
-  cellPrefab: {fileID: 3533908045777653638, guid: 71bb5f1d81485fb41b830d263020e3dc, type: 3}
+  cellPrefab: {fileID: 0}
 --- !u!1 &1307694930
 GameObject:
   m_ObjectHideFlags: 0

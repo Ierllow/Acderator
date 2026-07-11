@@ -1,14 +1,12 @@
 #nullable enable
 
 using Intense;
-using Intense.UI;
 using UnityEngine;
 
 namespace Song
 {
     public class ParticleObject : MonoBehaviour
     {
-        [SerializeField] private AtlasImage atlas = default!;
         [SerializeField] private ParticleSystemRenderer particleSystemRenderer = default!;
 
         private ParticleSystem particle = default!;
@@ -16,6 +14,12 @@ namespace Song
         public bool IsPlaying => particle.isPlaying;
 
         private void Awake() => particle = GetComponent<ParticleSystem>();
+
+        public void SetMainTexture(Sprite sprite)
+        {
+            if (sprite == null) return;
+            particleSystemRenderer.material.mainTexture = sprite.texture;
+        }
 
         public void Emit(float xPosition)
         {
@@ -28,8 +32,7 @@ namespace Song
         {
             if (type == EJudgementType.None) return;
 
-            atlas.SetSprite(judgeSprite);
-            particleSystemRenderer.material.mainTexture = atlas.mainTexture;
+            if (judgeSprite != null) particleSystemRenderer.material.mainTexture = judgeSprite.texture;
             particle.transform.localPosition = new(xChildPosition, particle.transform.localPosition.y, particle.transform.localPosition.z);
             Emit(xParentPosition);
         }

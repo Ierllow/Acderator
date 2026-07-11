@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.U2D;
 using UnityEngine.UI;
+using System;
 
 namespace Intense.UI
 {
@@ -19,9 +20,18 @@ namespace Intense.UI
         public virtual void SetAtlas(string spriteName)
         {
             m_SpriteName = spriteName;
-            SetSprite(m_Atlas?.GetSprite(spriteName));
+            if (m_Atlas != null) SetSprite(m_Atlas.GetSprite(spriteName));
         }
 
         public void SetSprite(Sprite value) => sprite = value;
+
+        public void ResolveSprite(Func<string, Sprite> spriteResolver)
+        {
+            if (spriteResolver == null) return;
+            if (string.IsNullOrEmpty(m_SpriteName)) return;
+
+            var resolvedSprite = spriteResolver(m_SpriteName);
+            if (resolvedSprite != null) SetSprite(resolvedSprite);
+        }
     }
 }

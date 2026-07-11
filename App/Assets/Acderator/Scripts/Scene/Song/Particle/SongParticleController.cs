@@ -20,19 +20,13 @@ namespace Song
         [SerializeField] private Transform particlePoolTransform = default!;
 
         [Inject] private readonly AddressableAssetManager addressableAssetManager = default!;
+        [Inject] private readonly AddressablePrefabResolver addressablePrefabResolver = default!;
 
-        private ObjectPool<ParticleObject> tapParticlePool = default!;
-        private ObjectPool<ParticleObject> holdParticlePool = default!;
-        private ObjectPool<ParticleObject> judgeParticlePool = default!;
+        private ObjectPool<ParticleObject>? tapParticlePool;
+        private ObjectPool<ParticleObject>? holdParticlePool;
+        private ObjectPool<ParticleObject>? judgeParticlePool;
 
         private readonly Dictionary<int, ParticleObject> playingHoldParticleDict = new();
-
-        private void Awake()
-        {
-            tapParticlePool = CreatePool(tapParticleObject);
-            holdParticlePool = CreatePool(holdParticleObject);
-            judgeParticlePool = CreatePool(judgeParticleObject);
-        }
 
         private ObjectPool<ParticleObject> CreatePool(ParticleObject prefab) => new(
             createFunc: () => Instantiate(prefab, particlePoolTransform),
@@ -46,6 +40,7 @@ namespace Song
 
         public void UpdateParticles(FingerInfo fingerInfo)
         {
+            if (!EnsurePools()) return;
             if (fingerInfo.NoteData == null) return;
 
             if (fingerInfo.IsMissed) StopHoldEffect(fingerInfo.NoteData.Lane);
@@ -87,6 +82,8 @@ namespace Song
 
         private async UniTask SpawnJudgeEffect(float parentX, float childX, EJudgementType judgementType)
         {
+            if (judgeParticlePool == null) return;
+
             var judgeParticle = judgeParticlePool.Get();
             judgeParticle.Emit(
                 parentX,
@@ -99,7 +96,10 @@ namespace Song
 
         private async UniTask SpawnTapEffect(float position)
         {
+            if (tapParticlePool == null) return;
+
             var tapParticle = tapParticlePool.Get();
+            tapParticle.SetMainTexture(addressableAssetManager.GetSprite("tap_effect"));
             tapParticle.Emit(position);
             await UniTask.WaitWhile(() => tapParticle.IsPlaying, cancellationToken: destroyCancellationToken);
             tapParticlePool.Release(tapParticle);
@@ -111,13 +111,18 @@ namespace Song
                 && particleInfo.fingerType == EFingerType.Down
                 && particleInfo.judgeType != EJudgementType.Miss)
             {
+                if (holdParticlePool == null) return;
+
                 var holdParticle = holdParticlePool.Get();
+                holdParticle.SetMainTexture(addressableAssetManager.GetSprite("hold_effect"));
                 holdParticle.Play(parentX);
                 playingHoldParticleDict.Add(particleInfo.lane, holdParticle);
             }
             if (playingHoldParticleDict.TryGetValue(particleInfo.lane, out var playing)
                 && !particleInfo.tappingLanes.Any(x => x == particleInfo.lane))
             {
+                if (holdParticlePool == null) return;
+
                 holdParticlePool.Release(playing);
                 playingHoldParticleDict.Remove(particleInfo.lane);
                 await SpawnJudgeEffect(parentX, childX, particleInfo.judgeType);
@@ -129,16 +134,31 @@ namespace Song
             if (playingHoldParticleDict.TryGetValue(lane, out var holdParticle))
             {
                 holdParticle.Stop();
-                holdParticlePool.Release(holdParticle);
+                holdParticlePool?.Release(holdParticle);
                 playingHoldParticleDict.Remove(lane);
             }
         }
 
+        private bool EnsurePools()
+        {
+            if (tapParticlePool != null && holdParticlePool != null && judgeParticlePool != null) return true;
+
+            var tapPrefab = addressablePrefabResolver.GetComponentOrFallback("TapEffect", tapParticleObject);
+            var holdPrefab = addressablePrefabResolver.GetComponentOrFallback("HoldEffect", holdParticleObject);
+            var judgePrefab = addressablePrefabResolver.GetComponentOrFallback("TextJudge", judgeParticleObject);
+            if (tapPrefab == null || holdPrefab == null || judgePrefab == null) return false;
+
+            tapParticlePool ??= CreatePool(tapPrefab);
+            holdParticlePool ??= CreatePool(holdPrefab);
+            judgeParticlePool ??= CreatePool(judgePrefab);
+            return true;
+        }
+
         private void OnDestroy()
         {
-            tapParticlePool.Dispose();
-            holdParticlePool.Dispose();
-            judgeParticlePool.Dispose();
+            tapParticlePool?.Dispose();
+            holdParticlePool?.Dispose();
+            judgeParticlePool?.Dispose();
         }
     }
 }

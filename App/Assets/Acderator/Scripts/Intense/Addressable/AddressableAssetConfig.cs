@@ -12,11 +12,13 @@ namespace Intense.Asset
         [SerializeField] private TextAssetReference songSe;
         [SerializeField] private TextAssetReference bgm;
 
+        [SerializeField] private string assetServerUrlPropertyName = "Acderator.AssetServerUrl";
         [SerializeField] private string assetServerUrl = "";
         [SerializeField] private int loadCoolDownMilliseconds = 500;
 
         internal TextAssetReference SongSe => songSe;
         internal TextAssetReference Bgm => bgm;
+        internal string AssetServerUrlPropertyName => assetServerUrlPropertyName;
         internal string AssetServerUrl => assetServerUrl;
         internal int LoadCoolDownMilliseconds => loadCoolDownMilliseconds;
 

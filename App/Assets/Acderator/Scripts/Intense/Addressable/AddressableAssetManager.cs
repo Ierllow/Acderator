@@ -30,7 +30,7 @@ namespace Intense.Asset
 
         private async UniTask<EAddressableOperationResult> InitializeCoreAsync(CancellationToken cancellationToken)
         {
-            AddressablesRuntimeProperties.SetPropertyValue(addressableAssetConfigObject.AssetServerUrl, addressableAssetConfigObject.AssetServerUrl.TrimEnd('/'));
+            AddressablesRuntimeProperties.SetPropertyValue(addressableAssetConfigObject.AssetServerUrlPropertyName, addressableAssetConfigObject.AssetServerUrl.TrimEnd('/'));
             return await AwaitHandleAsync(Addressables.InitializeAsync(false), cancellationToken) switch
             {
                 (var result, _) when result != EAddressableOperationResult.Success => result,
@@ -51,7 +51,12 @@ namespace Intense.Asset
                 {
                     loading.ShowLoading();
                     var result = await TryLoadAssetsAsync(currentSceneType, cancellationToken);
-                    if (result == EAddressableOperationResult.Success || result == EAddressableOperationResult.Canceled) return;
+                    if (result == EAddressableOperationResult.Success)
+                    {
+                        ResolveSceneSprites();
+                        return;
+                    }
+                    if (result == EAddressableOperationResult.Canceled) return;
                     if (!await addressableAssetPopupController.TryRetryAssetErrorAsync()) return;
                 }
                 catch (Exception ex)
@@ -167,6 +172,18 @@ namespace Intense.Asset
         }
 
         internal Sprite GetSprite(string spriteName) => addressableAssetCache.GetSprite(spriteName);
+
+        private void ResolveSceneSprites()
+        {
+            foreach (var atlasImage in FindObjectsByType<AtlasImage>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+            {
+                atlasImage.ResolveSprite(GetSprite);
+            }
+            foreach (var spriteRenderer in FindObjectsByType<AddressableSpriteRenderer>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+            {
+                spriteRenderer.Resolve(GetSprite);
+            }
+        }
 
         private async UniTask<EAddressableOperationResult> LoadLabelAssetsAsync(IEnumerable<AssetLabelReference> labelListESceneType, CancellationToken cancellationToken)
         {

@@ -16,6 +16,7 @@ namespace Intense
             Container.Bind<Loading>().FromComponentInHierarchy().AsSingle().NonLazy();
             Container.Bind<NetworkManager>().FromComponentInHierarchy().AsSingle().NonLazy();
             Container.Bind<AddressableAssetCache>().AsSingle();
+            Container.Bind<AddressablePrefabResolver>().AsSingle();
             Container.BindInterfacesAndSelfTo<AddressableAssetManager>().FromComponentInHierarchy().AsSingle().NonLazy();
             Container.Bind<IApiSession>().To<ApiSession>().AsSingle().NonLazy();
             Container.Bind<MasterDataManager>().AsSingle().NonLazy();
