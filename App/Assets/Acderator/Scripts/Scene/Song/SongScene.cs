@@ -99,7 +99,7 @@ namespace Song
             _ => backTelopLayerController.ShowSongIntro(
                 sceneContext.SongInfo,
                 songManagerResolver.Addressable.GetSprite(sceneContext.SongInfo.Group.ToString()),
-                songManagerResolver.Addressable.GetSprite(string.Format("difficulty_{0}", sceneContext.SongInfo.Difficulty))),
+                songManagerResolver.Addressable.GetSprite(string.Format("difficulty_{0}", sceneContext.SongInfo.Difficulty))).AddWatcherTo(failFastExceptionWatcher),
         };
 
         private async UniTask LoadAssets()

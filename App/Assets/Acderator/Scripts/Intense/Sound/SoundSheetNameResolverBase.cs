@@ -7,7 +7,7 @@ namespace Intense
     {
         [Inject] private readonly MasterDataManager masterDataManager;
 
-        protected SoundSheetNameMaster FindByCategory(int category) => masterDataManager.MemoryDatabase.SoundSheetNameMasterTable.First(x => x.Category == category);
+        protected SoundSheetNameMaster FindByCategory(int category) => masterDataManager.MemoryDatabase.SoundSheetNameMasterTable.FindByCategory(category);
 
         protected SoundSheetNameMaster FindByCategoryAndId(int category, int id) => masterDataManager.MemoryDatabase.SoundSheetNameMasterTable.First(x => x.Category == category && x.Id == id);
     }

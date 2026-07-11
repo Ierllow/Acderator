@@ -22,7 +22,7 @@ namespace Song
 
             await songInfoCanvas.DOFade(0f, 2f).SetDelay(5f).WithCancellation(destroyCancellationToken);
             songInfoCanvas.gameObject.SetActive(false);
-            await UniTask.NextFrame();
+            await UniTask.NextFrame().AttachExternalCancellation(destroyCancellationToken);
         }
 
         public void SetBackgroundImage(Sprite background) => backgroundImage.SetSprite(background);

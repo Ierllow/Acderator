@@ -50,7 +50,7 @@ namespace Intense.Asset
             RefreshSpriteAtlases();
         }
 
-        public Sprite GetSprite(string spriteName) => spriteAtlasSet.Select(atlas => atlas.GetSprite(spriteName)).FirstOrDefault(sprite => sprite != null);
+        public Sprite GetSprite(string spriteName) => spriteAtlasSet.FirstOrDefault(sprite => sprite != null).GetSprite(spriteName);
 
         public void RegisterSpriteAtlas(Object asset)
         {
