@@ -8,7 +8,6 @@ namespace Song
 {
     public class LoadedChartInfo
     {
-        public ELoadResult LoadResult { get; set; }
         public List<NoteData> NoteDataList { get; } = new();
         public HeaderData HeaderData { get; set; } = new();
 

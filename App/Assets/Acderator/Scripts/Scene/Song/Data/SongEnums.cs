@@ -34,15 +34,6 @@ namespace Song
         Complete
     }
 
-    public enum ELoadResult
-    {
-        None = 0,
-        Unknown,
-        Unsupported,
-        InvalidAsset,
-        Exception,
-    }
-
     public enum ENoteType
     {
         Single,

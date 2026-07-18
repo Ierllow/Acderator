@@ -60,12 +60,12 @@ namespace Song
             return await completionSource.Task == ECommonPopupTapKind.Positive;
         }
 
-        public void OnOpenScoreErrorPopup(ELoadResult loadResult)
+        public void OnOpenScoreErrorPopup(bool isLoadFailure)
         {
             if (currentOpenPopupType == EType.ScoreError) return;
 
             currentOpenPopupType = EType.ScoreError;
-            errorPopup.Open(loadResult, () =>
+            errorPopup.Open(isLoadFailure, () =>
             {
                 currentOpenPopupType = EType.None;
                 asyncSceneTypeSubject.OnNext(ESceneType.SongSelect);

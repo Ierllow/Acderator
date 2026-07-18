@@ -129,10 +129,11 @@ namespace Song
 
         private async UniTask OnReadySong()
         {
-            var loadResult = await songAssetLoader.LoadChart().AddWatcherTo(failFastExceptionWatcher);
-            if (loadResult.IsSuccess)
+            var response = await songManagerResolver.Network.RequestAsync(new ChartRequest { Sid = sceneContext.SongInfo.Sid }).AddWatcherTo(failFastExceptionWatcher);
+            var loadedChartInfo = response?.IsSuccess == true ? response.ToLoadedChartInfo() : default;
+            if (loadedChartInfo?.NoteDataList.Count > 0)
             {
-                songManagerResolver.Notes.Init(loadResult.ChartInfo);
+                songManagerResolver.Notes.Init(loadedChartInfo);
                 songManagerResolver.Factory.Init();
                 var leadInSec = songManagerResolver.Notes.GetInitialSpawnLeadInSec(notesLineController.LaneLength);
                 songControllerResolver.Spawner.Init(notesLineController.LaneLength);
@@ -143,7 +144,7 @@ namespace Song
                 return;
 
             }
-            songPopupLayerController.OnOpenScoreErrorPopup(loadResult.LoadResult);
+            songPopupLayerController.OnOpenScoreErrorPopup(isLoadFailure: loadedChartInfo == default);
         }
 
         private void OnPlayingSong()
