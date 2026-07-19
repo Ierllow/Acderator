@@ -64,7 +64,7 @@ namespace Intense.Api
                     UnityWebRequest.Result.Success => request.DeserializeResponse(www.downloadHandler.data),
                     _ => default
                 };
-                Debug.Log(string.Format("UnityWebRequest.Result: {1}, errorCode: {1}, networkError: {2}, errorResponse: {2}", www.result, response.ErrorCode, response.NetworkError, response.ErrorMessage));
+                Debug.Log(string.Format("UnityWebRequest.Result: {0}, errorCode: {1}, networkError: {2}, errorMessage: {3}", www.result, response?.ErrorCode, response?.NetworkError, response?.ErrorMessage));
                 return response;
             }
             finally

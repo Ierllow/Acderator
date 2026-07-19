@@ -47,7 +47,7 @@ namespace Song
             songControllerResolver.FingerJudgeRequest.JudgmentAsObservable.Subscribe(FingerSubscribeNext).RegisterTo(destroyCancellationToken);
             songControllerResolver.Finger.EveryUseTouchChanged.Subscribe(notesLineController.SetLaneLightActiveAll).RegisterTo(destroyCancellationToken);
             songPopupLayerController.ClosedPausePopupAsAsyncEnumerable.TakeWhile(_ => sceneContext.IsNormal()).SubscribeAwait(ClosedPausePopupSubscribeNext).RegisterTo(destroyCancellationToken);
-            songPopupLayerController.EverySceneTypeChanged.Where(s => s.IsResult()).SubscribeAwait(async (s, _) => await sceneManager.ChangeSceneAsync(s, sceneContext.ToResultSceneContext(songLayerController.CurrentScore, songLayerController.JudgeCountDict))).RegisterTo(destroyCancellationToken);
+            songPopupLayerController.EverySceneTypeChanged.Where(s => s.IsSongSelect()).SubscribeAwait(async (_, _) => await sceneManager.ChangeSceneAsync(ESceneType.SongSelect, new SongSelect.SongSelectSceneContext())).RegisterTo(destroyCancellationToken);
             songLayerController.OnTapPauseButtonAsObservable.TakeWhile(_ => !songControllerResolver.Loop.IsEnd()).SubscribeAwait(async (_, __) => await OnTapPauseButton()).RegisterTo(destroyCancellationToken);
             songManagerResolver.TutorialState?.TutorialEventAsObservable.Subscribe(TutorialEventSubscribeNext).RegisterTo(destroyCancellationToken);
             songControllerResolver.Tutorial?.TutorialIntroCompletedSubject.Subscribe(_ => songControllerResolver.Loop.UpdateState(ESongState.Playing)).RegisterTo(destroyCancellationToken);
@@ -170,10 +170,19 @@ namespace Song
             songControllerResolver.Finger.TrySetUseTouch(false);
             switch ((sceneContext.IsAuto(), sceneContext.SongMode))
             {
-                case (true, _): await ChangeResultScene(); break;
-                case (_, ESongMode.Tutorial): await CompleteTutorial(); break;
-                case (_, ESongMode.Normal): await EndNormalSong(); break;
-                default: songPopupLayerController.OnOpenSaveScoreDataErrorPopup(); break;
+                case (true, _):
+                    await ChangeResultScene();
+                    break;
+                case (_, ESongMode.Tutorial):
+                    await CompleteTutorial();
+                    break;
+                case (_, ESongMode.Normal):
+                    await EndNormalSong();
+                    break;
+                default:
+                    await songPopupLayerController.OpenSaveScoreDataErrorPopup();
+                    await sceneManager.ChangeSceneAsync(ESceneType.SongSelect, new SongSelect.SongSelectSceneContext());
+                    break;
             }
         }
 
@@ -187,15 +196,21 @@ namespace Song
         private async UniTask EndNormalSong()
         {
             await frontTelopLayerController.ShowResult(songLayerController.GetSongResult(songManagerResolver.Notes.LoadedChartInfo!.NoteCount));
-
-            var request = new ScoreSubmitRequest { SessionId = sceneContext.SessionId, Score = songLayerController.CurrentScore };
-            var response = await songManagerResolver.Network.RequestAsync(request);
-            if (response?.IsSuccess ?? false)
+            while (true)
             {
-                await ChangeResultScene();
-                return;
+                var request = new ScoreSubmitRequest { SessionId = sceneContext.SessionId, Score = songLayerController.CurrentScore };
+                var response = await songManagerResolver.Network.RequestAsync(request);
+                if (response?.IsSuccess ?? false)
+                {
+                    await ChangeResultScene();
+                    return;
+                }
+                if (!await songPopupLayerController.OpenSaveScoreDataErrorPopup())
+                {
+                    await sceneManager.ChangeSceneAsync(ESceneType.SongSelect, new SongSelect.SongSelectSceneContext());
+                    return;
+                }
             }
-            songPopupLayerController.OnOpenSaveScoreDataErrorPopup();
         }
 
         private UniTask ChangeResultScene() => sceneManager.ChangeSceneAsync(ESceneType.Result, sceneContext.ToResultSceneContext(songLayerController.CurrentScore, songLayerController.JudgeCountDict));
@@ -272,7 +287,7 @@ namespace Song
         private async UniTask ConfirmSkipTutorial()
         {
             songControllerResolver.Loop.UpdateState(ESongState.Stop);
-            if (await songPopupLayerController.OpenTutorialSkipConfirm())
+            if (await songPopupLayerController.OpenTutorialSkipPopup())
             {
                 songControllerResolver.Tutorial?.CompleteTutorial();
                 return;
@@ -315,6 +330,6 @@ namespace Song
         public static bool IsNormal(this SongSceneContext context) => context.SongMode == ESongMode.Normal;
         public static bool IsAuto(this SongSceneContext context) => context.SongOption.IsAuto;
         public static bool IsAliveNotes(this IReadOnlyList<NoteBase> notes) => notes.Count > 0;
-        public static bool IsResult(this ESceneType type) => type == ESceneType.Result;
+        public static bool IsSongSelect(this ESceneType type) => type == ESceneType.SongSelect;
     }
 }

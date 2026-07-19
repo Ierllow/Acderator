@@ -36,7 +36,7 @@ namespace Song
             pausePopup.Open(showRestartButton, () => currentOpenPopupType = EType.None);
         }
 
-        public async UniTask<bool> OpenTutorialSkipConfirm()
+        public async UniTask<bool> OpenTutorialSkipPopup()
         {
             if (currentOpenPopupType == EType.TutorialSkip) return false;
 
@@ -83,32 +83,39 @@ namespace Song
             await completionSource.Task;
         }
 
-        public void OnOpenSaveScoreDataErrorPopup()
+        public async UniTask<bool> OpenSaveScoreDataErrorPopup()
         {
-            if (currentOpenPopupType == EType.ScoreData) return;
+            if (currentOpenPopupType == EType.ScoreData) return false;
 
             currentOpenPopupType = EType.ScoreData;
-            var popupContext = new CommonPopupContext
+            var completionSource = AutoResetUniTaskCompletionSource<bool>.Create();
+            void Complete(bool retry)
             {
+                currentOpenPopupType = EType.None;
+                completionSource.TrySetResult(retry);
+            }
+            void OpenErrorPopup() => Open(new CommonPopupContext
+            {
+                ButtonType = EButtonType.Both,
                 Title = "エラー",
                 Text = "通信エラーが発生しました。\n 再度実行しますか。",
                 PositiveText = "リトライ",
                 NegativeText = "キャンセル",
-                PositiveCallback = () => asyncSceneTypeSubject.OnNext(ESceneType.None),
-                NegativeCallback = () => Open(new CommonPopupContext
-                {
-                    ButtonType = EButtonType.Close,
-                    Title = "確認",
-                    Text = "選曲画面に戻ります。\n ただし、スコア等の記録は残りません。\n 本当によろしいですか。",
-                    PositiveText = "OK",
-                    PositiveCallback = () =>
-                    {
-                        currentOpenPopupType = EType.None;
-                        asyncSceneTypeSubject.OnNext(ESceneType.SongSelect);
-                    },
-                })
-            };
-            Open(popupContext);
+                PositiveCallback = () => Complete(true),
+                NegativeCallback = OpenQuitConfirm,
+            });
+            void OpenQuitConfirm() => Open(new CommonPopupContext
+            {
+                ButtonType = EButtonType.Both,
+                Title = "確認",
+                Text = "選曲画面に戻ります。\n ただし、スコア等の記録は残りません。\n 本当によろしいですか。",
+                PositiveText = "OK",
+                NegativeText = "キャンセル",
+                PositiveCallback = () => Complete(false),
+                NegativeCallback = OpenErrorPopup,
+            });
+            OpenErrorPopup();
+            return await completionSource.Task;
         }
 
         private void Open<TPopup>(PopupContext<TPopup> popupContext) where TPopup : PopupBase
