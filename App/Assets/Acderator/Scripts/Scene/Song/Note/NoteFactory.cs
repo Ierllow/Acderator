@@ -1,9 +1,9 @@
 #nullable enable
 
+using Intense.Asset;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Intense.Asset;
 using UnityEngine;
 using UnityEngine.Pool;
 using Zenject;

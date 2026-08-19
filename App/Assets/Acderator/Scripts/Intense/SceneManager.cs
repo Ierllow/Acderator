@@ -2,14 +2,8 @@ using Cysharp.Threading.Tasks;
 using Cysharp.Threading.Tasks.Linq;
 using DG.Tweening;
 using Element;
-using Intense.Attribute;
-using Intense.Master;
 using Intense.UI;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Zenject;
 
@@ -24,15 +18,13 @@ namespace Intense
         [SerializeField] private Image fadeMask;
         [SerializeField] private Header header;
 
-        [Inject] private readonly ZenjectSceneLoader zenjectSceneLoader;
-        [Inject] private readonly List<ISceneUnloadHandler> sceneUnloadHandlers;
-        [Inject] private readonly List<ISceneLoadedHandler> sceneLoadedHandlers;
+        [Inject] private readonly SceneLoader sceneLoader;
+        [Inject] private readonly SceneRegistry sceneRegistry;
+        [Inject] private readonly SceneLifecycleDispatcher sceneLifecycleDispatcher;
         [Inject] private readonly Loading loading;
 
-        public ESceneType CurrentSceneType => sceneBaseDict.Count > 0 ? sceneBaseDict.LastOrDefault().Key : default;
+        public ESceneType CurrentSceneType => sceneRegistry.CurrentSceneType;
         public bool IsFadeIn { get; private set; } = false;
-
-        private readonly Dictionary<ESceneType, SceneBase> sceneBaseDict = new();
 
         private void Start() => UniTaskAsyncEnumerable.EveryValueChanged(this, x => x.fadeMask.color.a).Queue().ForEachAsync(a =>
         {
@@ -54,14 +46,6 @@ namespace Intense
 
         public async UniTask FadeOutAsync() => await fadeMask.DOFade(1.0f, 0.2f);
 
-        public void SetSceneBase(SceneBase scene)
-        {
-            var type = scene.GetType();
-            var sceneType = type.GetCustomAttribute<SceneTypeAttribute>().Type;
-            if (sceneType == ESceneType.None) throw new InvalidSceneTypeException(sceneType);
-            if (!sceneBaseDict.TryAdd(sceneType, scene)) throw new DuplicateSceneTypeException(sceneType);
-        }
-
         public async UniTask ChangeSceneAsync(ESceneType sceneType, SceneContext context = default, bool sameScene = false)
         {
             context ??= new DefaultSceneContext();
@@ -69,20 +53,19 @@ namespace Intense
             {
                 await FadeOutAsync();
 
-                foreach (var kvp in sceneBaseDict) kvp.Value.OnDeleteScene();
+                sceneRegistry.DeleteAll();
 
                 if (!sameScene)
                 {
-                    foreach (var handler in sceneUnloadHandlers) await handler.OnSceneUnloadingAsync();
-                    await Resources.UnloadUnusedAssets();
+                    await sceneLifecycleDispatcher.OnSceneUnloadingAsync();
                 }
 
-                sceneBaseDict.Clear();
+                sceneRegistry.Clear();
 
-                await zenjectSceneLoader.LoadSceneAsync(sceneType.ToString(), extraBindings: container => container.Bind<SceneContext>().FromInstance(context).AsSingle()).ToUniTask();
-                sceneBaseDict.GetValueOrDefault(sceneType)?.OnCreateScene();
-                Application.targetFrameRate = context.FrameRate;
-                foreach (var handler in sceneLoadedHandlers) handler.OnSceneLoaded(context);
+                await sceneLoader.LoadAsync(sceneType, context);
+                sceneRegistry.AddLoaded(sceneType);
+                sceneRegistry.Create(sceneType);
+                sceneLifecycleDispatcher.OnSceneLoaded(context);
                 await UniTask.Yield();
                 return;
             }
@@ -92,13 +75,14 @@ namespace Intense
         public async UniTask ChangeSceneAdditiveAsync(ESceneType sceneType, SceneContext context = default)
         {
             loading.ShowLoading();
-            if (sceneBaseDict.ContainsKey(sceneType))
+            if (sceneRegistry.Contains(sceneType))
             {
                 loading.HideLoading();
                 return;
             }
-            await zenjectSceneLoader.LoadSceneAsync(sceneType.ToString(), LoadSceneMode.Additive, container => container.Bind<SceneContext>().FromInstance(context).AsSingle()).ToUniTask();
-            sceneBaseDict.GetValueOrDefault(sceneType)?.OnCreateScene();
+            await sceneLoader.LoadAdditiveAsync(sceneType, context);
+            sceneRegistry.AddLoaded(sceneType);
+            sceneRegistry.Create(sceneType);
             await UniTask.Yield();
         }
     }

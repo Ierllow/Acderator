@@ -22,11 +22,7 @@ public abstract class SceneBase : MonoBehaviour
     [Inject] private readonly SceneErrorPopupController sceneErrorPopupController;
 
     #region MonoBehaviour Handlers
-    protected virtual void Awake()
-    {
-        sceneManager.SetSceneBase(this);
-        sceneErrorHandler.Register(OnErrorScene);
-    }
+    protected virtual void Awake() => sceneErrorHandler.Register(OnErrorScene);
     protected virtual void OnDestroy() => sceneErrorHandler.Dispose();
     #endregion
 

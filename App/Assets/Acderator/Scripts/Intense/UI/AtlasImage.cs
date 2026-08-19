@@ -1,7 +1,7 @@
+using System;
 using UnityEngine;
 using UnityEngine.U2D;
 using UnityEngine.UI;
-using System;
 
 namespace Intense.UI
 {
