@@ -21,9 +21,7 @@ namespace Song
         public IReadOnlyList<AddressableAssetAddress> DynamicAssetAddressList => new[]
         {
             SongAddress,
-            SongChartAddress,
         };
-        public AddressableAssetAddress SongChartAddress => DynamicAssetAddresses.SongChart(SongInfo.Sid);
 
         public AddressableAssetAddress SongAddress => DynamicAssetAddresses.Song(SongInfo.Group);
 

@@ -8,8 +8,6 @@ namespace Song
 
     public sealed class FingerJudgeRequest
     {
-        private const int PointerIdNone = int.MinValue;
-
         public FingerJudgeRequestType RequestType { get; }
         public EFingerType FingerType { get; }
         public int Lane { get; }
@@ -19,7 +17,7 @@ namespace Song
 
         public bool IsCurrentFrame() => Frame == Time.frameCount;
 
-        private FingerJudgeRequest(FingerJudgeRequestType requestType, EFingerType fingerType, int lane, bool allowMiss, int pointerId = PointerIdNone)
+        private FingerJudgeRequest(FingerJudgeRequestType requestType, EFingerType fingerType, int pointerId, int lane, bool allowMiss)
         {
             RequestType = requestType;
             FingerType = fingerType;
@@ -29,12 +27,12 @@ namespace Song
             Frame = Time.frameCount;
         }
 
-        public static FingerJudgeRequest Down(int lane) => new(FingerJudgeRequestType.Normal, EFingerType.Down, lane, allowMiss: false);
+        public static FingerJudgeRequest Down(int pointerId, int lane) => new(FingerJudgeRequestType.Normal, EFingerType.Down, pointerId, lane, allowMiss: false);
 
-        public static FingerJudgeRequest Up(int lane) => new(FingerJudgeRequestType.Normal, EFingerType.Up, lane, allowMiss: true);
+        public static FingerJudgeRequest Up(int pointerId, int lane) => new(FingerJudgeRequestType.Normal, EFingerType.Up, pointerId, lane, allowMiss: true);
 
-        public static FingerJudgeRequest Swipe(int lane) => new(FingerJudgeRequestType.Swipe, EFingerType.Up, lane, allowMiss: false);
+        public static FingerJudgeRequest Swipe(int pointerId, int lane) => new(FingerJudgeRequestType.Swipe, EFingerType.Up, pointerId, lane, allowMiss: false);
 
-        public static FingerJudgeRequest HoldCross(int pointerId, int lane) => new(FingerJudgeRequestType.HoldCross, EFingerType.Up, lane, allowMiss: true, pointerId: pointerId);
+        public static FingerJudgeRequest HoldCross(int pointerId, int lane) => new(FingerJudgeRequestType.HoldCross, EFingerType.Up, pointerId, lane, allowMiss: true);
     }
 }

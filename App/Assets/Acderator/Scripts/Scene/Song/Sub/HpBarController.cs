@@ -27,7 +27,6 @@ namespace Song
         {
             if (judgmentType == EJudgementType.Bad || judgmentType == EJudgementType.Miss) return;
             if (currentHpNum >= baseHp) return;
-            if (currentHpPercent.Value >= MAX_HP_PERCENT) return;
 
             var rate = masterDataManager.MemoryDatabase.SongHpRateMasterTable.FindByType((int)judgmentType).Rate;
             currentHpNum += judgmentType switch
@@ -35,6 +34,7 @@ namespace Song
                 EJudgementType.Perfect or EJudgementType.Great or EJudgementType.Good => Mathf.FloorToInt(rate / noteCount),
                 _ => -Mathf.FloorToInt(rate / noteCount),
             };
+            currentHpNum = Mathf.Clamp(currentHpNum, 0, baseHp);
             currentHpPercent.Value = (float)Math.Round((decimal)((double)currentHpNum / baseHp), 4, MidpointRounding.AwayFromZero);
         }
     }

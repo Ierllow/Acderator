@@ -15,9 +15,10 @@ namespace Song
 
         [Inject] private readonly NotesManager notesManager = default!;
         [Inject] private readonly NoteJudgeController noteJudgeController = default!;
-        [Inject] private readonly TouchStateManager touchStateManager = default!;
 
         private readonly List<FingerJudgeRequest> judgeRequestList = new();
+        private readonly Dictionary<int, NoteBase> holdingNoteDict = new();
+        private readonly List<int> releasedPointerIdList = new();
         private readonly Subject<FingerInfo> judgmentSubject = new();
 
         public Observable<FingerInfo> JudgmentAsObservable => judgmentSubject;
@@ -28,7 +29,11 @@ namespace Song
             judgeRequestList.Add(request);
         }
 
-        public void Clear() => judgeRequestList.Clear();
+        public void Clear()
+        {
+            judgeRequestList.Clear();
+            holdingNoteDict.Clear();
+        }
 
         public void Judge(float currentSec)
         {
@@ -45,6 +50,7 @@ namespace Song
                 if (noteJudgeController.IsMissed(note, currentSec)) { EmitMiss(note, currentSec); continue; }
                 if (notesManager.SongOption.IsAuto) EmitPerfect(note);
             }
+            ForgetReleasedHoldingNotes();
         }
 
         private void EmitJudgeRequest(FingerJudgeRequest request)
@@ -65,12 +71,25 @@ namespace Song
 
         private void EmitNormalJudgeRequest(FingerJudgeRequest request)
         {
-            var fingerInfo = new FingerInfo() { FingerType = request.FingerType, Lane = request.Lane };
-            if (TryGetRequestedNote(request, out var note))
+            if (request.FingerType == EFingerType.Up)
             {
-                TryApplyJudgement(note, request.FingerType, request.Lane, request.AllowMiss, out fingerInfo);
-                judgmentSubject.OnNext(fingerInfo);
+                TryEmitHoldingNoteRelease(request.PointerId, request.Lane);
+                return;
             }
+            if (!TryGetRequestedNote(request, out var note)) return;
+
+            TryApplyJudgement(note, request.FingerType, request.Lane, request.AllowMiss, out var fingerInfo);
+            if (request.FingerType == EFingerType.Down && note.IsTapping && IsHoldNote(note)) holdingNoteDict[request.PointerId] = note;
+            judgmentSubject.OnNext(fingerInfo);
+        }
+
+        private bool TryEmitHoldingNoteRelease(int pointerId, int lane)
+        {
+            if (!holdingNoteDict.Remove(pointerId, out var note) || !IsHolding(note)) return false;
+            if (!TryApplyJudgement(note, EFingerType.Up, lane, true, out var fingerInfo)) return false;
+
+            judgmentSubject.OnNext(fingerInfo);
+            return true;
         }
 
         private void EmitSwipeJudgeRequest(FingerJudgeRequest request)
@@ -80,16 +99,34 @@ namespace Song
                 judgmentSubject.OnNext(fingerInfo);
                 return;
             }
-            EmitNormalJudgeRequest(FingerJudgeRequest.Up(request.Lane));
+            EmitNormalJudgeRequest(FingerJudgeRequest.Up(request.PointerId, request.Lane));
         }
 
         private void EmitHoldCrossJudgeRequest(FingerJudgeRequest request)
         {
-            if (!notesManager.TryGetNote(EFingerType.Up, request.Lane, out var note)) return;
+            if (!holdingNoteDict.TryGetValue(request.PointerId, out var note) || !IsHolding(note)) return;
+
+            var noteData = notesManager.GetNoteData(note);
+            if (noteData.NoteType != ENoteType.Long || noteData.Lane == request.Lane) return;
+
+            holdingNoteDict.Remove(request.PointerId);
             if (!TryApplyJudgement(note, EFingerType.Up, request.Lane, true, out var fingerInfo)) return;
 
-            touchStateManager.Remove(request.PointerId);
             judgmentSubject.OnNext(fingerInfo.WithTappingLanes(GetTappingLanes()));
+        }
+
+        private bool IsHoldNote(NoteBase note) => notesManager.GetNoteData(note).NoteType is ENoteType.Long or ENoteType.Curve;
+
+        private bool IsHolding(NoteBase note) => note && note.IsActive && note.IsTapping && notesManager.IsAlive(note);
+
+        private void ForgetReleasedHoldingNotes()
+        {
+            releasedPointerIdList.Clear();
+            foreach (var (pointerId, note) in holdingNoteDict)
+            {
+                if (!IsHolding(note)) releasedPointerIdList.Add(pointerId);
+            }
+            foreach (var pointerId in releasedPointerIdList) holdingNoteDict.Remove(pointerId);
         }
 
         private bool TryGetRequestedNote(FingerJudgeRequest request, [NotNullWhen(true)] out NoteBase? note) => notesManager.TryGetNote(request.FingerType, request.Lane, out note);
@@ -111,7 +148,7 @@ namespace Song
             NoteData = notesManager.GetNoteData(note),
             JudgmentType = notesManager.SongOption.IsAuto ? EJudgementType.Perfect : EJudgementType.Miss,
             Lane = LaneNone,
-            MissInfo = (true, true),
+            MissInfo = (true, notesManager.GetNoteData(note).NoteType == ENoteType.Long && !note.IsTapping),
         });
 
         private void EmitPerfect(NoteBase note, EFingerType fingerType)

@@ -28,6 +28,8 @@ namespace SongSelect
             var mSoundCueName = soundSheetNameResolver.Song;
             var sheet = await cueSheetLoader.GetOrAddCueSheetAsync(mSoundCueName.SheetName, DynamicAssetAddresses.Song(group));
             var songSelectMaster = masterDataManager.MemoryDatabase.SongSelectMasterTable.FindByGroup(group);
+            if (previewToken.IsCancellationRequested) return;
+
             songVolumeController.Register(songPreviewExPlayer);
             songPreviewExPlayer.AttachFader();
             songPreviewExPlayer.SetFadeInTime(3000);
@@ -45,7 +47,7 @@ namespace SongSelect
             }
             catch (OperationCanceledException)
             {
-                StopPreview();
+                if (songPreviewCancellationTokenSource?.Token == previewToken) StopPreview();
             }
         });
 

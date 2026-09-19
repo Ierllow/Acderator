@@ -14,11 +14,9 @@ namespace Song
 
         public Action<NoteBase>? Finalized;
 
-        private void OnDisable()
-        {
-            IsTapping = false;
-            Finalized?.Invoke(this);
-        }
+        private void OnDisable() => IsTapping = false;
+
+        public void Release() => Finalized?.Invoke(this);
 
         public virtual void Init(NoteData data) => transform.localPosition = new Vector3(0, 50, 0);
 

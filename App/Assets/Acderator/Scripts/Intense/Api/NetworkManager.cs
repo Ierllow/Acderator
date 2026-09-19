@@ -57,19 +57,39 @@ namespace Intense.Api
                 }
                 www.downloadHandler = new DownloadHandlerBuffer();
                 www.timeout = 60;
-                await www.SendWebRequest();
-
-                var response = www.result switch
+                try
                 {
-                    UnityWebRequest.Result.Success => request.DeserializeResponse(www.downloadHandler.data),
-                    _ => default
-                };
+                    await www.SendWebRequest();
+                }
+                catch (UnityWebRequestException)
+                {
+
+                }
+
+                var response = TryDeserializeResponse(request, www);
                 Debug.Log(string.Format("UnityWebRequest.Result: {0}, errorCode: {1}, networkError: {2}, errorMessage: {3}", www.result, response?.ErrorCode, response?.NetworkError, response?.ErrorMessage));
                 return response;
             }
             finally
             {
                 loading.HideLoading();
+            }
+        }
+
+        private ResponseBase TryDeserializeResponse(RequestBase request, UnityWebRequest www)
+        {
+            var data = www.downloadHandler?.data;
+            if (data == null || data.Length == 0) return default;
+
+            try
+            {
+                var response = request.DeserializeResponse(data);
+                return www.result == UnityWebRequest.Result.Success || !(response?.IsSuccess ?? false) ? response : default;
+            }
+            catch (MessagePackSerializationException e)
+            {
+                Debug.LogWarning(e);
+                return default;
             }
         }
 

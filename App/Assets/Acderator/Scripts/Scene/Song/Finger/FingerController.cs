@@ -67,7 +67,7 @@ namespace Song
 
             touchStateManager.Set(pointerId, new TouchStateManager.TouchState(screenPosition, lane));
 
-            judgeRequestController.Enqueue(FingerJudgeRequest.Down(lane));
+            judgeRequestController.Enqueue(FingerJudgeRequest.Down(pointerId, lane));
         }
 
         private void FingerUpdate(int pointerId, Vector2 screenPosition)
@@ -76,23 +76,13 @@ namespace Song
             if (ignoreIsOverGui && IsPointerOverGui(pointerId)) return;
 
             TryGetLane(screenPosition, out var lane);
-
-            if (TryEnqueueHoldCross(pointerId, touchState.Lane, lane))
-            {
-                touchStateManager.Set(pointerId, touchState.WithLane(lane));
-                return;
-            }
+            if (lane == touchState.Lane) return;
 
             touchStateManager.Set(pointerId, touchState.WithLane(lane));
-            judgeRequestController.Enqueue(FingerJudgeRequest.Down(lane));
-        }
+            if (lane < 0) return;
 
-        private bool TryEnqueueHoldCross(int pointerId, int previousLane, int currentLane)
-        {
-            if (currentLane < 0 || previousLane == currentLane) return false;
-
-            judgeRequestController.Enqueue(FingerJudgeRequest.HoldCross(pointerId, currentLane));
-            return true;
+            judgeRequestController.Enqueue(FingerJudgeRequest.HoldCross(pointerId, lane));
+            judgeRequestController.Enqueue(FingerJudgeRequest.Down(pointerId, lane));
         }
 
         private void FingerUp(int pointerId, Vector2 screenPosition)
@@ -105,7 +95,7 @@ namespace Song
             }
 
             var lane = touchState.Lane;
-            judgeRequestController.Enqueue(FingerJudgeRequest.Up(lane));
+            judgeRequestController.Enqueue(FingerJudgeRequest.Up(pointerId, lane));
             touchStateManager.Remove(pointerId);
         }
 
@@ -113,7 +103,7 @@ namespace Song
         {
             if (!touchStateManager.TryGet(pointerId, out var touchState)) return false;
 
-            judgeRequestController.Enqueue(FingerJudgeRequest.Swipe(touchState.Lane));
+            judgeRequestController.Enqueue(FingerJudgeRequest.Swipe(pointerId, touchState.Lane));
             touchStateManager.Remove(pointerId);
             return true;
         }

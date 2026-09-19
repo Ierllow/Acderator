@@ -40,7 +40,6 @@ namespace Song
             if (fingerInfo.NoteBase == null || fingerInfo.NoteData == null) return;
             if (!notesManager.AliveNoteList.Any(x => x == fingerInfo.NoteBase)) return;
 
-            var noteType = fingerInfo.NoteData.NoteType == ENoteType.Flick;
             if (fingerInfo.IsMissed)
             {
                 notesManager.RemoveNote(fingerInfo.NoteBase);
@@ -57,7 +56,7 @@ namespace Song
                 if (fingerInfo.NoteData.NoteType == ENoteType.Long && fingerInfo.FingerType == EFingerType.Down) return;
                 notesManager.RemoveNote(fingerInfo.NoteBase);
             }
-            if (notesManager.SongOption.IsAuto) hpBarController.UpdateHp(fingerInfo.JudgmentType, notesManager.LoadedChartInfo!.NoteCount);
+            if (!notesManager.SongOption.IsAuto) hpBarController.UpdateHp(fingerInfo.JudgmentType, notesManager.LoadedChartInfo!.NoteCount);
         }
     }
 }

@@ -41,7 +41,6 @@ namespace Intense.Api
                     loadedChartInfo.AddNoteData(note.BeatBegin, note.BeatEnd, note.Lane, (ENoteType)note.NoteType);
                 }
             }
-
             return loadedChartInfo;
         }
     }

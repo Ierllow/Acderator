@@ -100,7 +100,7 @@ namespace Song
 
         private void ReleaseNote(NoteBase note)
         {
-            if (pools == null || !noteDict.TryGetValue(note, out var data)) return;
+            if (pools == null || !noteDict.Remove(note, out var data)) return;
 
             var type = (int)data.NoteType;
             var lane = data.Lane;

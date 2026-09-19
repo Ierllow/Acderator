@@ -25,7 +25,7 @@ namespace SongSelect
 
         public EOrderType CurrentOrderType { get; private set; } = (EOrderType)PlayerPrefsValues.OrderType;
 
-        public string Text => CurrentOrderType.GetType().GetCustomAttribute<TextAttribute>().Text;
+        public string Text => typeof(EOrderType).GetField(CurrentOrderType.ToString())?.GetCustomAttribute<TextAttribute>()?.Text ?? CurrentOrderType.ToString();
 
         public List<int> GetOrderedList(int selectedDifficulty)
         {
@@ -34,7 +34,7 @@ namespace SongSelect
             {
                 EOrderType.Default => songMasterTables.Select(x => x.Group).Distinct().ToList(),
                 EOrderType.Level => songMasterTables.OrderBy(x => x.Difficulty == selectedDifficulty).Select(x => x.Group).Distinct().ToList(),
-                EOrderType.HighScore => songMasterTables.OrderBy(_ => scoreManager.ScoreDataList.OrderBy(x => x.ScoreNum).ToList()).Select(x => x.Group).Distinct().ToList(),
+                EOrderType.HighScore => songMasterTables.OrderBy(x => -scoreManager.GetScore(x.Sid)).Select(x => x.Group).Distinct().ToList(),
                 EOrderType.Name => songMasterTables.OrderBy(x => x.Name).Select(x => x.Group).Distinct().ToList(),
                 _ => default
             };

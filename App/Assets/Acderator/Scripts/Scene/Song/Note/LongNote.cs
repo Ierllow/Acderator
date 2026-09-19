@@ -13,6 +13,16 @@ namespace Song
         [SerializeField] private Color32 defaultTrailColor; //
         [SerializeField] private Color32 tappingTrailColor;
 
+        private Color initialTrailColor;
+
+        private void Awake() => initialTrailColor = trailSprite.color;
+
+        public override void Init(NoteData data)
+        {
+            base.Init(data);
+            trailSprite.color = initialTrailColor;
+        }
+
         public override void UpdatePosition(NotePositionUpdateContext context)
         {
             transform.localPosition = new(0, context.PositionBeginY, 0);

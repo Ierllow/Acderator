@@ -47,6 +47,7 @@ namespace Song
         {
             SongOption = songOption;
             CurrentNoteSpeed = songOption.NoteSpeed;
+            for (var lane = 0; lane < LaneCount; lane++) aliveNotesByLaneDict[lane] = new();
         }
 
         public void Init(LoadedChartInfo loadedChartInfo)
@@ -70,11 +71,14 @@ namespace Song
             {
                 aliveNotesCache = true;
                 noteDataDict.Remove(note);
+                note.Release();
             }
             return removed;
         }
 
         public NoteData GetNoteData(NoteBase note) => noteDataDict[note];
+
+        public bool IsAlive(NoteBase note) => noteDataDict.ContainsKey(note);
 
         public void UpdateBeat(float sec)
         {

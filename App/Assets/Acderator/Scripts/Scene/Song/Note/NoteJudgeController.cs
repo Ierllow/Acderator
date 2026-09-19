@@ -15,8 +15,7 @@ namespace Song
         [Inject] private readonly NotesManager notesManager = default!;
 
         private float? badJudgmentZone;
-
-        private float BadJudgmentZone => badJudgmentZone ??= masterDataManager.MemoryDatabase.SongJudgeZoneMasterTable.FirstOrDefault(x => x.Type <= (int)EJudgementType.Bad).Zone;
+        private float BadJudgmentZone => badJudgmentZone ??= masterDataManager.MemoryDatabase.SongJudgeZoneMasterTable.LastOrDefault(x => x.Type <= (int)EJudgementType.Bad).Zone;
 
         public bool TryJudge(NoteBase note, EFingerType fingerType, bool allowMiss, out EJudgementType judgementType)
         {
@@ -37,13 +36,14 @@ namespace Song
             return zone == default ? EJudgementType.None : (EJudgementType)zone.Type;
         }
 
-        private float GetNoteDiffSec(EFingerType fingerType, NoteData noteData) => noteData.NoteType == ENoteType.Curve ? GetCurveNoteDiffSec(noteData) : GetDiffSec(fingerType, noteData);
-
-        private float GetDiffSec(EFingerType fingerType, NoteData noteData)
+        private float GetNoteDiffSec(EFingerType fingerType, NoteData noteData) => (noteData.NoteType, fingerType) switch
         {
-            var noteSec = fingerType == EFingerType.Down ? noteData.SecBegin : noteData.SecEnd;
-            return Math.Abs(noteSec - notesManager.CurrentSec + notesManager.SongOption.TapTiming * 0.1f);
-        }
+            (ENoteType.Curve, EFingerType.Down) => GetCurveNoteDiffSec(noteData),
+            (ENoteType.Curve, _) => GetDiffSec(noteData.SecBegin + noteData.CurveDuration),
+            _ => GetDiffSec(fingerType == EFingerType.Down ? noteData.SecBegin : noteData.SecEnd),
+        };
+
+        private float GetDiffSec(float noteSec) => Math.Abs(noteSec - notesManager.CurrentSec + notesManager.SongOption.TapTiming * 0.1f);
 
         private float GetCurveNoteDiffSec(NoteData noteData)
         {
@@ -82,14 +82,7 @@ namespace Song
 
         private bool IsFlickMissed(NoteBase note, NoteData data, float currentSec, bool beginMissed) => !note.IsTapping ? beginMissed : data.SecEnd - currentSec < -BadJudgmentZone;
 
-        private bool IsHoldMissed(NoteBase note, NoteData data, float currentSec, bool beginMissed)
-        {
-            if (!note.IsTapping) return false;
-
-            var duration = GetHoldDuration(data);
-            var endMissed = data.SecBegin + duration - currentSec < -BadJudgmentZone;
-            return beginMissed || endMissed;
-        }
+        private bool IsHoldMissed(NoteBase note, NoteData data, float currentSec, bool beginMissed) => !note.IsTapping ? beginMissed : data.SecBegin + GetHoldDuration(data) - currentSec < -BadJudgmentZone;
 
         private float GetHoldDuration(NoteData data) => data.NoteType switch
         {

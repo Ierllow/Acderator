@@ -37,7 +37,7 @@ namespace SongSelect
             }
         }
 
-        public void UpdateInfo(int score, int percentNum, Sprite rankSprite)
+        public void UpdateInfo(int score, float percentNum, Sprite rankSprite)
         {
             if (mSongList == default) return;
 

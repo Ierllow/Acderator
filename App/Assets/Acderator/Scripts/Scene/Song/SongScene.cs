@@ -72,7 +72,7 @@ namespace Song
         {
             if (!pauseStatus) return;
             if (!sceneContext.IsNormal()) return;
-            if (songControllerResolver.Sound.IsPlayEnd || songManagerResolver.Notes.AliveNoteList.IsAliveNotes()) return;
+            if (songControllerResolver.Sound.IsPlayEnd || !songManagerResolver.Notes.AliveNoteList.IsAliveNotes()) return;
 
             songControllerResolver.Loop.UpdateState(ESongState.Stop);
             songPopupLayerController.OnOpenPausePopup(!sceneContext.IsAuto());
@@ -313,7 +313,7 @@ namespace Song
             if (state == PauseState.Paused)
             {
                 songControllerResolver.Loop.UpdateState(ESongState.Stop);
-                songPopupLayerController.OnOpenPausePopup(sceneContext.IsAuto());
+                songPopupLayerController.OnOpenPausePopup(!sceneContext.IsAuto());
                 return;
             }
             songControllerResolver.Loop.UpdateState(ESongState.Playing);

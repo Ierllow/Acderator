@@ -20,10 +20,14 @@ namespace Song
         private float curveDuration;
         private float secBegin;
         private bool useMidPoint;
+        private Color initialTrailColor;
+
+        private void Awake() => initialTrailColor = trailSprite.color;
 
         public override void Init(NoteData data)
         {
             base.Init(data);
+            trailSprite.color = initialTrailColor;
             segmentList = data.CurveSegmentList;
             var maxPoints = 0;
             foreach (var segment in segmentList) maxPoints = Mathf.Max(maxPoints, segment.Points.Count);

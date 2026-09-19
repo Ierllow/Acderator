@@ -41,8 +41,7 @@ namespace Song
             _ when (int)(songGameLogic.CurrentHpPercent * HpBarController.MAX_HP_PERCENT) < MinClearHpPercent => ESongResultType.Failed,
             _ when noteCount == songGameLogic.JudgeCountDict.GetValueOrDefault(EJudgementType.Perfect) => ESongResultType.Excellent,
             _ when noteCount == songGameLogic.CurrentCombo => ESongResultType.FullCombo,
-            _ when ScoreUtils.IsClear(songGameLogic.CurrentCombo) => ESongResultType.Clear,
-            _ => ESongResultType.Failed,
+            _ => ESongResultType.Clear,
         };
 
         public void SetPauseButtonGrayOut(bool value) => songPlayingFieldView.PauseButton.SetGrayOut(value);

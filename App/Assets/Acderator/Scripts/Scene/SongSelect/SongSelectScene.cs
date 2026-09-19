@@ -110,11 +110,13 @@ namespace SongSelect
         private void SelectedDifficultChanged(Toggle toggle)
         {
             songListView.UpdateSelectedDifficulty(int.Parse(toggle.name));
-            var persent = scoreManager.GetScore(songListView.SelectedCellListSid) % masterDataManager.MemoryDatabase.SongMasterTable.FindBySid(songListView.SelectedCellListSid).Score / 10000;
-            var rank = (int)ScoreUtils.ToRank(scoreManager.GetScore(songListView.SelectedCellListSid), true);
+            var sid = songListView.SelectedCellListSid;
+            var score = scoreManager.GetScore(sid);
+            var percent = score * 100f / masterDataManager.MemoryDatabase.SongMasterTable.FindBySid(sid).Score;
+            var rank = (int)ScoreUtils.ToRank(score, true);
             songSelectDetail.UpdateInfo(
-                scoreManager.GetScore(songListView.SelectedCellListSid),
-                persent,
+                score,
+                percent,
                 addressableAssetManager.GetSprite(string.Format("icon_result_rank_{0}", rank)));
         }
     }

@@ -10,10 +10,14 @@ namespace Intense.Asset
 {
     internal class AddressableAssetCache
     {
+        private const string ResourcesAtlasPath = "Altas";
+
         private readonly HashSet<string> addLoadAddressSet = new();
         private readonly Dictionary<string, AsyncOperationHandle<Object>> loadedAssetHandleDict = new();
         private readonly Dictionary<string, AsyncOperationHandle<IList<Object>>> loadedLabelHandleDict = new();
         private readonly HashSet<SpriteAtlas> spriteAtlasSet = new();
+
+        public IEnumerable<Object> LoadedAssets => loadedAssetHandleDict.Values.Select(handle => handle.Result).Concat(loadedLabelHandleDict.Values.SelectMany(handle => handle.Result));
 
         public void AddLoad(string address) => addLoadAddressSet.Add(address);
 
@@ -32,8 +36,6 @@ namespace Intense.Asset
             return false;
         }
 
-        public List<Object> LoadedAssets => loadedAssetHandleDict.Values.Select(handle => handle.Result).Concat(loadedLabelHandleDict.Values.SelectMany(handle => handle.Result)).ToList();
-
         public void CacheAsset(string cacheKey, AsyncOperationHandle<Object> handle)
         {
             loadedAssetHandleDict[cacheKey] = handle;
@@ -49,28 +51,25 @@ namespace Intense.Asset
             addLoadAddressSet.Clear();
             loadedAssetHandleDict.Clear();
             loadedLabelHandleDict.Clear();
-            RefreshSpriteAtlases();
+            spriteAtlasSet.Clear();
+            spriteAtlasSet.UnionWith(Resources.LoadAll<SpriteAtlas>(ResourcesAtlasPath));
         }
 
-        public Sprite GetSprite(string spriteName) => spriteAtlasSet.Select(atlas => atlas?.GetSprite(spriteName)).FirstOrDefault(sprite => sprite != null);
+        public Sprite GetSprite(string spriteName)
+        {
+            foreach (var atlas in spriteAtlasSet)
+            {
+                if (atlas == null) continue;
+
+                var sprite = atlas.GetSprite(spriteName);
+                if (sprite != null) return sprite;
+            }
+            return null;
+        }
 
         public void RegisterSpriteAtlas(Object asset)
         {
             if (asset is SpriteAtlas atlas) spriteAtlasSet.Add(atlas);
-        }
-
-        private void RefreshSpriteAtlases()
-        {
-            spriteAtlasSet.Clear();
-            spriteAtlasSet.UnionWith(Resources.LoadAll<SpriteAtlas>("Altas"));
-            foreach (var handle in loadedAssetHandleDict.Values)
-            {
-                RegisterSpriteAtlas(handle.Result);
-            }
-            foreach (var asset in loadedLabelHandleDict.SelectMany(x => x.Value.Result))
-            {
-                RegisterSpriteAtlas(asset);
-            }
         }
     }
 }
