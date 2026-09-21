@@ -22,6 +22,14 @@ namespace Song
 
         public virtual void UpdatePosition(NotePositionUpdateContext context) => transform.localPosition = new(0, context.PositionBeginY, 0);
 
-        public abstract void OnJudgedNote(EFingerType fingerType, EJudgementType judgmentType = EJudgementType.None);
+        public abstract void OnJudgedNote(FingerType fingerType, JudgementType judgmentType = JudgementType.None);
+
+        protected bool TryBeginTap(FingerType fingerType, JudgementType judgmentType)
+        {
+            if (fingerType != FingerType.Down || judgmentType == JudgementType.None) return false;
+
+            IsTapping = true;
+            return true;
+        }
     }
 }

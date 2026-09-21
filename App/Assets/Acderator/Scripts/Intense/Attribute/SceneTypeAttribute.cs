@@ -5,8 +5,8 @@ namespace Intense.Attribute
     [AttributeUsage(AttributeTargets.Class, Inherited = true)]
     public sealed class SceneTypeAttribute : System.Attribute
     {
-        public ESceneType Type { get; }
+        public SceneType Type { get; }
 
-        public SceneTypeAttribute(ESceneType type) => Type = type;
+        public SceneTypeAttribute(SceneType type) => Type = type;
     }
 }

@@ -1,6 +1,6 @@
 namespace Intense
 {
-    public enum EJudgementType
+    public enum JudgementType
     {
         None,
         Perfect,

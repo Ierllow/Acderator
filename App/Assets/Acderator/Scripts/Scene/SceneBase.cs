@@ -7,14 +7,14 @@ using Zenject;
 #region SceneContext
 public abstract class SceneContext
 {
-    public virtual EBgmType BgmType { get; }
+    public virtual BgmType BgmType { get; }
     public virtual int FrameRate { get; } = 30;
 
     protected SceneContext() { }
 }
 #endregion
 
-[SceneType(ESceneType.None)]
+[SceneType(SceneType.None)]
 public abstract class SceneBase : MonoBehaviour
 {
     [Inject] protected readonly SceneManager sceneManager;
@@ -29,6 +29,6 @@ public abstract class SceneBase : MonoBehaviour
     #region SceneBase Handlers
     public abstract void OnCreateScene();
     public virtual void OnDeleteScene() => Destroy(gameObject);
-    protected virtual UniTask OnErrorScene() => sceneErrorPopupController.Open();
+    protected virtual UniTask OnErrorScene() => sceneErrorPopupController.OpenAsync();
     #endregion
 }

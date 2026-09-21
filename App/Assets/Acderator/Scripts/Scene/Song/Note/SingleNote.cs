@@ -6,6 +6,6 @@ namespace Song
 {
     public class SingleNote : NoteBase
     {
-        public override void OnJudgedNote(EFingerType fingerType, EJudgementType judgmentType) { }
+        public override void OnJudgedNote(FingerType fingerType, JudgementType judgmentType) { }
     }
 }

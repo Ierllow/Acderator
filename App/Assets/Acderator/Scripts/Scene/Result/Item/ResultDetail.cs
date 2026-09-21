@@ -23,16 +23,16 @@ namespace Result
         [SerializeField] private TextMeshProUGUI badNum;
         [SerializeField] private TextMeshProUGUI missNum;
 
-        public void Setup(SongMaster mSong, ResultInfo resultInfo, Sprite jacketSprite, Sprite rankSprite)
+        public void Setup(SongMaster song, ResultInfo resultInfo, Sprite jacketSprite, Sprite rankSprite)
         {
             jacket.SetSprite(jacketSprite);
-            songName.SetText(mSong.Name);
-            composer.SetText(mSong.Composer);
-            perfectNum.SetText("{0:D3}", resultInfo.JudgeCountDict.GetValueOrDefault(EJudgementType.Perfect));
-            greatNum.SetText("{0:D3}", resultInfo.JudgeCountDict.GetValueOrDefault(EJudgementType.Great));
-            goodNum.SetText("{0:D3}", resultInfo.JudgeCountDict.GetValueOrDefault(EJudgementType.Good));
-            badNum.SetText("{0:D3}", resultInfo.JudgeCountDict.GetValueOrDefault(EJudgementType.Bad));
-            missNum.SetText("{0:D3}", resultInfo.JudgeCountDict.GetValueOrDefault(EJudgementType.Miss));
+            songName.SetText(song.Name);
+            composer.SetText(song.Composer);
+            perfectNum.SetText("{0:D3}", resultInfo.JudgeCountDict.GetValueOrDefault(JudgementType.Perfect));
+            greatNum.SetText("{0:D3}", resultInfo.JudgeCountDict.GetValueOrDefault(JudgementType.Great));
+            goodNum.SetText("{0:D3}", resultInfo.JudgeCountDict.GetValueOrDefault(JudgementType.Good));
+            badNum.SetText("{0:D3}", resultInfo.JudgeCountDict.GetValueOrDefault(JudgementType.Bad));
+            missNum.SetText("{0:D3}", resultInfo.JudgeCountDict.GetValueOrDefault(JudgementType.Miss));
             score.SetText("{0:D7}", resultInfo.CurrentScore);
             highScore.SetText(string.Format("<color={0}>High Score</color> {1:D7}", "#C58EF1", (int)resultInfo.HighScore));
             rank.SetSprite(rankSprite);

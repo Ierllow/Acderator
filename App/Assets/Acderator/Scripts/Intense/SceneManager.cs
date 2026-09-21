@@ -9,7 +9,7 @@ using Zenject;
 
 namespace Intense
 {
-    public enum ESceneType { None, Boot, Title, SongSelect, Song, Result }
+    public enum SceneType { None, Boot, Title, SongSelect, Song, Result }
 
     public class SceneManager : MonoBehaviour
     {
@@ -23,7 +23,7 @@ namespace Intense
         [Inject] private readonly SceneLifecycleDispatcher sceneLifecycleDispatcher;
         [Inject] private readonly Loading loading;
 
-        public ESceneType CurrentSceneType => sceneRegistry.CurrentSceneType;
+        public SceneType CurrentSceneType => sceneRegistry.CurrentSceneType;
         public bool IsFadeIn { get; private set; } = false;
 
         private void Start() => UniTaskAsyncEnumerable.EveryValueChanged(this, x => x.fadeMask.color.a).Queue().ForEachAsync(a =>
@@ -31,7 +31,7 @@ namespace Intense
             if (a == 0.0f)
             {
                 IsFadeIn = true;
-                header.SetHeaderActive(CurrentSceneType == ESceneType.SongSelect);
+                header.SetHeaderActive(CurrentSceneType == SceneType.SongSelect);
                 loading.HideLoading();
             }
             else if (a == 1.0f)
@@ -46,7 +46,7 @@ namespace Intense
 
         public async UniTask FadeOutAsync() => await fadeMask.DOFade(1.0f, 0.2f);
 
-        public async UniTask ChangeSceneAsync(ESceneType sceneType, SceneContext context = default, bool sameScene = false)
+        public async UniTask ChangeSceneAsync(SceneType sceneType, SceneContext context = default, bool sameScene = false)
         {
             context ??= new DefaultSceneContext();
             if (CurrentSceneType != sceneType || sameScene)
@@ -72,7 +72,7 @@ namespace Intense
             Debug.LogWarning(string.Format("{0} is the same as before.", sceneType));
         }
 
-        public async UniTask ChangeSceneAdditiveAsync(ESceneType sceneType, SceneContext context = default)
+        public async UniTask ChangeSceneAdditiveAsync(SceneType sceneType, SceneContext context = default)
         {
             loading.ShowLoading();
             if (sceneRegistry.Contains(sceneType))

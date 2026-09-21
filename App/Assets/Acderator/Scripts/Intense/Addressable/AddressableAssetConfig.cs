@@ -22,11 +22,11 @@ namespace Intense.Asset
         internal string AssetServerUrl => assetServerUrl;
         internal int LoadCoolDownMilliseconds => loadCoolDownMilliseconds;
 
-        internal AssetLabelReference[] GetLabels(ESceneType sceneType) => sceneType switch
+        internal AssetLabelReference[] GetLabels(SceneType sceneType) => sceneType switch
         {
-            ESceneType.SongSelect => songSelectLabels,
-            ESceneType.Song => songLabels,
-            ESceneType.Result => resultLabels,
+            SceneType.SongSelect => songSelectLabels,
+            SceneType.Song => songLabels,
+            SceneType.Result => resultLabels,
             _ => new AssetLabelReference[] { },
         };
     }

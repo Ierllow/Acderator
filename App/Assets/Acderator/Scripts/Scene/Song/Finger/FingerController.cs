@@ -3,15 +3,16 @@
 using R3;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.Serialization;
 using Zenject;
 
 namespace Song
 {
-    public enum EFingerType { None, Up, Down }
+    public enum FingerType { None, Up, Down }
 
     public class FingerController : MonoBehaviour, IInitializable
     {
-        [SerializeField] private Camera choose = default!;
+        [FormerlySerializedAs("choose"), SerializeField] private Camera inputCamera = default!;
         [SerializeField] private Transform hitPlane = default!;
         [SerializeField] private bool ignoreIsOverGui;
         [SerializeField] private bool ignoreStartedOverGui = true;
@@ -35,7 +36,7 @@ namespace Song
         public void Initialize()
         {
             if (IsAuto) return;
-            laneDetector.Init(choose, hitPlane, noteFactory.LaneParents);
+            laneDetector.Init(inputCamera, hitPlane, noteFactory.LaneParents);
             pointerInput.SetCallbacks(FingerDown, FingerUpdate, FingerUp);
             TrySetUseTouch(true);
         }

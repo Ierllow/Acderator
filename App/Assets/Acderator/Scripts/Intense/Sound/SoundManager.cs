@@ -4,8 +4,8 @@ using Zenject;
 
 namespace Intense
 {
-    public enum EBgmType { Stop = -1, None, GameResult, GameResultFailed }
-    public enum ESeType { Tap, Flick }
+    public enum BgmType { Stop = -1, None, GameResult, GameResultFailed }
+    public enum SeType { Tap, Flick }
 
     public class SoundManager : IInitializable, ISceneLoadedHandler
     {
@@ -20,13 +20,13 @@ namespace Intense
 
         public void OnSceneLoaded(SceneContext context) => UpdateSounds(context.BgmType);
 
-        private void UpdateSounds(EBgmType bgmType)
+        private void UpdateSounds(BgmType bgmType)
         {
             switch (bgmType)
             {
-                case EBgmType.None:
+                case BgmType.None:
                     break;
-                case EBgmType.Stop:
+                case BgmType.Stop:
                     bgmPlayer.Stop();
                     break;
                 default:
@@ -44,18 +44,18 @@ namespace Intense
             seVolumeController.Register(sePlayer);
         }
 
-        public void PlaySe(ESeType type) => UniTask.Void(async () =>
+        public void PlaySe(SeType type) => UniTask.Void(async () =>
         {
-            var mSoundCueName = soundSheetNameResolver.FindSe(type);
-            var sheet = await cueSheetLoader.GetOrAddCueSheetAsync(mSoundCueName.SheetName, addressableAssetManager.Config.SongSe);
-            sePlayer.Play(sheet, mSoundCueName.CueName);
+            var soundCue = soundSheetNameResolver.FindSe(type);
+            var sheet = await cueSheetLoader.GetOrAddCueSheetAsync(soundCue.SheetName, addressableAssetManager.Config.SongSe);
+            sePlayer.Play(sheet, soundCue.CueName);
         });
 
-        public void PlayBgm(EBgmType type, bool isLoop = true) => UniTask.Void(async () =>
+        public void PlayBgm(BgmType type, bool isLoop = true) => UniTask.Void(async () =>
         {
-            var mSoundCueName = soundSheetNameResolver.FindBgm(type);
-            var sheet = await cueSheetLoader.GetOrAddCueSheetAsync(mSoundCueName.SheetName, addressableAssetManager.Config.Bgm);
-            bgmPlayer.Play(sheet, mSoundCueName.CueName, isLoop);
+            var soundCue = soundSheetNameResolver.FindBgm(type);
+            var sheet = await cueSheetLoader.GetOrAddCueSheetAsync(soundCue.SheetName, addressableAssetManager.Config.Bgm);
+            bgmPlayer.Play(sheet, soundCue.CueName, isLoop);
         });
     }
 }

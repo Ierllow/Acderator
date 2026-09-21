@@ -5,13 +5,15 @@ using UnityEngine.Rendering;
 
 namespace Boot
 {
-    [SceneType(ESceneType.Boot)]
+    [SceneType(SceneType.Boot)]
     public class BootScene : SceneBase
     {
-        private async UniTask Start()
+        private void Start() => StartAsync().Forget();
+
+        private async UniTask StartAsync()
         {
             await UniTask.WaitUntil(() => SplashScreen.isFinished, cancellationToken: destroyCancellationToken);
-            await sceneManager.ChangeSceneAsync(ESceneType.Title);
+            await sceneManager.ChangeSceneAsync(SceneType.Title);
         }
 
         public override void OnCreateScene() { }

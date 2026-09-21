@@ -19,19 +19,19 @@ namespace Song
 
         public ReadOnlyReactiveProperty<float> CurrentHpPercent => currentHpPercent;
 
-        public const int MAX_HP_PERCENT = 100;
+        public const int MaxHpPercent = 100;
 
         public void Init(int sid) => baseHp = masterDataManager.MemoryDatabase.SongMasterTable.FindBySid(sid).Hp;
 
-        public void UpdateHp(EJudgementType judgmentType, int noteCount)
+        public void UpdateHp(JudgementType judgmentType, int noteCount)
         {
-            if (judgmentType == EJudgementType.Bad || judgmentType == EJudgementType.Miss) return;
+            if (judgmentType == JudgementType.Bad || judgmentType == JudgementType.Miss) return;
             if (currentHpNum >= baseHp) return;
 
             var rate = masterDataManager.MemoryDatabase.SongHpRateMasterTable.FindByType((int)judgmentType).Rate;
             currentHpNum += judgmentType switch
             {
-                EJudgementType.Perfect or EJudgementType.Great or EJudgementType.Good => Mathf.FloorToInt(rate / noteCount),
+                JudgementType.Perfect or JudgementType.Great or JudgementType.Good => Mathf.FloorToInt(rate / noteCount),
                 _ => -Mathf.FloorToInt(rate / noteCount),
             };
             currentHpNum = Mathf.Clamp(currentHpNum, 0, baseHp);

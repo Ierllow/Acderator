@@ -5,8 +5,8 @@ using UnityEngine;
 
 namespace Element.UI
 {
-    public enum ECommonPopupTapKind { None = 0, Positive, Negative }
-    public enum EButtonType { Close, Both }
+    public enum CommonPopupTapKind { None = 0, Positive, Negative }
+    public enum PopupButtonType { Close, Both }
 
     public sealed class CommonPopupContext : PopupContext<CommonPopup>
     {
@@ -15,7 +15,7 @@ namespace Element.UI
         public string PositiveText { get; init; }
         public string NegativeText { get; init; }
         public Action PositiveCallback { get; init; }
-        public EButtonType ButtonType { get; init; }
+        public PopupButtonType ButtonType { get; init; }
     }
 
     public class CommonPopup : PopupBase<CommonPopupContext>
@@ -36,7 +36,7 @@ namespace Element.UI
             text.Text.SetText(context.Text);
             negativeText.SetText(context.NegativeText);
 
-            var isBoth =context.ButtonType == EButtonType.Both;
+            var isBoth =context.ButtonType == PopupButtonType.Both;
             positiveObj.SetActive(isBoth);
             positiveText.SetText(isBoth ? context.PositiveText : "");
 
@@ -47,12 +47,6 @@ namespace Element.UI
         {
             positiveCallback?.Invoke();
             Close();
-        }
-
-        protected override void FinishClosePopupScale()
-        {
-            base.FinishClosePopupScale();
-            Destroy(gameObject);
         }
     }
 }

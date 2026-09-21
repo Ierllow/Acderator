@@ -47,7 +47,7 @@ namespace Intense.Api
             try
             {
                 var sessionToken = apiSession.Token;
-                var url = string.Format("{0}/{1}", networkConfigObject.apiServerUrl, request.ApiKey);
+                var url = string.Format("{0}/{1}", networkConfigObject.ApiServerUrl, request.ApiKey);
 
                 using var www = new UnityWebRequest(url, request.HttpMethod);
                 www.SetApiRequestHeaders(sessionToken, apiSession.MasterVersion);

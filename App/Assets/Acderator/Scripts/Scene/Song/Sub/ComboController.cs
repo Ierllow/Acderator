@@ -10,12 +10,12 @@ namespace Song
         private readonly ReactiveProperty<int> currentCombo = new(0);
         public ReadOnlyReactiveProperty<int> CurrentCombo => currentCombo;
 
-        public void UpdateCombo(EJudgementType judgementType)
+        public void UpdateCombo(JudgementType judgementType)
         {
             switch (judgementType)
             {
-                case EJudgementType.None: break;
-                case EJudgementType.Perfect or EJudgementType.Great: currentCombo.Value++; break;
+                case JudgementType.None: break;
+                case JudgementType.Perfect or JudgementType.Great: currentCombo.Value++; break;
                 default: currentCombo.Value = 0; break;
             }
         }

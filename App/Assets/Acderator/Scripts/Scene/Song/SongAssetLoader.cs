@@ -13,7 +13,7 @@ namespace Song
         [Inject] private readonly AddressableAssetManager addressableAssetManager = default!;
         [Inject] private readonly SongSceneContext sceneContext = default!;
 
-        public async UniTask LoadAssetsAsync(ESceneType sceneType, CancellationToken token)
+        public async UniTask LoadAssetsAsync(SceneType sceneType, CancellationToken token)
         {
             foreach (var address in sceneContext.DynamicAssetAddressList)
             {

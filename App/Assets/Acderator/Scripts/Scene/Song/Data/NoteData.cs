@@ -13,7 +13,7 @@ namespace Song
         public float SecBegin { get; init; }
         public float SecEnd { get; init; }
         public int Lane { get; init; }
-        public ENoteType NoteType { get; init; }
+        public NoteType NoteType { get; init; }
         public List<CurveSegment> CurveSegmentList { get; init; } = new();
         public float CurveDuration { get; init; }
         public bool UseMidPoint { get; init; }

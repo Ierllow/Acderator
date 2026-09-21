@@ -28,19 +28,25 @@ public static class SpreadsheetToMasterGenerator
     }
 
     [Serializable]
-    private class ServiceAccountKey
+    private sealed class ServiceAccountKey
     {
-        public string clientEmail;
-        public string privateKey;
-        public string tokenUri = "https://oauth2.googleapis.com/token";
+        [SerializeField] private string clientEmail;
+        [SerializeField] private string privateKey;
+        [SerializeField] private string tokenUri = "https://oauth2.googleapis.com/token";
+
+        public string ClientEmail => clientEmail;
+        public string PrivateKey => privateKey;
+        public string TokenUri => tokenUri;
     }
 
     [Serializable]
-    private class TokenResponse
+    private sealed class TokenResponse
     {
-        public string accessToken;
-        public int expiresIn;
-        public string tokenType;
+        [SerializeField] private string accessToken;
+        [SerializeField] private int expiresIn;
+
+        public string AccessToken => accessToken;
+        public int ExpiresIn => expiresIn;
     }
 
     private const string DefaultSpreadsheetPath = "Assets/Acderator/Master.xlsx";
@@ -109,7 +115,7 @@ public static class SpreadsheetToMasterGenerator
         File.WriteAllText(outputAbs, source, new UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
     }
 
-    public static void Generate() => UniTask.Void(async () =>
+    public static async UniTask GenerateAsync()
     {
         if (string.IsNullOrEmpty(GoogleSheetId))
         {
@@ -130,7 +136,7 @@ public static class SpreadsheetToMasterGenerator
         {
             Debug.LogError(string.Format("Generation failed: {0}", ex));
         }
-    });
+    }
 
     private static MasterTable ReadSheet(IXLWorksheet sheet)
     {
@@ -410,16 +416,16 @@ public static class SpreadsheetToMasterGenerator
         }
 
         var key = JsonUtility.FromJson<ServiceAccountKey>(File.ReadAllText(keyPath));
-        if (string.IsNullOrEmpty(key.clientEmail) || string.IsNullOrEmpty(key.privateKey))
+        if (string.IsNullOrEmpty(key.ClientEmail) || string.IsNullOrEmpty(key.PrivateKey))
         {
             throw new InvalidOperationException("Service account key is missing client_email or private_key.");
         }
 
         var jwt = BuildServiceAccountJwt(key);
-        var tokenResponse = await ExchangeJwtForTokenAsync(jwt, key.tokenUri);
-        cachedAccessToken = tokenResponse.accessToken;
-        cachedAccessTokenExpiry = DateTime.UtcNow.AddSeconds(tokenResponse.expiresIn);
-        Debug.Log(string.Format("Service account access token acquired (expires in {0}s)", tokenResponse.expiresIn));
+        var tokenResponse = await ExchangeJwtForTokenAsync(jwt, key.TokenUri);
+        cachedAccessToken = tokenResponse.AccessToken;
+        cachedAccessTokenExpiry = DateTime.UtcNow.AddSeconds(tokenResponse.ExpiresIn);
+        Debug.Log(string.Format("Service account access token acquired (expires in {0}s)", tokenResponse.ExpiresIn));
         return cachedAccessToken;
     }
 
@@ -429,13 +435,13 @@ public static class SpreadsheetToMasterGenerator
         var now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
         var claimsJson = string.Format(
             "{{\"iss\":\"{0}\",\"scope\":\"https://www.googleapis.com/auth/drive.readonly\",\"aud\":\"{1}\",\"iat\":{2},\"exp\":{3}}}",
-            key.clientEmail, key.tokenUri, now, now + 3600);
+            key.ClientEmail, key.TokenUri, now, now + 3600);
 
         var headerB64 = Base64UrlEncode(Encoding.UTF8.GetBytes(headerJson));
         var claimsB64 = Base64UrlEncode(Encoding.UTF8.GetBytes(claimsJson));
         var unsigned = string.Format("{0}.{1}", headerB64, claimsB64);
 
-        using var rsa = CreateRsaFromPkcs8Pem(key.privateKey);
+        using var rsa = CreateRsaFromPkcs8Pem(key.PrivateKey);
         var signature = rsa.SignData(
             Encoding.UTF8.GetBytes(unsigned),
             System.Security.Cryptography.HashAlgorithmName.SHA256,

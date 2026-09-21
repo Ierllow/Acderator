@@ -11,9 +11,9 @@ namespace Song
         public List<NoteData> NoteDataList { get; } = new();
         public HeaderData HeaderData { get; set; } = new();
 
-        public int NoteCount => NoteDataList.Sum(x => x.NoteType == ENoteType.Long ? 2 : 1);
+        public int NoteCount => NoteDataList.Sum(x => x.NoteType == NoteType.Long ? 2 : 1);
 
-        public void AddNoteData(float beatBegin, float beatEnd, int lane, ENoteType noteType = ENoteType.Single) => NoteDataList.Add(new()
+        public void AddNoteData(float beatBegin, float beatEnd, int lane, NoteType noteType = NoteType.Single) => NoteDataList.Add(new()
         {
             BeatBegin = beatBegin,
             BeatEnd = beatEnd,
@@ -22,7 +22,7 @@ namespace Song
             Lane = lane,
             NoteType = noteType,
         });
-        public void AddCurveNoteData(float beatBegin, float beatEnd, int lane, ENoteType noteType, List<CurveSegment> curveSegments, float curveDuration, bool useMidPoint) => NoteDataList.Add(new()
+        public void AddCurveNoteData(float beatBegin, float beatEnd, int lane, NoteType noteType, List<CurveSegment> curveSegments, float curveDuration, bool useMidPoint) => NoteDataList.Add(new()
         {
             BeatBegin = beatBegin,
             BeatEnd = beatEnd,

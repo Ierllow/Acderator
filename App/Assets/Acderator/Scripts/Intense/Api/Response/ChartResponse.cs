@@ -26,7 +26,7 @@ namespace Intense.Api
 
             foreach (var note in Notes)
             {
-                if (note.NoteType == (int)ENoteType.Curve)
+                if (note.NoteType == (int)NoteType.Curve)
                 {
                     var segments = note.Segments.Select(segment => new CurveSegment
                     {
@@ -34,11 +34,11 @@ namespace Intense.Api
                         StartT = segment.StartTime,
                         EndT = segment.EndTime,
                     }).ToList();
-                    loadedChartInfo.AddCurveNoteData(note.BeatBegin, note.BeatEnd, note.Lane, ENoteType.Curve, segments, note.CurveDuration, note.UseMidPoint);
+                    loadedChartInfo.AddCurveNoteData(note.BeatBegin, note.BeatEnd, note.Lane, NoteType.Curve, segments, note.CurveDuration, note.UseMidPoint);
                 }
                 else
                 {
-                    loadedChartInfo.AddNoteData(note.BeatBegin, note.BeatEnd, note.Lane, (ENoteType)note.NoteType);
+                    loadedChartInfo.AddNoteData(note.BeatBegin, note.BeatEnd, note.Lane, (NoteType)note.NoteType);
                 }
             }
             return loadedChartInfo;

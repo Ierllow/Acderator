@@ -11,10 +11,10 @@ namespace Intense.Asset
 
         public async UniTask<bool> TryRetryAssetErrorAsync()
         {
-            var completionSource = AutoResetUniTaskCompletionSource<ECommonPopupTapKind>.Create();
+            var completionSource = AutoResetUniTaskCompletionSource<CommonPopupTapKind>.Create();
             var popupContext = PopupContextFactory.CreateAssetErrorPopupContext(completionSource);
             popupManager.OpenPopup(popupContext);
-            return await completionSource.Task == ECommonPopupTapKind.Positive;
+            return await completionSource.Task == CommonPopupTapKind.Positive;
         }
 
         public async UniTask<bool> TryDownloadConfirmedAsync(long fileSize)

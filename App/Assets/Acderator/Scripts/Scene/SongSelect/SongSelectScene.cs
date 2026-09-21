@@ -15,7 +15,7 @@ using Zenject;
 
 namespace SongSelect
 {
-    [SceneType(ESceneType.SongSelect)]
+    [SceneType(SceneType.SongSelect)]
     public partial class SongSelectScene : SceneBase
     {
         [SerializeField] private AtlasImage backgroundImage;
@@ -87,11 +87,11 @@ namespace SongSelect
 
             if (!PlayerPrefsValues.IsTutorialCompleted && !autoButton.IsOn && tutorialSceneContextBuilder.TryBuild(selectedSong, response.SessionId, out var tutorialSceneContext))
             {
-                await sceneManager.ChangeSceneAsync(ESceneType.Song, tutorialSceneContext);
+                await sceneManager.ChangeSceneAsync(SceneType.Song, tutorialSceneContext);
                 return;
             }
 
-            await sceneManager.ChangeSceneAsync(ESceneType.Song, sceneContext.ToSongSceneContext(selectedSong, autoButton.IsOn, response.SessionId));
+            await sceneManager.ChangeSceneAsync(SceneType.Song, sceneContext.ToSongSceneContext(selectedSong, autoButton.IsOn, response.SessionId));
         }
 
         private void TapOrderButton()
@@ -102,9 +102,9 @@ namespace SongSelect
 
         private void SelectedCellChanged(SongSelectCell cell)
         {
-            songSelectDetail.SetData(cell.MSong.Group, songListView.SelectedDifficulty, addressableAssetManager.GetSprite(cell.MSong.Group.ToString()));
-            backgroundImage.SetSprite(addressableAssetManager.GetSprite(cell.MSong.Bg.ToString()));
-            soundController.PlayPreview(cell.MSong.Group, destroyCancellationToken);
+            songSelectDetail.SetData(cell.Song.Group, songListView.SelectedDifficulty, addressableAssetManager.GetSprite(cell.Song.Group.ToString()));
+            backgroundImage.SetSprite(addressableAssetManager.GetSprite(cell.Song.Bg.ToString()));
+            soundController.PlayPreview(cell.Song.Group, destroyCancellationToken);
         }
 
         private void SelectedDifficultChanged(Toggle toggle)

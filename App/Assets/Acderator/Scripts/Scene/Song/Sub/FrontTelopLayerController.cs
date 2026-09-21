@@ -22,15 +22,15 @@ namespace Song
 
         public async UniTask CountDownStart() => await countDownBar.CountDown().SetAutoInActive(countDownBar.gameObject, inputBlocker);
 
-        public async UniTask ShowResult(ESongResultType resultType)
+        public async UniTask ShowResult(SongResultType resultType)
         {
             resultText.SetText(resultType.ToString());
 
             var gradient = resultType switch
             {
-                ESongResultType.Excellent => resultVisualConfig.ExcellentGradient,
-                ESongResultType.FullCombo or ESongResultType.Clear => resultVisualConfig.ClearGradient,
-                ESongResultType.Failed => resultVisualConfig.FailedGradient,
+                SongResultType.Excellent => resultVisualConfig.ExcellentGradient,
+                SongResultType.FullCombo or SongResultType.Clear => resultVisualConfig.ClearGradient,
+                SongResultType.Failed => resultVisualConfig.FailedGradient,
                 _ => throw new NotImplementedException(),
             };
             resultText.colorGradient = new VertexGradient(gradient.Evaluate(0), gradient.Evaluate(0.33f), gradient.Evaluate(0.66f), gradient.Evaluate(1));

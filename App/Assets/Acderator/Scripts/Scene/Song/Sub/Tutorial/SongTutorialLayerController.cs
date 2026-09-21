@@ -37,13 +37,13 @@ namespace Song
         {
             switch (tutorialEvent.Type)
             {
-                case ETutorialEventType.ShowIntro when tutorialEvent.Data is TutorialMaster tutorial:
+                case TutorialEventType.ShowIntro when tutorialEvent.Data is TutorialMaster tutorial:
                     ShowTutorialIntro(tutorial);
                     break;
-                case ETutorialEventType.ShowStep when tutorialEvent.Data is TutorialStepMaster tutorialStep:
+                case TutorialEventType.ShowStep when tutorialEvent.Data is TutorialStepMaster tutorialStep:
                     ShowTutorialStep(tutorialStep);
                     break;
-                case ETutorialEventType.ShowComplete:
+                case TutorialEventType.ShowComplete:
                     ShowTutorialComplete();
                     break;
                 default:

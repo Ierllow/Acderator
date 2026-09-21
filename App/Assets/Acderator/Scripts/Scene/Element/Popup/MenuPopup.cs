@@ -10,7 +10,7 @@ namespace Element.UI
 {
     public sealed class MenuPopupContext : PopupContext<MenuPopup>
     {
-        public new Action<ESceneType> NegativeCallback { get; init; }
+        public new Action<SceneType> NegativeCallback { get; init; }
     }
 
     public class MenuPopup : PopupBase<MenuPopupContext>
@@ -23,7 +23,7 @@ namespace Element.UI
 
         [Inject] private readonly PopupManager popupManager;
 
-        private new Action<ESceneType> closeCallback;
+        private new Action<SceneType> closeCallback;
 
         private void Start()
         {
@@ -55,9 +55,9 @@ namespace Element.UI
                 {
                     PlayerPrefs.DeleteAll();
                     base.Close();
-                    closeCallback.Invoke(ESceneType.Title);
+                    closeCallback.Invoke(SceneType.Title);
                 },
-                ButtonType = EButtonType.Both,
+                ButtonType = PopupButtonType.Both,
             };
             popupManager.OpenPopup(context);
         }
@@ -65,20 +65,14 @@ namespace Element.UI
         private async void TapLicenseButton()
         {
             var title = "権利表記";
-            var url = networkConfigObject.webViewServerUrl + "/lisence.html";
+            var url = networkConfigObject.WebViewServerUrl + "/lisence.html";
             popupManager.OpenPopup(new WebViewPopupContext { TitleText = title, Url = url });
         }
 
         private void TapTitleSceneButton()
         {
-            closeCallback.Invoke(ESceneType.Title);
+            closeCallback.Invoke(SceneType.Title);
             base.Close();
-        }
-
-        protected override void FinishClosePopupScale()
-        {
-            base.FinishClosePopupScale();
-            Destroy(gameObject);
         }
     }
 }

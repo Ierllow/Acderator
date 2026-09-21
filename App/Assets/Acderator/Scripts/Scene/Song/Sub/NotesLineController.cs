@@ -22,13 +22,13 @@ namespace Song
         }
 
         private List<(GameObject, int)>? laneLightTuple;
-        public void SetLaneLightActive(int lane, EFingerType fingerType)
+        public void SetLaneLightActive(int lane, FingerType fingerType)
         {
             laneLightTuple ??= laneLights.Select((ll, index) => (ll, index)).ToList();
             foreach (var (ll, index) in laneLightTuple)
             {
                 if (index != lane) continue;
-                var value = fingerType == EFingerType.Down;
+                var value = fingerType == FingerType.Down;
                 ll.SetActive(value);
             }
         }

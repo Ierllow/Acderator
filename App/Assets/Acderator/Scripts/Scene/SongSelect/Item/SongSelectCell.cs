@@ -4,37 +4,37 @@ using Intense.UI;
 using System;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace SongSelect
 {
     public class SongSelectCell : EnhancedScrollerCellView
     {
-        [SerializeField] private AtlasImage bg;
+        [FormerlySerializedAs("bg"), SerializeField] private AtlasImage background;
         [SerializeField] private TextMeshProUGUI songName;
         [SerializeField] private TextMeshProUGUI composer;
 
-        public Action<SongSelectCell> selected;
-
+        private Action<SongSelectCell> onSelected;
         private Func<string, Sprite> spriteResolver;
 
-        public SongMaster MSong { get; private set; }
+        public SongMaster Song { get; private set; }
 
-        public void Setup(SongMaster mSong, Action<SongSelectCell> selected, Func<string, Sprite> spriteResolver)
+        public void Setup(SongMaster song, Action<SongSelectCell> onSelected, Func<string, Sprite> spriteResolver)
         {
-            this.selected = selected;
+            this.onSelected = onSelected;
             this.spriteResolver = spriteResolver;
-            MSong = mSong;
+            Song = song;
             SetSelectedCell(true);
-            songName.SetText(mSong.Name);
-            composer.SetText(mSong.Composer);
+            songName.SetText(song.Name);
+            composer.SetText(song.Composer);
         }
 
         public void SetSelectedCell(bool value)
         {
-            bg.SetAtlas(value ? "song_selected" : "song_not_selected");
-            bg.ResolveSprite(spriteResolver);
+            background.SetAtlas(value ? "song_selected" : "song_not_selected");
+            background.ResolveSprite(spriteResolver);
         }
 
-        public void OnTapCell() => selected?.Invoke(this);
+        public void OnTapCell() => onSelected?.Invoke(this);
     }
 }

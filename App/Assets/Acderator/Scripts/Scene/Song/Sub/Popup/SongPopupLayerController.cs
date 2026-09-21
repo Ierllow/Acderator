@@ -13,38 +13,38 @@ namespace Song
 {
     public class SongPopupLayerController : MonoBehaviour
     {
-        private enum EType { None, Pause, Error, ScoreError, ScoreData, TutorialSkip }
+        private enum PopupType { None, Pause, Error, ScoreError, ScoreData, TutorialSkip }
 
         [SerializeField] private PausePopup pausePopup = default!;
         [SerializeField] private ScoreErrorPopup errorPopup = default!;
 
         [Inject] private readonly PopupManager popupManager = default!;
-        [Inject] private readonly SceneManager sceneManager = default!;
+        [Inject] private readonly SceneErrorPopupController sceneErrorPopupController = default!;
 
-        public IUniTaskAsyncEnumerable<EPopupTapKind> ClosedPausePopupAsAsyncEnumerable => UniTaskAsyncEnumerable.EveryValueChanged(pausePopup, x => x.TapKind);
-        public Observable<ESceneType> EverySceneTypeChanged => asyncSceneTypeSubject.Where(x => x != ESceneType.None);
+        public IUniTaskAsyncEnumerable<PopupTapKind> ClosedPausePopupAsAsyncEnumerable => UniTaskAsyncEnumerable.EveryValueChanged(pausePopup, x => x.TapKind);
+        public Observable<SceneType> EverySceneTypeChanged => asyncSceneTypeSubject.Where(x => x != SceneType.None);
 
-        private readonly Subject<ESceneType> asyncSceneTypeSubject = new();
+        private readonly Subject<SceneType> asyncSceneTypeSubject = new();
 
-        private EType currentOpenPopupType = EType.None;
+        private PopupType currentOpenPopupType = PopupType.None;
 
         public void OnOpenPausePopup(bool showRestartButton)
         {
-            if (currentOpenPopupType == EType.Pause) return;
+            if (currentOpenPopupType == PopupType.Pause) return;
 
-            currentOpenPopupType = EType.Pause;
-            pausePopup.Open(showRestartButton, () => currentOpenPopupType = EType.None);
+            currentOpenPopupType = PopupType.Pause;
+            pausePopup.Open(showRestartButton, () => currentOpenPopupType = PopupType.None);
         }
 
         public async UniTask<bool> OpenTutorialSkipPopup()
         {
-            if (currentOpenPopupType == EType.TutorialSkip) return false;
+            if (currentOpenPopupType == PopupType.TutorialSkip) return false;
 
-            currentOpenPopupType = EType.TutorialSkip;
-            var completionSource = AutoResetUniTaskCompletionSource<ECommonPopupTapKind>.Create();
-            void Complete(ECommonPopupTapKind tapKind)
+            currentOpenPopupType = PopupType.TutorialSkip;
+            var completionSource = AutoResetUniTaskCompletionSource<CommonPopupTapKind>.Create();
+            void Complete(CommonPopupTapKind tapKind)
             {
-                currentOpenPopupType = EType.None;
+                currentOpenPopupType = PopupType.None;
                 completionSource.TrySetResult(tapKind);
             }
             Open(new CommonPopupContext
@@ -53,50 +53,48 @@ namespace Song
                 Text = "チュートリアルをスキップしますか？",
                 PositiveText = "OK",
                 NegativeText = "キャンセル",
-                PositiveCallback = () => Complete(ECommonPopupTapKind.Positive),
-                NegativeCallback = () => Complete(ECommonPopupTapKind.Negative),
-                ButtonType = EButtonType.Both,
+                PositiveCallback = () => Complete(CommonPopupTapKind.Positive),
+                NegativeCallback = () => Complete(CommonPopupTapKind.Negative),
+                ButtonType = PopupButtonType.Both,
             });
-            return await completionSource.Task == ECommonPopupTapKind.Positive;
+            return await completionSource.Task == CommonPopupTapKind.Positive;
         }
 
         public void OnOpenScoreErrorPopup(bool isLoadFailure)
         {
-            if (currentOpenPopupType == EType.ScoreError) return;
+            if (currentOpenPopupType == PopupType.ScoreError) return;
 
-            currentOpenPopupType = EType.ScoreError;
+            currentOpenPopupType = PopupType.ScoreError;
             errorPopup.Open(isLoadFailure, () =>
             {
-                currentOpenPopupType = EType.None;
-                asyncSceneTypeSubject.OnNext(ESceneType.SongSelect);
+                currentOpenPopupType = PopupType.None;
+                asyncSceneTypeSubject.OnNext(SceneType.SongSelect);
             });
         }
 
         public async UniTask OnOpenErrorPopup()
         {
-            if (currentOpenPopupType == EType.Error) return;
+            if (currentOpenPopupType == PopupType.Error) return;
 
-            currentOpenPopupType = EType.Error;
-            var completionSource = AutoResetUniTaskCompletionSource.Create();
-            var context = PopupContextFactory.CreateErrorPopupContext(completionSource, () => sceneManager.ChangeSceneAsync(ESceneType.Title));
-            popupManager.OpenPopup(context);
-            await completionSource.Task;
+            currentOpenPopupType = PopupType.Error;
+            await sceneErrorPopupController.OpenAsync();
+            currentOpenPopupType = PopupType.None;
         }
 
         public async UniTask<bool> OpenSaveScoreDataErrorPopup()
         {
-            if (currentOpenPopupType == EType.ScoreData) return false;
+            if (currentOpenPopupType == PopupType.ScoreData) return false;
 
-            currentOpenPopupType = EType.ScoreData;
+            currentOpenPopupType = PopupType.ScoreData;
             var completionSource = AutoResetUniTaskCompletionSource<bool>.Create();
             void Complete(bool retry)
             {
-                currentOpenPopupType = EType.None;
+                currentOpenPopupType = PopupType.None;
                 completionSource.TrySetResult(retry);
             }
             void OpenErrorPopup() => Open(new CommonPopupContext
             {
-                ButtonType = EButtonType.Both,
+                ButtonType = PopupButtonType.Both,
                 Title = "エラー",
                 Text = "通信エラーが発生しました。\n 再度実行しますか。",
                 PositiveText = "リトライ",
@@ -106,7 +104,7 @@ namespace Song
             });
             void OpenQuitConfirm() => Open(new CommonPopupContext
             {
-                ButtonType = EButtonType.Both,
+                ButtonType = PopupButtonType.Both,
                 Title = "確認",
                 Text = "選曲画面に戻ります。\n ただし、スコア等の記録は残りません。\n 本当によろしいですか。",
                 PositiveText = "OK",

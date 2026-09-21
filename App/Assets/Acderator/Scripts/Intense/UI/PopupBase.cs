@@ -122,5 +122,11 @@ namespace Intense.UI
         public abstract void Open(TContext context);
 
         public sealed override void Open(PopupContext context) => Open((TContext)context);
+
+        protected override void FinishClosePopupScale()
+        {
+            base.FinishClosePopupScale();
+            Destroy(gameObject);
+        }
     }
 }

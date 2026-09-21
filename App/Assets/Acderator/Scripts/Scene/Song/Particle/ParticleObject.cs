@@ -28,9 +28,9 @@ namespace Song
             particle.Emit(1);
         }
 
-        public void Emit(float xParentPosition, float xChildPosition, EJudgementType type, Sprite judgeSprite)
+        public void Emit(float xParentPosition, float xChildPosition, JudgementType type, Sprite judgeSprite)
         {
-            if (type == EJudgementType.None) return;
+            if (type == JudgementType.None) return;
 
             if (judgeSprite != null) particleSystemRenderer.material.mainTexture = judgeSprite.texture;
             particle.transform.localPosition = new(xChildPosition, particle.transform.localPosition.y, particle.transform.localPosition.z);

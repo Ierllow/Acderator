@@ -32,7 +32,7 @@ namespace SongSelect
 
         public void ChangeSelectedCell(SongSelectCell cell)
         {
-            SelectedGroup = cell.MSong.Group;
+            SelectedGroup = cell.Song.Group;
             selectedCell.SetSelectedCell(false);
             cell.SetSelectedCell(true);
             selectedCell = cell;

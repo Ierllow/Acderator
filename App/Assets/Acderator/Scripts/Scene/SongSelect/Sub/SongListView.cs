@@ -37,14 +37,14 @@ namespace SongSelect
             scroller.cellViewVisibilityChanged = (cellView) =>
             {
                 var cell = (SongSelectCell)cellView;
-                if (cell.MSong == null) return;
+                if (cell.Song == null) return;
 
-                cell.SetSelectedCell(cell.MSong.Group == songSelectCellListController.SelectedGroup);
+                cell.SetSelectedCell(cell.Song.Group == songSelectCellListController.SelectedGroup);
             };
             scroller.cellViewInstantiated = (_, cellView) =>
             {
                 var songSelectCell = cellView as SongSelectCell;
-                if (songSelectCell.MSong?.Group == songSelectCellListController.SelectedGroup)
+                if (songSelectCell.Song?.Group == songSelectCellListController.SelectedGroup)
                 {
                     songSelectCellListController.UpdateSelectedCell(songSelectCell);
                     songSelectCell.SetSelectedCell(true);

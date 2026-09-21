@@ -51,11 +51,5 @@ namespace Element.UI
             webViewObject.SetVisibility(true);
 #endif
         }
-
-        protected override void FinishClosePopupScale()
-        {
-            base.FinishClosePopupScale();
-            Destroy(gameObject);
-        }
     }
 }

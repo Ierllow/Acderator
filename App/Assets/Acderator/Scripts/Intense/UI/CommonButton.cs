@@ -4,6 +4,7 @@ using R3;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace Intense.UI
@@ -14,47 +15,41 @@ namespace Intense.UI
     {
         [SerializeField] protected Button button;
         [SerializeField] protected TextMeshProUGUI buttonText;
-        [SerializeField] protected UIEffect uIEffect;
-        [SerializeField] protected float grayFactory = 0.4f;
+        [FormerlySerializedAs("uIEffect"), SerializeField] protected UIEffect uiEffect;
+        [FormerlySerializedAs("grayFactory"), SerializeField] protected float grayscaleFactor = 0.4f;
 
         public virtual bool IsTapping { get; protected set; }
 
         public virtual Observable<Unit> OnTapButtonAsObservable => button.OnClickAsObservable();
 
-        protected virtual void Awake() => AwakeCore();
-
-        private void AwakeCore()
+        protected virtual void Awake()
         {
-            if (uIEffect == null) return;
-            if (uIEffect.effectMode != EffectMode.None) uIEffect.effectMode = EffectMode.None;
-            if (uIEffect.colorMode != ColorMode.Subtract) uIEffect.colorMode = ColorMode.Subtract;
-            if (uIEffect.blurMode != BlurMode.None) uIEffect.blurMode = BlurMode.None;
+            if (uiEffect == null) return;
+            if (uiEffect.effectMode != EffectMode.None) uiEffect.effectMode = EffectMode.None;
+            if (uiEffect.colorMode != ColorMode.Subtract) uiEffect.colorMode = ColorMode.Subtract;
+            if (uiEffect.blurMode != BlurMode.None) uiEffect.blurMode = BlurMode.None;
         }
 
         public void OnPointerUp(PointerEventData eventData) => IsTapping = false;
 
         public void OnPointerDown(PointerEventData eventData) => IsTapping = true;
 
-        public virtual void SetGrayOut(bool value) => SetGrayOutCore(value);
-
-        protected void SetGrayOutCore(bool value)
+        public virtual void SetGrayOut(bool value)
         {
-            if (uIEffect == null)
+            if (uiEffect == null)
             {
-                Debug.LogWarning(string.Format("{0} is null", uIEffect.GetType().Name));
+                Debug.LogWarning(string.Format("{0} is not assigned", nameof(uiEffect)), this);
                 return;
             }
-            uIEffect.colorFactor = value ? grayFactory : 0f;
+            uiEffect.colorFactor = value ? grayscaleFactor : 0f;
             button.interactable = !value;
         }
 
-        public virtual void SetButtonText(string text) => SetButtonTextCore(text);
-
-        protected void SetButtonTextCore(string text)
+        public virtual void SetButtonText(string text)
         {
             if (buttonText == null)
             {
-                Debug.LogWarning(string.Format("{0} is null", buttonText.GetType().Name));
+                Debug.LogWarning(string.Format("{0} is not assigned", nameof(buttonText)), this);
                 return;
             }
             buttonText.SetText(text);

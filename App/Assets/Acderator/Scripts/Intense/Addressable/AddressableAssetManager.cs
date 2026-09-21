@@ -14,7 +14,7 @@ using Zenject;
 
 namespace Intense.Asset
 {
-    internal enum EAddressableOperationResult { Success, Canceled, Failed }
+    internal enum AddressableOperationResult { Success, Canceled, Failed }
 
     internal class AddressableAssetManager : MonoBehaviour, IInitializable, ISceneUnloadHandler
     {
@@ -24,39 +24,39 @@ namespace Intense.Asset
         [Inject] private readonly AddressableAssetPopupController addressableAssetPopupController;
         [Inject] private readonly AddressableAssetCache addressableAssetCache;
 
-        private UniTask<EAddressableOperationResult> initializeTask;
+        private UniTask<AddressableOperationResult> initializeTask;
 
         internal AddressableAssetConfig Config => addressableAssetConfigObject;
 
         public void Initialize() => initializeTask = InitializeCoreAsync(destroyCancellationToken).Preserve();
 
-        private async UniTask<EAddressableOperationResult> InitializeCoreAsync(CancellationToken cancellationToken)
+        private async UniTask<AddressableOperationResult> InitializeCoreAsync(CancellationToken cancellationToken)
         {
             AddressablesRuntimeProperties.SetPropertyValue(addressableAssetConfigObject.AssetServerUrlPropertyName, addressableAssetConfigObject.AssetServerUrl.TrimEnd('/'));
 
             var (initializeResult, _) = await AwaitHandleAsync(Addressables.InitializeAsync(false), cancellationToken);
-            if (initializeResult != EAddressableOperationResult.Success) return LogInitializeResult(initializeResult);
+            if (initializeResult != AddressableOperationResult.Success) return LogInitializeResult(initializeResult);
 
             var (checkResult, catalogList) = await AwaitHandleAsync(Addressables.CheckForCatalogUpdates(false), cancellationToken);
-            if (checkResult != EAddressableOperationResult.Success || catalogList.Count == 0) return LogInitializeResult(checkResult);
+            if (checkResult != AddressableOperationResult.Success || catalogList.Count == 0) return LogInitializeResult(checkResult);
 
             var (updateResult, _) = await AwaitHandleAsync(Addressables.UpdateCatalogs(true, catalogList, false), cancellationToken);
             return LogInitializeResult(updateResult);
         }
 
-        private EAddressableOperationResult LogInitializeResult(EAddressableOperationResult result)
+        private AddressableOperationResult LogInitializeResult(AddressableOperationResult result)
         {
-            if (result == EAddressableOperationResult.Failed) Debug.LogError("Addressables initialization failed.");
+            if (result == AddressableOperationResult.Failed) Debug.LogError("Addressables initialization failed.");
             return result;
         }
 
-        public async UniTask LoadAssetsAsync(ESceneType currentSceneType, CancellationToken cancellationToken)
+        public async UniTask LoadAssetsAsync(SceneType currentSceneType, CancellationToken cancellationToken)
         {
             await initializeTask;
 
             while (!cancellationToken.IsCancellationRequested)
             {
-                var result = EAddressableOperationResult.Failed;
+                var result = AddressableOperationResult.Failed;
                 loading.ShowLoading();
                 try
                 {
@@ -73,10 +73,10 @@ namespace Intense.Asset
 
                 switch (result)
                 {
-                    case EAddressableOperationResult.Success:
+                    case AddressableOperationResult.Success:
                         ResolveSceneSprites();
                         return;
-                    case EAddressableOperationResult.Canceled:
+                    case AddressableOperationResult.Canceled:
                         return;
                 }
 
@@ -107,7 +107,7 @@ namespace Intense.Asset
             if (addressableAssetCache.TryGetAsset<T>(cacheKey, out var cachedAsset)) return cachedAsset;
 
             var loadHandle = Addressables.LoadAssetAsync<Object>(key);
-            if (await WaitForCompletionAsync(loadHandle, CancellationToken.None) != EAddressableOperationResult.Success)
+            if (await WaitForCompletionAsync(loadHandle, CancellationToken.None) != AddressableOperationResult.Success)
             {
                 ReleaseIfValid(loadHandle);
                 return default;
@@ -117,24 +117,24 @@ namespace Intense.Asset
             return loadHandle.Result as T;
         }
 
-        private async UniTask<EAddressableOperationResult> TryLoadAssetsAsync(ESceneType currentSceneType, CancellationToken cancellationToken)
+        private async UniTask<AddressableOperationResult> TryLoadAssetsAsync(SceneType currentSceneType, CancellationToken cancellationToken)
         {
             var addressList = addressableAssetCache.GetUnloadedAddresses();
             var labels = addressableAssetConfigObject.GetLabels(currentSceneType).Where(IsValidLabel).ToList();
             var downloadKeyList = addressList.Cast<object>().Concat(labels.Select(label => label.RuntimeKey)).ToList();
 
             var (sizeResult, downloadSize) = await AwaitHandleAsync(Addressables.GetDownloadSizeAsync((IEnumerable)downloadKeyList), cancellationToken);
-            if (sizeResult != EAddressableOperationResult.Success) return sizeResult;
-            if (downloadSize > 0 && !await addressableAssetPopupController.TryDownloadConfirmedAsync(downloadSize)) return EAddressableOperationResult.Canceled;
+            if (sizeResult != AddressableOperationResult.Success) return sizeResult;
+            if (downloadSize > 0 && !await addressableAssetPopupController.TryDownloadConfirmedAsync(downloadSize)) return AddressableOperationResult.Canceled;
 
             var downloadResult = await DownloadDependenciesAsync(downloadKeyList, cancellationToken);
-            if (downloadResult != EAddressableOperationResult.Success) return downloadResult;
+            if (downloadResult != AddressableOperationResult.Success) return downloadResult;
 
             var addressResult = await LoadAddressesAsync(addressList, cancellationToken);
-            return addressResult != EAddressableOperationResult.Success ? addressResult : await LoadLabelsAsync(labels, cancellationToken);
+            return addressResult != AddressableOperationResult.Success ? addressResult : await LoadLabelsAsync(labels, cancellationToken);
         }
 
-        private async UniTask<EAddressableOperationResult> DownloadDependenciesAsync(IEnumerable keyList, CancellationToken cancellationToken)
+        private async UniTask<AddressableOperationResult> DownloadDependenciesAsync(IEnumerable keyList, CancellationToken cancellationToken)
         {
             var downloadHandle = Addressables.DownloadDependenciesAsync(keyList, Addressables.MergeMode.Union, false);
             var isCanceled = await UniTask.WaitUntil(() =>
@@ -148,13 +148,13 @@ namespace Intense.Asset
             return result;
         }
 
-        private async UniTask<EAddressableOperationResult> LoadAddressesAsync(IEnumerable<string> addressList, CancellationToken cancellationToken)
+        private async UniTask<AddressableOperationResult> LoadAddressesAsync(IEnumerable<string> addressList, CancellationToken cancellationToken)
         {
             foreach (var address in addressList)
             {
                 var loadHandle = Addressables.LoadAssetAsync<Object>(address);
                 var result = await WaitForCompletionAsync(loadHandle, cancellationToken);
-                if (result != EAddressableOperationResult.Success)
+                if (result != AddressableOperationResult.Success)
                 {
                     ReleaseIfValid(loadHandle);
                     return result;
@@ -162,41 +162,41 @@ namespace Intense.Asset
 
                 addressableAssetCache.CacheAsset(address, loadHandle);
             }
-            return EAddressableOperationResult.Success;
+            return AddressableOperationResult.Success;
         }
 
-        private async UniTask<EAddressableOperationResult> LoadLabelsAsync(IEnumerable<AssetLabelReference> labels, CancellationToken cancellationToken)
+        private async UniTask<AddressableOperationResult> LoadLabelsAsync(IEnumerable<AssetLabelReference> labels, CancellationToken cancellationToken)
         {
             foreach (var label in labels)
             {
                 var result = await LoadLabelAsync(label, cancellationToken);
-                if (result != EAddressableOperationResult.Success) return result;
+                if (result != AddressableOperationResult.Success) return result;
             }
-            return EAddressableOperationResult.Success;
+            return AddressableOperationResult.Success;
         }
 
-        private async UniTask<EAddressableOperationResult> LoadLabelAsync(AssetLabelReference label, CancellationToken cancellationToken)
+        private async UniTask<AddressableOperationResult> LoadLabelAsync(AssetLabelReference label, CancellationToken cancellationToken)
         {
             var cacheKey = string.Format("label:{0}", label.labelString);
-            if (addressableAssetCache.IsLabelLoaded(cacheKey)) return EAddressableOperationResult.Success;
+            if (addressableAssetCache.IsLabelLoaded(cacheKey)) return AddressableOperationResult.Success;
 
             var locationHandle = Addressables.LoadResourceLocationsAsync(label.RuntimeKey, typeof(Object));
             try
             {
                 var locationResult = await WaitForCompletionAsync(locationHandle, cancellationToken);
-                if (locationResult != EAddressableOperationResult.Success) return locationResult;
-                if (locationHandle.Result.Count == 0) return EAddressableOperationResult.Success;
+                if (locationResult != AddressableOperationResult.Success) return locationResult;
+                if (locationHandle.Result.Count == 0) return AddressableOperationResult.Success;
 
                 var loadHandle = Addressables.LoadAssetsAsync<Object>(locationHandle.Result, addressableAssetCache.RegisterSpriteAtlas);
                 var loadResult = await WaitForCompletionAsync(loadHandle, cancellationToken);
-                if (loadResult != EAddressableOperationResult.Success)
+                if (loadResult != AddressableOperationResult.Success)
                 {
                     ReleaseIfValid(loadHandle);
                     return loadResult;
                 }
 
                 addressableAssetCache.CacheLabel(cacheKey, loadHandle);
-                return EAddressableOperationResult.Success;
+                return AddressableOperationResult.Success;
             }
             finally
             {
@@ -223,22 +223,22 @@ namespace Intense.Asset
             if (handle.IsValid()) Addressables.Release(handle);
         }
 
-        private async UniTask<(EAddressableOperationResult Result, T Value)> AwaitHandleAsync<T>(AsyncOperationHandle<T> handle, CancellationToken cancellationToken)
+        private async UniTask<(AddressableOperationResult Result, T Value)> AwaitHandleAsync<T>(AsyncOperationHandle<T> handle, CancellationToken cancellationToken)
         {
             var result = await WaitForCompletionAsync(handle, cancellationToken);
-            var value = result == EAddressableOperationResult.Success ? handle.Result : default;
+            var value = result == AddressableOperationResult.Success ? handle.Result : default;
             ReleaseIfValid(handle);
             return (result, value);
         }
 
-        private async UniTask<EAddressableOperationResult> WaitForCompletionAsync(AsyncOperationHandle handle, CancellationToken cancellationToken)
+        private async UniTask<AddressableOperationResult> WaitForCompletionAsync(AsyncOperationHandle handle, CancellationToken cancellationToken)
             => GetOperationResult(handle, await UniTask.WaitUntil(() => handle.IsDone, cancellationToken: cancellationToken).SuppressCancellationThrow());
 
-        private EAddressableOperationResult GetOperationResult(AsyncOperationHandle operation, bool isCanceled) => (isCanceled, operation.Status) switch
+        private AddressableOperationResult GetOperationResult(AsyncOperationHandle operation, bool isCanceled) => (isCanceled, operation.Status) switch
         {
-            (true, _) => EAddressableOperationResult.Canceled,
-            (_, AsyncOperationStatus.Succeeded) => EAddressableOperationResult.Success,
-            _ => EAddressableOperationResult.Failed,
+            (true, _) => AddressableOperationResult.Canceled,
+            (_, AsyncOperationStatus.Succeeded) => AddressableOperationResult.Success,
+            _ => AddressableOperationResult.Failed,
         };
     }
 }

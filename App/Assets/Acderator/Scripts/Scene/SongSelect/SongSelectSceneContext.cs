@@ -10,6 +10,6 @@ namespace SongSelect
         public IReadOnlyList<AddressableAssetAddress> DynamicAssetAddressList(IEnumerable<int> groupList)
             => groupList.Select(DynamicAssetAddresses.Song).ToList();
 
-        public Song.SongSceneContext ToSongSceneContext(SongMaster mSong, bool isAuto, string sessionId) => Song.SongSceneContext.Create(new(mSong), isAuto, Song.ESongMode.Normal, sessionId);
+        public Song.SongSceneContext ToSongSceneContext(SongMaster song, bool isAuto, string sessionId) => Song.SongSceneContext.Create(new(song), isAuto, Song.SongMode.Normal, sessionId);
     }
 }

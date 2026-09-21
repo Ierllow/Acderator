@@ -1,10 +1,14 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Intense.Api
 {
     public class NetworkConfig : ScriptableObject
     {
-        public string apiServerUrl = "";
-        public string webViewServerUrl = "";
+        [SerializeField] private string apiServerUrl = "";
+        [SerializeField] private string webViewServerUrl = "";
+
+        public string ApiServerUrl => apiServerUrl;
+        public string WebViewServerUrl => webViewServerUrl;
     }
 }

@@ -15,10 +15,15 @@ namespace Song
         [Serializable]
         private class NotePrefabs
         {
-            public SingleNote singleNote = default!;
-            public LongNote longNote = default!;
-            public FlickNote flickNote = default!;
-            public CurveNote curveNote = default!;
+            [SerializeField] private SingleNote singleNote = default!;
+            [SerializeField] private LongNote longNote = default!;
+            [SerializeField] private FlickNote flickNote = default!;
+            [SerializeField] private CurveNote curveNote = default!;
+
+            public SingleNote SingleNote => singleNote;
+            public LongNote LongNote => longNote;
+            public FlickNote FlickNote => flickNote;
+            public CurveNote CurveNote => curveNote;
         }
 
         [HideInInspector, SerializeField] private Transform[] parents = default!;
@@ -35,19 +40,19 @@ namespace Song
         public void Init()
         {
             var laneCount = parents.Length;
-            var typeCount = Enum.GetValues(typeof(ENoteType)).Length;
+            var typeCount = Enum.GetValues(typeof(NoteType)).Length;
             pools = new ObjectPool<NoteBase>[typeCount, laneCount];
-            var singleNote = addressablePrefabResolver.GetComponentOrFallback("SingleNote", notePrefabs.singleNote);
-            var longNote = addressablePrefabResolver.GetComponentOrFallback("LongNote", notePrefabs.longNote);
-            var flickNote = addressablePrefabResolver.GetComponentOrFallback("FlickNote", notePrefabs.flickNote);
-            var curveNote = addressablePrefabResolver.GetComponentOrFallback("CurveNote", notePrefabs.curveNote);
+            var singleNote = addressablePrefabResolver.GetComponentOrFallback("SingleNote", notePrefabs.SingleNote);
+            var longNote = addressablePrefabResolver.GetComponentOrFallback("LongNote", notePrefabs.LongNote);
+            var flickNote = addressablePrefabResolver.GetComponentOrFallback("FlickNote", notePrefabs.FlickNote);
+            var curveNote = addressablePrefabResolver.GetComponentOrFallback("CurveNote", notePrefabs.CurveNote);
 
             foreach (var (parent, lane) in parents.Select((parent, lane) => (parent, lane)))
             {
-                pools[(int)ENoteType.Single, lane] = CreatePoolOrDefault(singleNote, parent)!;
-                pools[(int)ENoteType.Long, lane] = CreatePoolOrDefault(longNote, parent)!;
-                pools[(int)ENoteType.Flick, lane] = CreatePoolOrDefault(flickNote, parent)!;
-                pools[(int)ENoteType.Curve, lane] = CreatePoolOrDefault(curveNote, parent)!;
+                pools[(int)NoteType.Single, lane] = CreatePoolOrDefault(singleNote, parent)!;
+                pools[(int)NoteType.Long, lane] = CreatePoolOrDefault(longNote, parent)!;
+                pools[(int)NoteType.Flick, lane] = CreatePoolOrDefault(flickNote, parent)!;
+                pools[(int)NoteType.Curve, lane] = CreatePoolOrDefault(curveNote, parent)!;
             }
         }
 

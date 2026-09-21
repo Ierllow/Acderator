@@ -7,7 +7,7 @@ namespace Intense.UI
     public static class PopupContextFactory
     {
         public static CommonPopupContext CreateAssetErrorPopupContext(
-            AutoResetUniTaskCompletionSource<ECommonPopupTapKind> completionSource,
+            AutoResetUniTaskCompletionSource<CommonPopupTapKind> completionSource,
             Action<PopupContext> openPopup = null,
             Func<UniTask> moveTitleScene = null) => new()
             {
@@ -15,10 +15,10 @@ namespace Intense.UI
                 Text = "エラーが発生しました。\n 再度実行しますか。",
                 PositiveText = "リトライ",
                 NegativeText = "キャンセル",
-                PositiveCallback = () => completionSource.TrySetResult(ECommonPopupTapKind.Positive),
+                PositiveCallback = () => completionSource.TrySetResult(CommonPopupTapKind.Positive),
                 NegativeCallback = () =>
                 {
-                    if (moveTitleScene == null)
+                    if (moveTitleScene != null && openPopup != null)
                     {
                         openPopup(new CommonPopupContext
                         {
@@ -27,24 +27,24 @@ namespace Intense.UI
                             NegativeText = "OK",
                             NegativeCallback = async () =>
                             {
-                                completionSource.TrySetResult(ECommonPopupTapKind.Negative);
+                                completionSource.TrySetResult(CommonPopupTapKind.Negative);
                                 await moveTitleScene();
                             }
                         });
                         return;
                     }
-                    completionSource.TrySetResult(ECommonPopupTapKind.Negative);
+                    completionSource.TrySetResult(CommonPopupTapKind.Negative);
                 }
             };
 
-        public static CommonPopupContext CreateNetworkErrorPopupContext(AutoResetUniTaskCompletionSource<ECommonPopupTapKind> completionSource, string error, int errorCode) => new()
+        public static CommonPopupContext CreateNetworkErrorPopupContext(AutoResetUniTaskCompletionSource<CommonPopupTapKind> completionSource, string error, int errorCode) => new()
         {
             Title = "エラー",
             Text = error + "\n エラーコード:" + errorCode,
             PositiveText = "リトライ",
             NegativeText = "閉じる",
-            PositiveCallback = () => completionSource.TrySetResult(ECommonPopupTapKind.Positive),
-            NegativeCallback = () => completionSource.TrySetResult(ECommonPopupTapKind.Negative)
+            PositiveCallback = () => completionSource.TrySetResult(CommonPopupTapKind.Positive),
+            NegativeCallback = () => completionSource.TrySetResult(CommonPopupTapKind.Negative)
         };
 
         public static CommonPopupContext CreateErrorPopupContext(AutoResetUniTaskCompletionSource completionSource, Func<UniTask> moveTitleScene) => new()
@@ -57,7 +57,7 @@ namespace Intense.UI
                 completionSource.TrySetResult();
                 await moveTitleScene();
             },
-            ButtonType = EButtonType.Close,
+            ButtonType = PopupButtonType.Close,
         };
 
         public static DownloadSizeConfPopupContext CreateDownloadSizeConfirmPopupContext(double fileSize, string size) => new() { FileSize = fileSize, Size = size };

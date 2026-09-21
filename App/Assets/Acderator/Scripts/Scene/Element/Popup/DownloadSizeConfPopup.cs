@@ -34,10 +34,5 @@ namespace Element.UI
 
         public void OnTapCancel() => IsClose = true;
 
-        protected override void FinishClosePopupScale()
-        {
-            base.FinishClosePopupScale();
-            Destroy(gameObject);
-        }
     }
 }

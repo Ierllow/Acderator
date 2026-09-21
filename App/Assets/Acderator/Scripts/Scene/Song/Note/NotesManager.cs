@@ -11,7 +11,7 @@ namespace Song
     public class NotesManager
     {
         public const int LaneCount = 4;
-        public const int MIN_NOTES_SPEED = 1;
+        public const int MinNotesSpeed = 1;
 
         public float CurrentSec { get; private set; } = default;
         public float CurrentBeat { get; private set; } = default;
@@ -86,9 +86,9 @@ namespace Song
             CurrentBeat = sec * ((LoadedChartInfo?.HeaderData.Tempo ?? 0) / 60f);
         }
 
-        public bool TryGetNote(EFingerType type, int lane, [NotNullWhen(true)] out NoteBase? note) => TryGetNearestNote(lane, type switch
+        public bool TryGetNote(FingerType type, int lane, [NotNullWhen(true)] out NoteBase? note) => TryGetNearestNote(lane, type switch
         {
-            EFingerType.Down => NoteSearchMode.Down,
+            FingerType.Down => NoteSearchMode.Down,
             _ => NoteSearchMode.Up,
         }, out note);
 
@@ -111,8 +111,8 @@ namespace Song
                 if (mode switch
                 {
                     NoteSearchMode.Down => candidate.IsTapping,
-                    NoteSearchMode.Up => !candidate.IsTapping || candidateData.NoteType is not (ENoteType.Long or ENoteType.Curve),
-                    NoteSearchMode.Flick => !candidate.IsTapping || candidateData.NoteType != ENoteType.Flick,
+                    NoteSearchMode.Up => !candidate.IsTapping || candidateData.NoteType is not (NoteType.Long or NoteType.Curve),
+                    NoteSearchMode.Flick => !candidate.IsTapping || candidateData.NoteType != NoteType.Flick,
                     _ => true,
                 }) continue;
 
@@ -135,7 +135,7 @@ namespace Song
 
         private float GetNoteEndSec(NoteData noteData) => noteData.NoteType switch
         {
-            ENoteType.Curve => noteData.SecBegin + noteData.CurveDuration,
+            NoteType.Curve => noteData.SecBegin + noteData.CurveDuration,
             _ => noteData.SecEnd,
         };
 
@@ -143,7 +143,7 @@ namespace Song
         {
             while (currentSpeedChangeIndex < NoteSpeedChangeList.Count && CurrentBeat >= NoteSpeedChangeList[currentSpeedChangeIndex].Beat)
             {
-                var diffNoteSpeed = SongOption.NoteSpeed - MIN_NOTES_SPEED;
+                var diffNoteSpeed = SongOption.NoteSpeed - MinNotesSpeed;
                 CurrentNoteSpeed = (float)NoteSpeedChangeList[currentSpeedChangeIndex].Speed + diffNoteSpeed;
                 currentSpeedChangeIndex++;
             }

@@ -8,10 +8,10 @@ public sealed class SceneErrorPopupController
     [Inject] private readonly SceneManager sceneManager;
     [Inject] private readonly PopupManager popupManager;
 
-    public async UniTask Open()
+    public async UniTask OpenAsync()
     {
         var completionSource = AutoResetUniTaskCompletionSource.Create();
-        var context = PopupContextFactory.CreateErrorPopupContext(completionSource, () => sceneManager.ChangeSceneAsync(ESceneType.Title));
+        var context = PopupContextFactory.CreateErrorPopupContext(completionSource, () => sceneManager.ChangeSceneAsync(SceneType.Title));
         popupManager.OpenPopup(context);
         await completionSource.Task;
     }

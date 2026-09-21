@@ -11,7 +11,7 @@ using Zenject;
 
 namespace Title
 {
-    [SceneType(ESceneType.Title)]
+    [SceneType(SceneType.Title)]
     public class TitleScene : SceneBase
     {
         [SerializeField] private CommonButton startButton;
@@ -49,13 +49,13 @@ namespace Title
         {
             if (PlayerPrefsValues.IsTutorialCompleted)
             {
-                await sceneManager.ChangeSceneAsync(ESceneType.SongSelect, new SongSelect.SongSelectSceneContext());
+                await sceneManager.ChangeSceneAsync(SceneType.SongSelect, new SongSelect.SongSelectSceneContext());
                 return;
             }
 
             if (!tutorialSceneContextBuilder.TryGetFirstTutorialScoreId(out var scoreId))
             {
-                await sceneManager.ChangeSceneAsync(ESceneType.SongSelect, new SongSelect.SongSelectSceneContext());
+                await sceneManager.ChangeSceneAsync(SceneType.SongSelect, new SongSelect.SongSelectSceneContext());
                 return;
             }
 
@@ -63,11 +63,11 @@ namespace Title
             var response = await titleAuthController.NetworkManager.RequestAsync(request);
             if ((response?.IsSuccess ?? false) && tutorialSceneContextBuilder.TryBuildFirstTutorial(response.SessionId, out var tutorialContext))
             {
-                await sceneManager.ChangeSceneAsync(ESceneType.Song, tutorialContext);
+                await sceneManager.ChangeSceneAsync(SceneType.Song, tutorialContext);
                 return;
             }
 
-            await sceneManager.ChangeSceneAsync(ESceneType.SongSelect, new SongSelect.SongSelectSceneContext());
+            await sceneManager.ChangeSceneAsync(SceneType.SongSelect, new SongSelect.SongSelectSceneContext());
         }
 
         private async UniTask AutoDownloadAllAssets()

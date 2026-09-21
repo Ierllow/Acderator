@@ -15,7 +15,7 @@ namespace Song
             BindCore(songSceneContext);
             BindSceneServices();
             BindInput();
-            if (songSceneContext.SongMode == ESongMode.Tutorial) BindTutorial();
+            if (songSceneContext.SongMode == SongMode.Tutorial) BindTutorial();
         }
 
         private void BindCore(SongSceneContext songSceneContext)

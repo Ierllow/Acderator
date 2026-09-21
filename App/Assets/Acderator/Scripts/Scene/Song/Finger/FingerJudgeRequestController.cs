@@ -71,7 +71,7 @@ namespace Song
 
         private void EmitNormalJudgeRequest(FingerJudgeRequest request)
         {
-            if (request.FingerType == EFingerType.Up)
+            if (request.FingerType == FingerType.Up)
             {
                 TryEmitHoldingNoteRelease(request.PointerId, request.Lane);
                 return;
@@ -79,14 +79,14 @@ namespace Song
             if (!TryGetRequestedNote(request, out var note)) return;
 
             TryApplyJudgement(note, request.FingerType, request.Lane, request.AllowMiss, out var fingerInfo);
-            if (request.FingerType == EFingerType.Down && note.IsTapping && IsHoldNote(note)) holdingNoteDict[request.PointerId] = note;
+            if (request.FingerType == FingerType.Down && note.IsTapping && IsHoldNote(note)) holdingNoteDict[request.PointerId] = note;
             judgmentSubject.OnNext(fingerInfo);
         }
 
         private bool TryEmitHoldingNoteRelease(int pointerId, int lane)
         {
             if (!holdingNoteDict.Remove(pointerId, out var note) || !IsHolding(note)) return false;
-            if (!TryApplyJudgement(note, EFingerType.Up, lane, true, out var fingerInfo)) return false;
+            if (!TryApplyJudgement(note, FingerType.Up, lane, true, out var fingerInfo)) return false;
 
             judgmentSubject.OnNext(fingerInfo);
             return true;
@@ -94,7 +94,7 @@ namespace Song
 
         private void EmitSwipeJudgeRequest(FingerJudgeRequest request)
         {
-            if (notesManager.TryGetFlickNote(request.Lane, out var flickNote) && TryApplyJudgement(flickNote, EFingerType.Up, request.Lane, false, out var fingerInfo))
+            if (notesManager.TryGetFlickNote(request.Lane, out var flickNote) && TryApplyJudgement(flickNote, FingerType.Up, request.Lane, false, out var fingerInfo))
             {
                 judgmentSubject.OnNext(fingerInfo);
                 return;
@@ -107,15 +107,15 @@ namespace Song
             if (!holdingNoteDict.TryGetValue(request.PointerId, out var note) || !IsHolding(note)) return;
 
             var noteData = notesManager.GetNoteData(note);
-            if (noteData.NoteType != ENoteType.Long || noteData.Lane == request.Lane) return;
+            if (noteData.NoteType != NoteType.Long || noteData.Lane == request.Lane) return;
 
             holdingNoteDict.Remove(request.PointerId);
-            if (!TryApplyJudgement(note, EFingerType.Up, request.Lane, true, out var fingerInfo)) return;
+            if (!TryApplyJudgement(note, FingerType.Up, request.Lane, true, out var fingerInfo)) return;
 
             judgmentSubject.OnNext(fingerInfo.WithTappingLanes(GetTappingLanes()));
         }
 
-        private bool IsHoldNote(NoteBase note) => notesManager.GetNoteData(note).NoteType is ENoteType.Long or ENoteType.Curve;
+        private bool IsHoldNote(NoteBase note) => notesManager.GetNoteData(note).NoteType is NoteType.Long or NoteType.Curve;
 
         private bool IsHolding(NoteBase note) => note && note.IsActive && note.IsTapping && notesManager.IsAlive(note);
 
@@ -133,38 +133,38 @@ namespace Song
 
         private void EmitPerfect(NoteBase note)
         {
-            if (noteJudgeController.IsJustAutoTiming(note, EFingerType.Down))
+            if (noteJudgeController.IsJustAutoTiming(note, FingerType.Down))
             {
-                EmitPerfect(note, EFingerType.Down);
+                EmitPerfect(note, FingerType.Down);
                 return;
             }
-            if (notesManager.GetNoteData(note).NoteType != ENoteType.Single && noteJudgeController.IsJustAutoTiming(note, EFingerType.Up))
-                EmitPerfect(note, EFingerType.Up);
+            if (notesManager.GetNoteData(note).NoteType != NoteType.Single && noteJudgeController.IsJustAutoTiming(note, FingerType.Up))
+                EmitPerfect(note, FingerType.Up);
         }
 
         private void EmitMiss(NoteBase note, float currentSec) => judgmentSubject.OnNext(new()
         {
             NoteBase = note,
             NoteData = notesManager.GetNoteData(note),
-            JudgmentType = notesManager.SongOption.IsAuto ? EJudgementType.Perfect : EJudgementType.Miss,
+            JudgmentType = notesManager.SongOption.IsAuto ? JudgementType.Perfect : JudgementType.Miss,
             Lane = LaneNone,
-            MissInfo = (true, notesManager.GetNoteData(note).NoteType == ENoteType.Long && !note.IsTapping),
+            MissInfo = (true, notesManager.GetNoteData(note).NoteType == NoteType.Long && !note.IsTapping),
         });
 
-        private void EmitPerfect(NoteBase note, EFingerType fingerType)
+        private void EmitPerfect(NoteBase note, FingerType fingerType)
         {
-            note.OnJudgedNote(fingerType, EJudgementType.Perfect);
+            note.OnJudgedNote(fingerType, JudgementType.Perfect);
             judgmentSubject.OnNext(new FingerInfo
             {
                 NoteBase = note,
                 NoteData = notesManager.GetNoteData(note),
                 FingerType = fingerType,
-                JudgmentType = EJudgementType.Perfect,
+                JudgmentType = JudgementType.Perfect,
                 Lane = LaneNone,
             });
         }
 
-        private bool TryApplyJudgement(NoteBase note, EFingerType fingerType, int lane, bool allowMiss, out FingerInfo fingerInfo)
+        private bool TryApplyJudgement(NoteBase note, FingerType fingerType, int lane, bool allowMiss, out FingerInfo fingerInfo)
         {
             fingerInfo = new FingerInfo() { FingerType = fingerType, Lane = lane };
             if (!noteJudgeController.TryJudge(note, fingerType, allowMiss, out var judgementType)) return false;

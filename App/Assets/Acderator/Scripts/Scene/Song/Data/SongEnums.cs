@@ -2,14 +2,14 @@
 
 namespace Song
 {
-    public enum ESongMode
+    public enum SongMode
     {
         Normal,
         Tutorial,
         TestMode
     }
 
-    public enum ESongState
+    public enum SongState
     {
         None,
         Ready,
@@ -18,7 +18,7 @@ namespace Song
         End,
     }
 
-    public enum ESongResultType
+    public enum SongResultType
     {
         Failed,
         Clear,
@@ -26,7 +26,7 @@ namespace Song
         Excellent,
     }
 
-    public enum ETutorialState
+    public enum TutorialState
     {
         None,
         Intro,
@@ -34,7 +34,7 @@ namespace Song
         Complete
     }
 
-    public enum ENoteType
+    public enum NoteType
     {
         Single,
         Long,

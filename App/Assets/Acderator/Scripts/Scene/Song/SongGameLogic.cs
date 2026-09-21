@@ -14,17 +14,17 @@ namespace Song
         [Inject] private readonly HpBarController hpBarController = default!;
         [Inject] private readonly NotesManager notesManager = default!;
 
-        private readonly Dictionary<EJudgementType, int> judgeCountDict = new()
+        private readonly Dictionary<JudgementType, int> judgeCountDict = new()
         {
-            { EJudgementType.None, 0 },
-            { EJudgementType.Perfect, 0 },
-            { EJudgementType.Great, 0 },
-            { EJudgementType.Good, 0 },
-            { EJudgementType.Bad, 0 },
-            { EJudgementType.Miss, 0 },
+            { JudgementType.None, 0 },
+            { JudgementType.Perfect, 0 },
+            { JudgementType.Great, 0 },
+            { JudgementType.Good, 0 },
+            { JudgementType.Bad, 0 },
+            { JudgementType.Miss, 0 },
         };
 
-        public Dictionary<EJudgementType, int> JudgeCountDict => judgeCountDict;
+        public Dictionary<JudgementType, int> JudgeCountDict => judgeCountDict;
         public int CurrentScore => (int)scoreController.CurrentScore.CurrentValue;
         public int CurrentCombo => comboController.CurrentCombo.CurrentValue;
         public float CurrentHpPercent => hpBarController.CurrentHpPercent.CurrentValue;
@@ -49,11 +49,11 @@ namespace Song
             }
             else
             {
-                if (fingerInfo.NoteData.NoteType == ENoteType.Flick && fingerInfo.FingerType == EFingerType.Down) return;
+                if (fingerInfo.NoteData.NoteType == NoteType.Flick && fingerInfo.FingerType == FingerType.Down) return;
                 comboController.UpdateCombo(fingerInfo.JudgmentType);
                 judgeCountDict[fingerInfo.JudgmentType] += 1;
                 scoreController.AddScore(fingerInfo.JudgmentType);
-                if (fingerInfo.NoteData.NoteType == ENoteType.Long && fingerInfo.FingerType == EFingerType.Down) return;
+                if (fingerInfo.NoteData.NoteType == NoteType.Long && fingerInfo.FingerType == FingerType.Down) return;
                 notesManager.RemoveNote(fingerInfo.NoteBase);
             }
             if (!notesManager.SongOption.IsAuto) hpBarController.UpdateHp(fingerInfo.JudgmentType, notesManager.LoadedChartInfo!.NoteCount);

@@ -7,8 +7,8 @@ namespace Intense
         private const int BgmCategory = 0;
         private const int SeCategory = 3;
 
-        public SoundSheetNameMaster FindBgm(EBgmType type) => FindByCategoryAndId(BgmCategory, (int)type);
+        public SoundSheetNameMaster FindBgm(BgmType type) => FindByCategoryAndId(BgmCategory, (int)type);
 
-        public SoundSheetNameMaster FindSe(ESeType type) => FindByCategoryAndId(SeCategory, (int)type);
+        public SoundSheetNameMaster FindSe(SeType type) => FindByCategoryAndId(SeCategory, (int)type);
     }
 }

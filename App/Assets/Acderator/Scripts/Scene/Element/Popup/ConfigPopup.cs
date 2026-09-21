@@ -77,11 +77,5 @@ namespace Element.UI
                     break;
             }
         }
-
-        protected override void FinishClosePopupScale()
-        {
-            base.FinishClosePopupScale();
-            Destroy(gameObject);
-        }
     }
 }

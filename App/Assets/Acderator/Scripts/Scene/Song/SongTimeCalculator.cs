@@ -21,13 +21,13 @@ namespace Song
             isLeadInStarted = true;
         }
 
-        public float GetSec(float requestedSec, ESongState currentState)
+        public float GetSec(float requestedSec, SongState currentState)
         {
             lastSec = currentState switch
             {
-                ESongState.Ready when isLeadInStarted => Time.realtimeSinceStartup - leadInStartRealtime - leadInSec,
-                ESongState.Playing => requestedSec > 0 ? requestedSec : 0f,
-                ESongState.None => NotStartedSec,
+                SongState.Ready when isLeadInStarted => Time.realtimeSinceStartup - leadInStartRealtime - leadInSec,
+                SongState.Playing => requestedSec > 0 ? requestedSec : 0f,
+                SongState.None => NotStartedSec,
                 _ => lastSec,
             };
             return lastSec;

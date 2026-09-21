@@ -1,27 +1,13 @@
 #nullable enable
 
-using Intense;
 using UnityEngine;
 
 namespace Song
 {
-    public class LongNote : NoteBase
+    public class LongNote : HoldNoteBase
     {
         [SerializeField] private SpriteRenderer beginSprite = default!;
-        [SerializeField] private SpriteRenderer trailSprite = default!;
         [SerializeField] private SpriteRenderer endSprite = default!;
-        [SerializeField] private Color32 defaultTrailColor; //
-        [SerializeField] private Color32 tappingTrailColor;
-
-        private Color initialTrailColor;
-
-        private void Awake() => initialTrailColor = trailSprite.color;
-
-        public override void Init(NoteData data)
-        {
-            base.Init(data);
-            trailSprite.color = initialTrailColor;
-        }
 
         public override void UpdatePosition(NotePositionUpdateContext context)
         {
@@ -31,19 +17,6 @@ namespace Song
             endSprite.transform.localPosition = new(0, length, 0);
             trailSprite.transform.localPosition = new(0, length / 2f, 0);
             trailSprite.transform.localScale = new(trailSprite.transform.localScale.x, length, 1f);
-        }
-
-        public override void OnJudgedNote(EFingerType fingerType, EJudgementType judgmentType)
-        {
-            switch (fingerType)
-            {
-                case EFingerType.Down when judgmentType != EJudgementType.None:
-                    IsTapping = true;
-                    trailSprite.color = tappingTrailColor;
-                    break;
-                default:
-                    break;
-            }
         }
     }
 }

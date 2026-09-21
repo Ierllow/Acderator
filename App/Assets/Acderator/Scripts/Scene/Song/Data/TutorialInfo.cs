@@ -7,13 +7,13 @@ namespace Song
 {
     public class TutorialInfo
     {
-        public TutorialMaster MTutorial { get; }
-        public List<TutorialStepMaster> MTutorialStepList { get; }
+        public TutorialMaster Tutorial { get; }
+        public List<TutorialStepMaster> TutorialSteps { get; }
 
-        public TutorialInfo(TutorialMaster mTutorial, List<TutorialStepMaster> mTutorialStepList)
+        public TutorialInfo(TutorialMaster tutorial, List<TutorialStepMaster> tutorialSteps)
         {
-            MTutorial = mTutorial;
-            MTutorialStepList = mTutorialStepList;
+            Tutorial = tutorial;
+            TutorialSteps = tutorialSteps;
         }
     }
 }

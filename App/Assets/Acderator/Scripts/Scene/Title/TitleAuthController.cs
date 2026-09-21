@@ -39,7 +39,7 @@ namespace Title
                 networkManager.Token = (authResponse as LoginResponse)?.Token;
             }
 
-            await addressableAssetManager.LoadAssetsAsync(ESceneType.Title, token).AddWatcherTo(failFastExceptionWatcher);
+            await addressableAssetManager.LoadAssetsAsync(SceneType.Title, token).AddWatcherTo(failFastExceptionWatcher);
             var userDataResponse = await networkManager.RequestAsync(new UserDataRequest()).AddWatcherTo(failFastExceptionWatcher);
             if (!(userDataResponse?.IsSuccess ?? false)) return await OpenNetworkErrorPopup(userDataResponse);
             scoreManager.SetScoreData(userDataResponse.ScorePairs);
@@ -63,10 +63,10 @@ namespace Title
 
         private async UniTask<bool> OpenNetworkErrorPopup(ResponseBase response)
         {
-            var completionSource = AutoResetUniTaskCompletionSource<ECommonPopupTapKind>.Create();
+            var completionSource = AutoResetUniTaskCompletionSource<CommonPopupTapKind>.Create();
             var context = PopupContextFactory.CreateNetworkErrorPopupContext(completionSource, response?.ErrorMessage ?? "通信に失敗しました。", response?.ErrorCode ?? 0);
             popupManager.OpenPopup(context);
-            return await completionSource.Task == ECommonPopupTapKind.Negative;
+            return await completionSource.Task == CommonPopupTapKind.Negative;
         }
     }
 }

@@ -23,8 +23,8 @@ namespace Song
 
         public void PlaySong(int id) => UniTask.Void(async () =>
         {
-            var mSoundCueName = soundSheetNameResolver.Song;
-            var sheet = await cueSheetLoader.GetOrAddCueSheetAsync(mSoundCueName.SheetName, DynamicAssetAddresses.Song(id));
+            var soundCue = soundSheetNameResolver.Song;
+            var sheet = await cueSheetLoader.GetOrAddCueSheetAsync(soundCue.SheetName, DynamicAssetAddresses.Song(id));
             songVolumeController.Register(songExPlayer);
             var playback = songExPlayer.Play(sheet, id.ToString());
             playbackClock.Start(playback);
@@ -32,7 +32,7 @@ namespace Song
 
         public void PauseSong(bool isPause) => songExPlayer.Pause(isPause);
 
-        public void PlaySe(ESeType type) => soundManager.PlaySe(type);
+        public void PlaySe(SeType type) => soundManager.PlaySe(type);
 
         public void StopSong()
         {

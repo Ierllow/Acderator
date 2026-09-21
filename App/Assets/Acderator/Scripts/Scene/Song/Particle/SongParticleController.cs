@@ -47,9 +47,9 @@ namespace Song
             else UpdateParticles((fingerInfo.FingerType, fingerInfo.NoteData.NoteType, fingerInfo.JudgmentType, fingerInfo.NoteData.Lane, fingerInfo.TappingLanes ?? Array.Empty<int>()));
         }
 
-        private void UpdateParticles((EFingerType, ENoteType, EJudgementType, int, IReadOnlyList<int>) particleInfo)
+        private void UpdateParticles((FingerType, NoteType, JudgementType, int, IReadOnlyList<int>) particleInfo)
         {
-            if (particleInfo.Item3 == EJudgementType.None) return;
+            if (particleInfo.Item3 == JudgementType.None) return;
 
             var particlePosition = particleInfo.Item4 switch
             {
@@ -69,9 +69,9 @@ namespace Song
             };
 
             SpawnJudgeEffect(particlePosition, judgeParticlePosition, particleInfo.Item3).Forget();
-            if (particleInfo.Item2 == ENoteType.Long || particleInfo.Item2 == ENoteType.Curve)
+            if (particleInfo.Item2 == NoteType.Long || particleInfo.Item2 == NoteType.Curve)
             {
-                if (particleInfo.Item1 != EFingerType.Up)
+                if (particleInfo.Item1 != FingerType.Up)
                     PlayHoldEffect(particleInfo, particlePosition, judgeParticlePosition).Forget();
                 else
                     StopHoldEffect(particleInfo.Item4);
@@ -80,7 +80,7 @@ namespace Song
             SpawnTapEffect(particlePosition).Forget();
         }
 
-        private async UniTask SpawnJudgeEffect(float parentX, float childX, EJudgementType judgementType)
+        private async UniTask SpawnJudgeEffect(float parentX, float childX, JudgementType judgementType)
         {
             if (judgeParticlePool == null) return;
 
@@ -105,11 +105,11 @@ namespace Song
             tapParticlePool.Release(tapParticle);
         }
 
-        private async UniTask PlayHoldEffect((EFingerType fingerType, ENoteType noteType, EJudgementType judgeType, int lane, IReadOnlyList<int> tappingLanes) particleInfo, float parentX, float childX)
+        private async UniTask PlayHoldEffect((FingerType fingerType, NoteType noteType, JudgementType judgeType, int lane, IReadOnlyList<int> tappingLanes) particleInfo, float parentX, float childX)
         {
             if (!playingHoldParticleDict.ContainsKey(particleInfo.lane)
-                && particleInfo.fingerType == EFingerType.Down
-                && particleInfo.judgeType != EJudgementType.Miss)
+                && particleInfo.fingerType == FingerType.Down
+                && particleInfo.judgeType != JudgementType.Miss)
             {
                 if (holdParticlePool == null) return;
 

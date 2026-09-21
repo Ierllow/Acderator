@@ -17,7 +17,7 @@ namespace Song
         public ReadOnlyReactiveProperty<float> CurrentScore => currentScore;
 
         private readonly Queue<int> scoreQueue = new();
-        private readonly Dictionary<EJudgementType, float> rateCacheDict = new();
+        private readonly Dictionary<JudgementType, float> rateCacheDict = new();
 
         private int noteCount = 0;
         private int maxScore = 0;
@@ -29,7 +29,7 @@ namespace Song
 
             foreach (var row in masterDataManager.MemoryDatabase.SongScoreRateMasterTable.All)
             {
-                rateCacheDict[(EJudgementType)row.Type] = row.Rate;
+                rateCacheDict[(JudgementType)row.Type] = row.Rate;
             }
 
             var perNoteScore = maxScore / noteCount;
@@ -41,13 +41,13 @@ namespace Song
             }
         }
 
-        public void AddScore(EJudgementType judgmentType)
+        public void AddScore(JudgementType judgmentType)
         {
             switch (judgmentType)
             {
-                case EJudgementType.None:
-                case EJudgementType.Miss:
-                case EJudgementType.Bad:
+                case JudgementType.None:
+                case JudgementType.Miss:
+                case JudgementType.Bad:
                     return;
             }
 

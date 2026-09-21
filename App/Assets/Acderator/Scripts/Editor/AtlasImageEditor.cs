@@ -26,8 +26,8 @@ public class AtlasImageEditor : ImageEditor
 
     protected override void OnEnable()
     {
-        atlas = serializedObject.FindProperty("m_Atlas");
-        spriteName = serializedObject.FindProperty("m_SpriteName");
+        atlas = serializedObject.FindProperty("atlas");
+        spriteName = serializedObject.FindProperty("spriteName");
         sprite = serializedObject.FindProperty("m_Sprite");
         imageType = serializedObject.FindProperty("m_Type");
 

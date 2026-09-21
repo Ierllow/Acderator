@@ -11,7 +11,6 @@ namespace Song
 {
     public class SongLayerController : MonoBehaviour
     {
-        [SerializeField] private ComboView comboView = default!;
         [SerializeField] private SongPlayingFieldView songPlayingFieldView = default!;
         [SerializeField] private HpBar hpBar = default!;
 
@@ -22,7 +21,7 @@ namespace Song
         public Observable<Unit> OnTapPauseButtonAsObservable => songPlayingFieldView.PauseButton.OnTapButtonAsObservable;
 
         public int CurrentScore => songGameLogic.CurrentScore;
-        public Dictionary<EJudgementType, int> JudgeCountDict => songGameLogic.JudgeCountDict;
+        public Dictionary<JudgementType, int> JudgeCountDict => songGameLogic.JudgeCountDict;
 
         public void Show(bool isAuto)
         {
@@ -36,12 +35,12 @@ namespace Song
 
         public void UpdateSongLayer(FingerInfo fingerInfo) => songGameLogic.UpdateGameLogic(fingerInfo);
 
-        public ESongResultType GetSongResult(int noteCount) => true switch
+        public SongResultType GetSongResult(int noteCount) => true switch
         {
-            _ when (int)(songGameLogic.CurrentHpPercent * HpBarController.MAX_HP_PERCENT) < MinClearHpPercent => ESongResultType.Failed,
-            _ when noteCount == songGameLogic.JudgeCountDict.GetValueOrDefault(EJudgementType.Perfect) => ESongResultType.Excellent,
-            _ when noteCount == songGameLogic.CurrentCombo => ESongResultType.FullCombo,
-            _ => ESongResultType.Clear,
+            _ when (int)(songGameLogic.CurrentHpPercent * HpBarController.MaxHpPercent) < MinClearHpPercent => SongResultType.Failed,
+            _ when noteCount == songGameLogic.JudgeCountDict.GetValueOrDefault(JudgementType.Perfect) => SongResultType.Excellent,
+            _ when noteCount == songGameLogic.CurrentCombo => SongResultType.FullCombo,
+            _ => SongResultType.Clear,
         };
 
         public void SetPauseButtonGrayOut(bool value) => songPlayingFieldView.PauseButton.SetGrayOut(value);

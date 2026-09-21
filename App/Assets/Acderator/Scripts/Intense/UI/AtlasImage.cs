@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.U2D;
 using UnityEngine.UI;
 
@@ -7,20 +8,20 @@ namespace Intense.UI
 {
     public class AtlasImage : Image
     {
-        [SerializeField] protected SpriteAtlas m_Atlas;
-        [SerializeField] protected string m_SpriteName;
+        [FormerlySerializedAs("m_Atlas"), SerializeField] protected SpriteAtlas atlas;
+        [FormerlySerializedAs("m_SpriteName"), SerializeField] protected string spriteName;
 
         protected override void Awake()
         {
             base.Awake();
-            if (m_Atlas == null || string.IsNullOrEmpty(m_SpriteName)) return;
-            SetAtlas(m_SpriteName);
+            if (atlas == null || string.IsNullOrEmpty(spriteName)) return;
+            SetAtlas(spriteName);
         }
 
         public virtual void SetAtlas(string spriteName)
         {
-            m_SpriteName = spriteName;
-            if (m_Atlas != null) SetSprite(m_Atlas.GetSprite(spriteName));
+            this.spriteName = spriteName;
+            if (atlas != null) SetSprite(atlas.GetSprite(spriteName));
         }
 
         public void SetSprite(Sprite value) => sprite = value;
@@ -28,9 +29,9 @@ namespace Intense.UI
         public void ResolveSprite(Func<string, Sprite> spriteResolver)
         {
             if (spriteResolver == null) return;
-            if (string.IsNullOrEmpty(m_SpriteName)) return;
+            if (string.IsNullOrEmpty(spriteName)) return;
 
-            var resolvedSprite = spriteResolver(m_SpriteName);
+            var resolvedSprite = spriteResolver(spriteName);
             if (resolvedSprite != null) SetSprite(resolvedSprite);
         }
     }

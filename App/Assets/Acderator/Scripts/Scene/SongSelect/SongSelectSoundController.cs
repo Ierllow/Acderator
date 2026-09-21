@@ -25,8 +25,8 @@ namespace SongSelect
 
             songPreviewCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(token);
             var previewToken = songPreviewCancellationTokenSource.Token;
-            var mSoundCueName = soundSheetNameResolver.Song;
-            var sheet = await cueSheetLoader.GetOrAddCueSheetAsync(mSoundCueName.SheetName, DynamicAssetAddresses.Song(group));
+            var soundCue = soundSheetNameResolver.Song;
+            var sheet = await cueSheetLoader.GetOrAddCueSheetAsync(soundCue.SheetName, DynamicAssetAddresses.Song(group));
             var songSelectMaster = masterDataManager.MemoryDatabase.SongSelectMasterTable.FindByGroup(group);
             if (previewToken.IsCancellationRequested) return;
 

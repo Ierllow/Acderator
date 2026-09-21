@@ -6,27 +6,27 @@ using UnityEngine;
 
 namespace Song
 {
-    public enum ETutorialEventType { ShowIntro, ShowStep, ShowComplete }
+    public enum TutorialEventType { ShowIntro, ShowStep, ShowComplete }
 
     public class TutorialEvent
     {
-        public readonly ETutorialEventType Type;
+        public readonly TutorialEventType Type;
         public readonly object? Data;
 
-        TutorialEvent(ETutorialEventType type, object? data = null)
+        TutorialEvent(TutorialEventType type, object? data = null)
         {
             Type = type;
             Data = data;
         }
 
-        public static TutorialEvent ShowIntro(TutorialMaster tutorial) => new(ETutorialEventType.ShowIntro, tutorial);
-        public static TutorialEvent ShowStep(TutorialStepMaster step) => new(ETutorialEventType.ShowStep, step);
-        public static TutorialEvent ShowComplete() => new(ETutorialEventType.ShowComplete);
+        public static TutorialEvent ShowIntro(TutorialMaster tutorial) => new(TutorialEventType.ShowIntro, tutorial);
+        public static TutorialEvent ShowStep(TutorialStepMaster step) => new(TutorialEventType.ShowStep, step);
+        public static TutorialEvent ShowComplete() => new(TutorialEventType.ShowComplete);
     }
 
     public class SongTutorialStateManager
     {
-        private ETutorialState cachedTutorialState = ETutorialState.Intro;
+        private TutorialState cachedTutorialState = TutorialState.Intro;
         private float tutorialElapsedTime;
         private bool isRunning;
 
@@ -39,7 +39,7 @@ namespace Song
 
         public SongTutorialStateManager(TutorialData tutorialData) => this.tutorialData = tutorialData;
 
-        public void UpdateState(ETutorialState currentState) => cachedTutorialState = currentState;
+        public void UpdateState(TutorialState currentState) => cachedTutorialState = currentState;
 
         public void ChangeState(bool isPlaying) => isRunning = isPlaying;
 
@@ -51,10 +51,10 @@ namespace Song
 
             switch (cachedTutorialState)
             {
-                case ETutorialState.Intro:
-                    UpdateState(ETutorialState.Step);
+                case TutorialState.Intro:
+                    UpdateState(TutorialState.Step);
                     break;
-                case ETutorialState.Step:
+                case TutorialState.Step:
                     TickStep();
                     break;
                 default:
@@ -67,11 +67,11 @@ namespace Song
             tutorialData.CompleteCurrentStep();
             if (tutorialData.IsCompleted)
             {
-                UpdateState(ETutorialState.Complete);
+                UpdateState(TutorialState.Complete);
                 ShowComplete();
                 return;
             }
-            UpdateState(ETutorialState.Step);
+            UpdateState(TutorialState.Step);
         }
 
         private void TickStep()
@@ -79,7 +79,7 @@ namespace Song
             var currentStep = tutorialData.GetCurrentStep();
             if (currentStep == default)
             {
-                UpdateState(ETutorialState.Complete);
+                UpdateState(TutorialState.Complete);
                 ShowComplete();
                 return;
             }
@@ -87,7 +87,7 @@ namespace Song
             if (tutorialElapsedTime < currentStep.TriggerTime) return;
 
             ShowCurrentStep(currentStep);
-            UpdateState(ETutorialState.None);
+            UpdateState(TutorialState.None);
         }
 
         public void ShowIntro() => tutorialEventSubject.OnNext(TutorialEvent.ShowIntro(tutorialData.TutorialMaster));

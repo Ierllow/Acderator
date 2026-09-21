@@ -12,7 +12,7 @@ using Zenject;
 
 namespace Result
 {
-    [SceneType(ESceneType.Result)]
+    [SceneType(SceneType.Result)]
     public class ResultScene : SceneBase
     {
         [SerializeField] private AtlasImage backgroundImage;
@@ -31,7 +31,7 @@ namespace Result
         private void Start()
         {
             retryButton.OnTapButtonAsObservable.SubscribeLockAwait(async (_, __) => await TapRetryButton()).RegisterTo(destroyCancellationToken);
-            quitButton.OnTapButtonAsObservable.SubscribeLockAwait(async (_, ___) => await sceneManager.ChangeSceneAsync(ESceneType.SongSelect, new SongSelect.SongSelectSceneContext())).RegisterTo(destroyCancellationToken);
+            quitButton.OnTapButtonAsObservable.SubscribeLockAwait(async (_, ___) => await sceneManager.ChangeSceneAsync(SceneType.SongSelect, new SongSelect.SongSelectSceneContext())).RegisterTo(destroyCancellationToken);
         }
 
         public override void OnCreateScene() => UniTask.Void(async () =>
@@ -50,7 +50,7 @@ namespace Result
             retryButton.gameObject.SetActive(!sceneContext.ResultInfo.IsAuto);
 
             await sceneManager.FadeInAsync();
-            soundManager.PlayBgm(ScoreUtils.IsClear(sceneContext.ResultInfo.CurrentScore) ? EBgmType.GameResult : EBgmType.GameResultFailed);
+            soundManager.PlayBgm(ScoreUtils.IsClear(sceneContext.ResultInfo.CurrentScore) ? BgmType.GameResult : BgmType.GameResultFailed);
         });
 
         private async UniTask TapRetryButton()
@@ -58,7 +58,7 @@ namespace Result
             var request = new ScoreBeginRequest { ScoreId = sceneContext.ResultInfo.Sid };
             var response = await networkManager.RequestAsync(request);
             if (!(response?.IsSuccess ?? false)) return;
-            await sceneManager.ChangeSceneAsync(ESceneType.Song, Song.SongSceneContext.Create(new(masterDataManager.MemoryDatabase.SongMasterTable.FindBySid(sceneContext.ResultInfo.Sid)), sceneContext.ResultInfo.IsAuto, Song.ESongMode.Normal, response.SessionId));
+            await sceneManager.ChangeSceneAsync(SceneType.Song, Song.SongSceneContext.Create(new(masterDataManager.MemoryDatabase.SongMasterTable.FindBySid(sceneContext.ResultInfo.Sid)), sceneContext.ResultInfo.IsAuto, Song.SongMode.Normal, response.SessionId));
         }
     }
 }
