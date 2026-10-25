@@ -104,10 +104,17 @@ docker build -f Server/Dockerfile -t acderator-server .
 ## Credits
 
 - [Ched](https://github.com/paralleltree/Ched)
+- [Dapper](https://github.com/DapperLib/Dapper)
+- [gRPC for .NET](https://github.com/grpc/grpc-dotnet)
+- [Isopoh.Cryptography.Argon2](https://github.com/mheyman/Isopoh.Cryptography.Argon2)
+- [MagicOnion](https://github.com/Cysharp/MagicOnion)
 - [MasterMemory](https://github.com/Cysharp/MasterMemory)
+- [MessagePack for C#](https://github.com/MessagePack-CSharp/MessagePack-CSharp)
+- [MySqlConnector](https://github.com/mysql-net/MySqlConnector)
 - [R3](https://github.com/Cysharp/R3)
 - [UIEffect](https://github.com/mob-sakai/UIEffect)
 - [UniTask](https://github.com/Cysharp/UniTask)
+- [YetAnotherHttpHandler](https://github.com/Cysharp/YetAnotherHttpHandler)
 - [Zenject](https://github.com/modesttree/Zenject)
 
 ## License
