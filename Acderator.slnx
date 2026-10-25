@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="Server/Acderator.Server.csproj" />
+  <Project Path="Shared/Acderator.Shared.csproj" />
+</Solution>

@@ -1,0 +1,6 @@
+{
+  "name": "com.ierllow.acderator.shared",
+  "version": "1.0.0",
+  "displayName": "Acderator Shared",
+  "description": "MagicOnion service contracts shared by Acderator Client and Server"
+}

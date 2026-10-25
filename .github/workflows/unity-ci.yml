@@ -31,7 +31,10 @@ jobs:
 
       - name: Check C# whitespace
         run: dotnet format whitespace --folder --verify-no-changes --include Assets/Acderator
-        working-directory: App
+        working-directory: Client
+
+      - name: Build MagicOnion server
+        run: dotnet build Acderator.slnx --configuration Release
 
       - name: Check C# files have no final newline
         run: |
@@ -46,7 +49,7 @@ jobs:
             fi
           done < <(git ls-files 'Assets/Acderator' 'Program.cs' | grep '\.cs$')
           exit "$failed"
-        working-directory: App
+        working-directory: Client
 
   unity-tests:
     name: Unity Tests
@@ -73,8 +76,8 @@ jobs:
       - name: Cache Library
         uses: actions/cache@v4
         with:
-          path: App/Library
-          key: Library-${{ runner.os }}-${{ hashFiles('App/Packages/manifest.json', 'App/Packages/packages-lock.json', 'App/ProjectSettings/ProjectVersion.txt') }}
+          path: Client/Library
+          key: Library-${{ runner.os }}-${{ hashFiles('Client/Packages/manifest.json', 'Client/Packages/packages-lock.json', 'Client/ProjectSettings/ProjectVersion.txt') }}
           restore-keys: |
             Library-${{ runner.os }}-
 
@@ -85,7 +88,7 @@ jobs:
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
-          projectPath: App
+          projectPath: Client
           githubToken: ${{ secrets.GITHUB_TOKEN }}
           checkName: Unity Test Results
 
@@ -102,9 +105,9 @@ jobs:
           if [ -z "$base_sha" ] || echo "$base_sha" | grep -q '^0*$'; then
             base_sha="HEAD~1"
           fi
-          mapfile -t files < <(git -C .. diff --name-only --diff-filter=ACM "$base_sha" HEAD -- 'App/Assets/Acderator/**/*.cs' 'App/Assets/Acderator/*.cs' | grep -v '^App/Assets/Acderator/Scripts/Intense/Master/' | sed 's#^App/##')
+          mapfile -t files < <(git -C .. diff --name-only --diff-filter=ACM "$base_sha" HEAD -- 'Client/Assets/Acderator/**/*.cs' 'Client/Assets/Acderator/*.cs' | grep -v '^Client/Assets/Acderator/Scripts/Intense/Master/' | sed 's#^Client/##')
           dotnet run --project CodingRuleChecker.csproj -- "${files[@]}"
-        working-directory: App
+        working-directory: Client
 
       - name: Upload test results
         uses: actions/upload-artifact@v4
@@ -142,8 +145,8 @@ jobs:
       - name: Cache Library
         uses: actions/cache@v4
         with:
-          path: App/Library
-          key: Library-${{ runner.os }}-Android-${{ hashFiles('App/Packages/manifest.json', 'App/Packages/packages-lock.json', 'App/ProjectSettings/ProjectVersion.txt') }}
+          path: Client/Library
+          key: Library-${{ runner.os }}-Android-${{ hashFiles('Client/Packages/manifest.json', 'Client/Packages/packages-lock.json', 'Client/ProjectSettings/ProjectVersion.txt') }}
           restore-keys: |
             Library-${{ runner.os }}-Android-
             Library-${{ runner.os }}-
@@ -155,7 +158,7 @@ jobs:
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
-          projectPath: App
+          projectPath: Client
           targetPlatform: Android
 
       - name: Upload build
