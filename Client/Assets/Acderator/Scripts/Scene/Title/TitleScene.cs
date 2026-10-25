@@ -62,7 +62,7 @@ namespace Title
 
             var request = new ScoreBeginRequest { ScoreId = scoreId };
             var response = await titleAuthController.NetworkManager.RequestAsync(request);
-            if ((response?.IsSuccess ?? false) && tutorialSceneContextBuilder.TryBuildFirstTutorial(response.SessionId, out var tutorialContext))
+            if (response?.IsSuccess == true && tutorialSceneContextBuilder.TryBuildFirstTutorial(response.SessionId, out var tutorialContext))
             {
                 await sceneManager.ChangeSceneAsync(SceneType.Song, tutorialContext);
                 return;

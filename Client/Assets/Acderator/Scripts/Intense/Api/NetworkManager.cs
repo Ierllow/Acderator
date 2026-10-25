@@ -4,6 +4,7 @@ using Cysharp.Threading.Tasks;
 using Grpc.Core;
 using Grpc.Net.Client;
 using Intense.UI;
+using MagicOnion;
 using MagicOnion.Client;
 using System;
 using UnityEngine;
@@ -45,27 +46,22 @@ namespace Intense.Api
 
         private void OnDestroy() => channel?.Dispose();
 
-        public async UniTask<ResponseBase> RequestAsync(IApiRequest request) => request switch
+        public async UniTask<TResponse> RequestAsync<TResponse>(IApiRequest<TResponse> request) where TResponse : ResponseBase
         {
-            LoginRequest value => await RequestAsync(value),
-            RegisterRequest value => await RequestAsync(value),
-            LogoutRequest value => await RequestAsync(value),
-            UserDataRequest value => await RequestAsync(value),
-            ScoreBeginRequest value => await RequestAsync(value),
-            ScoreSubmitRequest value => await RequestAsync(value),
-            ChartRequest value => await RequestAsync(value),
-            _ => throw new ArgumentOutOfRangeException(nameof(request)),
-        };
+            return (TResponse)(ResponseBase)(request switch
+            {
+                LoginRequest value => await SendAsync(() => authService.WithHeaders(CreateHeaders()).LoginAsync(value)),
+                RegisterRequest value => await SendAsync(() => authService.WithHeaders(CreateHeaders()).RegisterAsync(value)),
+                LogoutRequest value => await SendAsync(() => authService.WithHeaders(CreateHeaders()).LogoutAsync(value)),
+                UserDataRequest value => await SendAsync(() => userService.WithHeaders(CreateHeaders()).GetDataAsync(value)),
+                ScoreBeginRequest value => await SendAsync(() => scoreService.WithHeaders(CreateHeaders()).BeginAsync(value)),
+                ScoreSubmitRequest value => await SendAsync(() => scoreService.WithHeaders(CreateHeaders()).SubmitAsync(value)),
+                ChartRequest value => await SendAsync(() => chartService.WithHeaders(CreateHeaders()).GetAsync(value)),
+                _ => throw new ArgumentOutOfRangeException(nameof(request)),
+            });
+        }
 
-        public UniTask<LoginResponse> RequestAsync(LoginRequest request) => SendAsync(async () => await authService.WithHeaders(CreateHeaders()).LoginAsync(request));
-        public UniTask<RegisterResponse> RequestAsync(RegisterRequest request) => SendAsync(async () => await authService.WithHeaders(CreateHeaders()).RegisterAsync(request));
-        public UniTask<LogoutResponse> RequestAsync(LogoutRequest request) => SendAsync(async () => await authService.WithHeaders(CreateHeaders()).LogoutAsync(request));
-        public UniTask<UserDataResponse> RequestAsync(UserDataRequest request) => SendAsync(async () => await userService.WithHeaders(CreateHeaders()).GetDataAsync(request));
-        public UniTask<ScoreBeginResponse> RequestAsync(ScoreBeginRequest request) => SendAsync(async () => await scoreService.WithHeaders(CreateHeaders()).BeginAsync(request));
-        public UniTask<ScoreSubmitResponse> RequestAsync(ScoreSubmitRequest request) => SendAsync(async () => await scoreService.WithHeaders(CreateHeaders()).SubmitAsync(request));
-        public UniTask<ChartResponse> RequestAsync(ChartRequest request) => SendAsync(async () => await chartService.WithHeaders(CreateHeaders()).GetAsync(request));
-
-        private async UniTask<TResponse> SendAsync<TResponse>(Func<UniTask<TResponse>> request) where TResponse : ResponseBase
+        private async UniTask<TResponse> SendAsync<TResponse>(Func<UnaryResult<TResponse>> request) where TResponse : ResponseBase
         {
             if (Application.internetReachability == NetworkReachability.NotReachable) return default;
 

@@ -1,9 +1,8 @@
 using Acderator.Shared;
-using Song;
 using System.Linq;
 using UnityEngine;
 
-namespace Intense.Api
+namespace Song
 {
     public static class ChartResponseExtensions
     {
@@ -22,13 +21,12 @@ namespace Intense.Api
             {
                 if (note.NoteType == (int)NoteType.Curve)
                 {
-                    var segments = note.Segments.Select(segment => new CurveSegment
+                    loadedChartInfo.AddCurveNoteData(note.BeatBegin, note.BeatEnd, note.Lane, NoteType.Curve, note.Segments.Select(segment => new CurveSegment
                     {
                         Points = segment.Points.Select(point => new Vector2(point.X, point.Y)).ToList(),
                         StartT = segment.StartTime,
                         EndT = segment.EndTime,
-                    }).ToList();
-                    loadedChartInfo.AddCurveNoteData(note.BeatBegin, note.BeatEnd, note.Lane, NoteType.Curve, segments, note.CurveDuration, note.UseMidPoint);
+                    }).ToList(), note.CurveDuration, note.UseMidPoint);
                 }
                 else
                 {

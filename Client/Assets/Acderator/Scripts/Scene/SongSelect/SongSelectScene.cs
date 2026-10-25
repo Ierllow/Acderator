@@ -84,7 +84,7 @@ namespace SongSelect
             var selectedSong = masterDataManager.MemoryDatabase.SongMasterTable.FindBySid(songListView.SelectedCellListSid);
             var request = new ScoreBeginRequest { ScoreId = songListView.SelectedCellListSid };
             var response = await networkManager.RequestAsync(request);
-            if (!(response?.IsSuccess ?? false)) return;
+            if (response?.IsSuccess != true) return;
 
             if (!PlayerPrefsValues.IsTutorialCompleted && !autoButton.IsOn && tutorialSceneContextBuilder.TryBuild(selectedSong, response.SessionId, out var tutorialSceneContext))
             {

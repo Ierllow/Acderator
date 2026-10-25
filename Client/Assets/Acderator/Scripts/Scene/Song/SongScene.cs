@@ -4,7 +4,6 @@ using Acderator.Shared;
 using Cysharp.Threading.Tasks;
 using Cysharp.Threading.Tasks.Linq;
 using Intense;
-using Intense.Api;
 using Intense.Attribute;
 using Intense.UI;
 using R3;
@@ -201,7 +200,7 @@ namespace Song
             {
                 var request = new ScoreSubmitRequest { SessionId = sceneContext.SessionId, Score = songLayerController.CurrentScore };
                 var response = await songManagerResolver.Network.RequestAsync(request);
-                if (response?.IsSuccess ?? false)
+                if (response?.IsSuccess == true)
                 {
                     await ChangeResultScene();
                     return;

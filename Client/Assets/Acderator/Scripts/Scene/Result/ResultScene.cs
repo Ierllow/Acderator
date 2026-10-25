@@ -58,7 +58,7 @@ namespace Result
         {
             var request = new ScoreBeginRequest { ScoreId = sceneContext.ResultInfo.Sid };
             var response = await networkManager.RequestAsync(request);
-            if (!(response?.IsSuccess ?? false)) return;
+            if (response?.IsSuccess != true) return;
             await sceneManager.ChangeSceneAsync(SceneType.Song, Song.SongSceneContext.Create(new(masterDataManager.MemoryDatabase.SongMasterTable.FindBySid(sceneContext.ResultInfo.Sid)), sceneContext.ResultInfo.IsAuto, Song.SongMode.Normal, response.SessionId));
         }
     }

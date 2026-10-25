@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Acderator.Shared
 {
-    public interface IApiRequest { }
+    public interface IApiRequest<TResponse> where TResponse : ResponseBase { }
 
     public enum NetworkError
     {
@@ -71,39 +71,39 @@ namespace Acderator.Shared
     }
 
     [MessagePackObject]
-    public class LoginRequest : IApiRequest
+    public class LoginRequest : IApiRequest<LoginResponse>
     {
         [Key(0)] public string UserId { get; set; } = string.Empty;
         [Key(1)] public string Password { get; set; } = string.Empty;
     }
 
     [MessagePackObject]
-    public class RegisterRequest : IApiRequest
+    public class RegisterRequest : IApiRequest<RegisterResponse>
     {
         [Key(0)] public string Uuid { get; set; } = string.Empty;
     }
 
     [MessagePackObject]
-    public class LogoutRequest : IApiRequest { }
+    public class LogoutRequest : IApiRequest<LogoutResponse> { }
 
     [MessagePackObject]
-    public class UserDataRequest : IApiRequest { }
+    public class UserDataRequest : IApiRequest<UserDataResponse> { }
 
     [MessagePackObject]
-    public class ScoreBeginRequest : IApiRequest
+    public class ScoreBeginRequest : IApiRequest<ScoreBeginResponse>
     {
         [Key(0)] public int ScoreId { get; set; }
     }
 
     [MessagePackObject]
-    public class ScoreSubmitRequest : IApiRequest
+    public class ScoreSubmitRequest : IApiRequest<ScoreSubmitResponse>
     {
         [Key(0)] public string SessionId { get; set; } = string.Empty;
         [Key(1)] public int Score { get; set; }
     }
 
     [MessagePackObject]
-    public class ChartRequest : IApiRequest
+    public class ChartRequest : IApiRequest<ChartResponse>
     {
         [Key(0)] public int Sid { get; set; }
     }

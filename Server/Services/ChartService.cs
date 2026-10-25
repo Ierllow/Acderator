@@ -27,7 +27,6 @@ public sealed class ChartService : AcderatorServiceBase<IChartService>, IChartSe
             PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
         });
         if (response is null) return Failure<ChartResponse>(AppError.InvalidRequestFormat);
-        response.Header = new ResponseHeader();
         return response;
     });
 }

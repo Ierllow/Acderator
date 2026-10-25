@@ -25,9 +25,8 @@ namespace Title
 
         public async UniTask<bool> Execute(CancellationToken token, FailFastExceptionWatcher failFastExceptionWatcher)
         {
-            var request = CreateAuthRequest();
-            var authResponse = await RequestAuth(request, failFastExceptionWatcher);
-            if (!(authResponse?.IsSuccess ?? false)) return await OpenNetworkErrorPopup(authResponse);
+            var authResponse = await RequestAuth(failFastExceptionWatcher);
+            if (authResponse?.IsSuccess != true) return await OpenNetworkErrorPopup(authResponse);
 
             if (authResponse is RegisterResponse registerResponse)
             {
@@ -42,18 +41,18 @@ namespace Title
 
             await addressableAssetManager.LoadAssetsAsync(SceneType.Title, token).AddWatcherTo(failFastExceptionWatcher);
             var userDataResponse = await networkManager.RequestAsync(new UserDataRequest()).AddWatcherTo(failFastExceptionWatcher);
-            if (!(userDataResponse?.IsSuccess ?? false)) return await OpenNetworkErrorPopup(userDataResponse);
+            if (userDataResponse?.IsSuccess != true) return await OpenNetworkErrorPopup(userDataResponse);
             scoreManager.SetScoreData(userDataResponse.ScorePairs);
             return true;
         }
 
-        private IApiRequest CreateAuthRequest()
+        private async UniTask<ResponseBase> RequestAuth(FailFastExceptionWatcher failFastExceptionWatcher)
         {
             var userid = PlayerPrefsValues.UserId;
-            return string.IsNullOrEmpty(userid) ? new RegisterRequest { Uuid = Guid.NewGuid().ToString() } : new LoginRequest { UserId = userid, Password = PlayerPrefsValues.Password };
+            return string.IsNullOrEmpty(userid) ? await RequestAuth(new RegisterRequest { Uuid = Guid.NewGuid().ToString() }, failFastExceptionWatcher) : await RequestAuth(new LoginRequest { UserId = userid, Password = PlayerPrefsValues.Password }, failFastExceptionWatcher);
         }
 
-        private async UniTask<ResponseBase> RequestAuth(IApiRequest request, FailFastExceptionWatcher failFastExceptionWatcher)
+        private async UniTask<TResponse> RequestAuth<TResponse>(IApiRequest<TResponse> request, FailFastExceptionWatcher failFastExceptionWatcher) where TResponse : ResponseBase
         {
             var response = await networkManager.RequestAsync(request).AddWatcherTo(failFastExceptionWatcher);
             if (response?.NetworkError != NetworkError.PreconditionFailed) return response;

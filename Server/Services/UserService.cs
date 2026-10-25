@@ -22,7 +22,6 @@ public sealed class UserService : AcderatorServiceBase<IUserService>, IUserServi
         if (authentication is null) return Failure<UserDataResponse>(AppError.Unauthorized);
         return new UserDataResponse
         {
-            Header = new ResponseHeader(),
             Scores = await repository.GetScoresAsync(authentication.Value.UserId),
         };
     });

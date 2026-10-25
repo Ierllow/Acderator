@@ -25,7 +25,7 @@ public sealed class ScoreService : AcderatorServiceBase<IScoreService>, IScoreSe
         {
             return Failure<ScoreBeginResponse>(AppError.BadRequest);
         }
-        return new ScoreBeginResponse { Header = new ResponseHeader(), SessionId = sessionToken };
+        return new ScoreBeginResponse { SessionId = sessionToken };
     });
 
     public async UnaryResult<ScoreSubmitResponse> SubmitAsync(ScoreSubmitRequest request) => await ExecuteAsync(async () =>
@@ -36,7 +36,7 @@ public sealed class ScoreService : AcderatorServiceBase<IScoreService>, IScoreSe
 
         return await repository.SubmitScoreAsync(authentication.Value.UserId, tokens.Hash(request.SessionId), request.Score) switch
         {
-            SubmitScoreResult.Success => new ScoreSubmitResponse { Header = new ResponseHeader() },
+            SubmitScoreResult.Success => new(),
             SubmitScoreResult.InvalidScore => Failure<ScoreSubmitResponse>(AppError.BadRequest),
             SubmitScoreResult.SessionNotFound => Failure<ScoreSubmitResponse>(AppError.NotFound),
             _ => Failure<ScoreSubmitResponse>(AppError.ServiceFailure),
