@@ -1,0 +1,101 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: Song
+  m_EditorClassIdentifier: Unity.Addressables.Editor::UnityEditor.AddressableAssets.Settings.AddressableAssetGroup
+  m_GroupName: Song
+  m_GUID: f60f49a54c0f16545ba632f2cd0fec18
+  m_SerializeEntries:
+  - m_GUID: 4526205e4f66a204fb2220177e227d43
+    m_Address: charts/1
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - charts/1
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 474502fc774a4bc4fb3637e4e607d1e2
+    m_Address: song/jacket
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - song/jacket
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 563e78f4351b4aa478dfe8300018a64f
+    m_Address: sounds/song/song_1
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - sounds/song/song_1
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 78c2c95c0e1496c4bb1fcd474d9f9a19
+    m_Address: master/master
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - master/master
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7ae69c32298675c4a9fd7c9f057b0626
+    m_Address: song/particle/judgetext
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - song/particle/judgetext
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8eff443bdec064f4ca8ff0634a47cd5b
+    m_Address: sounds/song/songse
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - sounds/song/songse
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 921a479ef4d6fb04ab4a1a997143c20b
+    m_Address: song/difficulty
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - song/difficulty
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a0a75ea3f97e67e4b96b2f12dd3bc075
+    m_Address: song/rank
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - song/rank
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a8f1e72ad0d55434fbfe6011f5361151
+    m_Address: sounds/bgm/bgm
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - sounds/bgm/bgm
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: af3a4d320e4817a48851b316bbc1f054
+    m_Address: song/bg
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - song/bg
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ccee2602023aa94429431317665fc6b9
+    m_Address: charts/3
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - charts/3
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: cde7a598075b24248ac99d5307a30c9e
+    m_Address: songselect/bg
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - songselect/bg
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f20eef1d5f38f6f489b393675a6bed70
+    m_Address: result/bg
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - result/bg
+    FlaggedDuringContentUpdateRestriction: 0
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: a22b3b2b81edf8c42b785fc5810a9a7b, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: 5a9faf82918bea14592e514699f5e688, type: 2}
+    - {fileID: 11400000, guid: e328011fd43297d48ba3aac066ae16aa, type: 2}

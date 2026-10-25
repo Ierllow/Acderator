@@ -8,6 +8,7 @@ Acderator is a rhythm game made with Unity.
 Client/  Unity 6000.3 project
 Server/  ASP.NET Core 8 + MagicOnion server
 Shared/  Acderator.Shared RPC contracts used as a .NET library and Unity local package
+Tools/AddressablesBuilder/  Unity project for building remote Addressables content
 ```
 
 The previous Rust/Axum backend from `AcderatorServer` has been migrated into this repository. The server keeps the existing MySQL schema and MessagePack-based request/response models while exposing them as typed MagicOnion services.
@@ -95,6 +96,10 @@ Build from the repository root so the shared project is included:
 ```bash
 docker build -f Server/Dockerfile -t acderator-server .
 ```
+
+## Addressables content
+
+Open `Tools/AddressablesBuilder` with Unity 6000.3.0f1 to build remote Addressables content. See `Tools/AddressablesBuilder/README.md` for address synchronization, Android and iOS builds, and deployment details.
 
 ## Project Status
 

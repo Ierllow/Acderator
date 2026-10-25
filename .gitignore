@@ -21,6 +21,12 @@ ExportedObj/
 *.sln
 /.artifacts/
 /Shared/.artifacts/
+/Tools/AddressablesBuilder/ServerData/
+/Tools/AddressablesBuilder/Assets/AddressableAssetsData/Android/
+/Tools/AddressablesBuilder/Assets/AddressableAssetsData/iOS/
+/Tools/AddressablesBuilder/UserSettings/
+/Tools/AddressablesBuilder/ProjectSettings/MultiplayerManager.asset
+/Tools/AddressablesBuilder/ProjectSettings/Packages/com.unity.dedicated-server/
 *.suo
 *.tmp
 *.user
