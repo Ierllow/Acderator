@@ -53,7 +53,7 @@ namespace Intense.UI
         public void SetDownloadFileSize(long downloadedFileSize, long allFileSize)
         {
             if (allFileSize <= 0) return;
-            progressBar.SetActive(!progressBar.activeSelf);
+            progressBar.SetActive(true);
 
             var val = (int)Math.Round((double)downloadedFileSize / allFileSize * 100);
             slider.DOValue(val, 0.1f).OnUpdate(() => percent.SetText("{0}%", (int)slider.value));
@@ -69,7 +69,7 @@ namespace Intense.UI
 
         public void HideLoading()
         {
-            sequence.Pause();
+            sequence?.Pause();
             loadingRoot.SetActive(false);
             eventSystem.enabled = true;
         }

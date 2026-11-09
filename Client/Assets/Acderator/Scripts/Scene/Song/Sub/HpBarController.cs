@@ -13,7 +13,7 @@ namespace Song
     {
         [Inject] private readonly MasterDataManager masterDataManager = default!;
 
-        private int currentHpNum;
+        private float currentHp;
         private int baseHp;
         private readonly ReactiveProperty<float> currentHpPercent = new(0f);
 
@@ -21,21 +21,24 @@ namespace Song
 
         public const int MaxHpPercent = 100;
 
-        public void Init(int sid) => baseHp = masterDataManager.MemoryDatabase.SongMasterTable.FindBySid(sid).Hp;
+        public void Init(int sid) => baseHp = masterDataManager.MemoryDatabase.SongMasterTable.FindBySid(sid)?.Hp ?? 0;
 
         public void UpdateHp(JudgementType judgmentType, int noteCount)
         {
-            if (judgmentType == JudgementType.Bad || judgmentType == JudgementType.Miss) return;
-            if (currentHpNum >= baseHp) return;
+            if (noteCount <= 0 || baseHp <= 0) return;
 
-            var rate = masterDataManager.MemoryDatabase.SongHpRateMasterTable.FindByType((int)judgmentType).Rate;
-            currentHpNum += judgmentType switch
+            var hpRateMaster = masterDataManager.MemoryDatabase.SongHpRateMasterTable.FindByType((int)judgmentType);
+            if (hpRateMaster == null) return;
+
+            var delta = hpRateMaster.Rate / (float)noteCount;
+            currentHp += judgmentType switch
             {
-                JudgementType.Perfect or JudgementType.Great or JudgementType.Good => Mathf.FloorToInt(rate / noteCount),
-                _ => -Mathf.FloorToInt(rate / noteCount),
+                JudgementType.Perfect or JudgementType.Great or JudgementType.Good => delta,
+                JudgementType.Bad or JudgementType.Miss => -delta,
+                _ => 0f,
             };
-            currentHpNum = Mathf.Clamp(currentHpNum, 0, baseHp);
-            currentHpPercent.Value = (float)Math.Round((decimal)((double)currentHpNum / baseHp), 4, MidpointRounding.AwayFromZero);
+            currentHp = Mathf.Clamp(currentHp, 0, baseHp);
+            currentHpPercent.Value = (float)Math.Round((decimal)((double)currentHp / baseHp), 4, MidpointRounding.AwayFromZero);
         }
     }
 }

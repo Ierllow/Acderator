@@ -48,6 +48,7 @@ namespace Intense
         {
             var soundCue = soundSheetNameResolver.FindSe(type);
             var sheet = await cueSheetLoader.GetOrAddCueSheetAsync(soundCue.SheetName, addressableAssetManager.Config.SongSe);
+            if (sheet == default) return;
             sePlayer.Play(sheet, soundCue.CueName);
         });
 
@@ -55,6 +56,7 @@ namespace Intense
         {
             var soundCue = soundSheetNameResolver.FindBgm(type);
             var sheet = await cueSheetLoader.GetOrAddCueSheetAsync(soundCue.SheetName, addressableAssetManager.Config.Bgm);
+            if (sheet == default) return;
             bgmPlayer.Play(sheet, soundCue.CueName, isLoop);
         });
     }

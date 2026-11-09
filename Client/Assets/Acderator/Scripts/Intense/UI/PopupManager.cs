@@ -12,12 +12,15 @@ namespace Intense.UI
 
         public TPopup OpenPopup<TPopup>(PopupContext<TPopup> context) where TPopup : PopupBase
         {
-            if (openedPopupDict.TryGetValue(typeof(TPopup), out var openedPopup)) return (TPopup)openedPopup;
+            if (openedPopupDict.TryGetValue(typeof(TPopup), out var openedPopup))
+            {
+                if (openedPopup != null && !openedPopup.IsClosing) return (TPopup)openedPopup;
+                openedPopupDict.Remove(typeof(TPopup));
+            }
 
             var resourcePath = string.Format(PopupResourcePath, typeof(TPopup).Name);
             var popup = UnityEngine.Object.Instantiate(Resources.Load<TPopup>(resourcePath));
             openedPopupDict[typeof(TPopup)] = popup;
-            popup.DestroyedCallback = (popup) => openedPopupDict.Remove(popup.GetType());
             popup.Open(context);
             Debug.Log(string.Format("{0} is open", popup));
             return popup;

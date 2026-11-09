@@ -3,6 +3,7 @@
 using Cysharp.Threading.Tasks;
 using Intense;
 using Intense.Asset;
+using UnityEngine;
 using Zenject;
 
 namespace Song
@@ -24,7 +25,17 @@ namespace Song
         public void PlaySong(int id) => UniTask.Void(async () =>
         {
             var soundCue = soundSheetNameResolver.Song;
+            if (soundCue == null)
+            {
+                Debug.LogWarning("Song sound cue does not exist in master data");
+                return;
+            }
             var sheet = await cueSheetLoader.GetOrAddCueSheetAsync(soundCue.SheetName, DynamicAssetAddresses.Song(id));
+            if (sheet == default)
+            {
+                Debug.LogWarning(string.Format("{0} dose not exist", soundCue.SheetName));
+                return;
+            }
             songVolumeController.Register(songExPlayer);
             var playback = songExPlayer.Play(sheet, id.ToString());
             playbackClock.Start(playback);

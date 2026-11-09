@@ -15,19 +15,22 @@ namespace Intense.UI
         protected Action openCallback;
         protected Action closeCallback;
 
-        public Action<PopupBase> DestroyedCallback { private get; set; }
+        public bool IsClosing { get; private set; }
 
         public virtual void Open(Action callback = null)
         {
             closeCallback = callback;
+            IsClosing = false;
             gameObject.SetActive(true);
         }
 
-        public virtual void Close() => popupAnimation.Play("close_popup");
+        public virtual void Close()
+        {
+            IsClosing = true;
+            popupAnimation.Play("close_popup");
+        }
 
         public virtual void Open(PopupContext context) { }
-
-        protected virtual void OnDestroy() => DestroyedCallback?.Invoke(this);
 
         protected virtual void FinishOpnePopupScale()
         {
