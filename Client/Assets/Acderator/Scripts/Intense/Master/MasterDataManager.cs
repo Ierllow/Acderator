@@ -45,8 +45,29 @@ namespace Intense.Master
             builder.Append(ReadMasters(masterDict, "tutorial_step_masters", TutorialStepMaster.From));
             builder.Append(ReadMasters(masterDict, "tutorial_masters", TutorialMaster.From));
             MemoryDatabase = new(builder.Build());
+            ValidateMaster(MemoryDatabase);
 
             await UniTask.CompletedTask;
+        }
+
+        private void ValidateMaster(MemoryDatabase database)
+        {
+            var problems = new List<string>();
+
+            if (!database.ResultMasterTable.All.Any()) problems.Add("result_masters is empty");
+            if (!database.SongJudgeZoneMasterTable.All.Any(x => x.Type <= (int)JudgementType.Bad)) problems.Add("judge_zone_masters has no zone for Bad or better");
+
+            foreach (var song in database.SongMasterTable.All)
+            {
+                if (song.Score <= 0) problems.Add(string.Format("song_masters sid={0} has no score", song.Sid));
+                if (song.Hp <= 0) problems.Add(string.Format("song_masters sid={0} has no hp", song.Sid));
+            }
+            foreach (var judgementType in new[] { JudgementType.Perfect, JudgementType.Great, JudgementType.Good, JudgementType.Bad, JudgementType.Miss })
+            {
+                if (database.SongHpRateMasterTable.FindByType((int)judgementType) == null) problems.Add(string.Format("hp_rate_masters has no row for {0}", judgementType));
+            }
+
+            if (problems.Count > 0) throw new InvalidOperationException("Invalid master data: " + string.Join(", ", problems));
         }
 
         private List<VersionMaster> SetVersion(Dictionary<string, object> masterDict)

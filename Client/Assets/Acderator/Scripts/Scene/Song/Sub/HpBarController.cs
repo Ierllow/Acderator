@@ -21,16 +21,12 @@ namespace Song
 
         public const int MaxHpPercent = 100;
 
-        public void Init(int sid) => baseHp = masterDataManager.MemoryDatabase.SongMasterTable.FindBySid(sid)?.Hp ?? 0;
+        public void Init(int sid) => baseHp = masterDataManager.MemoryDatabase.SongMasterTable.FindBySid(sid).Hp;
 
         public void UpdateHp(JudgementType judgmentType, int noteCount)
         {
-            if (noteCount <= 0 || baseHp <= 0) return;
-
-            var hpRateMaster = masterDataManager.MemoryDatabase.SongHpRateMasterTable.FindByType((int)judgmentType);
-            if (hpRateMaster == null) return;
-
-            var delta = hpRateMaster.Rate / (float)noteCount;
+            var rate = masterDataManager.MemoryDatabase.SongHpRateMasterTable.FindByType((int)judgmentType).Rate;
+            var delta = rate / (float)noteCount;
             currentHp += judgmentType switch
             {
                 JudgementType.Perfect or JudgementType.Great or JudgementType.Good => delta,

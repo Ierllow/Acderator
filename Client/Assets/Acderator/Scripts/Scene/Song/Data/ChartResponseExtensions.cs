@@ -8,6 +8,9 @@ namespace Song
     {
         public static LoadedChartInfo ToLoadedChartInfo(this ChartResponse response)
         {
+            if (response.Tempo <= 0 || response.Notes == null || response.Notes.Count == 0 || response.SpeedChanges == null) return default;
+            if (response.Notes.Any(note => note.NoteType == (int)NoteType.Curve && note.Segments == null)) return default;
+
             var loadedChartInfo = new LoadedChartInfo
             {
                 HeaderData = new HeaderData
