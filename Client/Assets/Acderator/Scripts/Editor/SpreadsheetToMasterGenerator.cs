@@ -461,8 +461,6 @@ public static class SpreadsheetToMasterGenerator
             throw new InvalidOperationException("Service account private_key must be PKCS#8 PEM ...");
         }
         var bodyStart = headerIndex + header.Length;
-        pem[bodyStart..footerIndex].Replace("\r", string.Empty);
-        pem[bodyStart..footerIndex].Replace("\n", string.Empty);
         var base64 = pem[bodyStart..footerIndex].Replace(" ", string.Empty);
         var der = Convert.FromBase64String(base64);
         var rsa = System.Security.Cryptography.RSA.Create();

@@ -51,12 +51,13 @@ namespace Acderator.ContentBuilder
         private static string AddressForPath(string path)
         {
             var relative = path[(ContentRoot.Length + 1)..];
-            var withoutExtension = relative[..^Path.GetExtension(relative).Length];
+            var extension = Path.GetExtension(relative);
+            var withoutExtension = relative[..^extension.Length];
             var parts = withoutExtension.Split('/');
-            if (Path.GetExtension(relative).Equals(".spriteatlas", StringComparison.OrdinalIgnoreCase) &&
+            if (extension.Equals(".spriteatlas", StringComparison.OrdinalIgnoreCase) &&
                 parts.Length > 1 &&
                 string.Equals(parts[^1], parts[^2], StringComparison.OrdinalIgnoreCase))
-                withoutExtension = string.Join("/", parts.Take(parts.Length - 1));
+                withoutExtension = string.Join("/", parts, 0, parts.Length - 1);
 
             var address = withoutExtension.ToLowerInvariant();
             return address == "sounds/song/song_se" ? "sounds/song/songse" : address;
