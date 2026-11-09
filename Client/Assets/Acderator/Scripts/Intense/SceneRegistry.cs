@@ -1,4 +1,5 @@
 using Intense.Attribute;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -8,6 +9,7 @@ namespace Intense
     internal sealed class SceneRegistry
     {
         private readonly Dictionary<SceneType, SceneBase> sceneBaseDict = new();
+        private readonly Dictionary<Type, SceneType> sceneTypeDict = new();
 
         public SceneType CurrentSceneType { get; private set; }
 
@@ -38,6 +40,13 @@ namespace Intense
 
         public void Create(SceneType sceneType) => sceneBaseDict.GetValueOrDefault(sceneType)?.OnCreateScene();
 
-        private SceneType GetSceneType(SceneBase sceneBase) => sceneBase.GetType().GetCustomAttribute<SceneTypeAttribute>()?.Type ?? SceneType.None;
+        private SceneType GetSceneType(SceneBase sceneBase)
+        {
+            var type = sceneBase.GetType();
+            if (sceneTypeDict.TryGetValue(type, out var sceneType)) return sceneType;
+            sceneType = type.GetCustomAttribute<SceneTypeAttribute>()?.Type ?? SceneType.None;
+            sceneTypeDict[type] = sceneType;
+            return sceneType;
+        }
     }
 }

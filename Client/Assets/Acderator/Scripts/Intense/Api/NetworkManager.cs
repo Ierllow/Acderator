@@ -7,6 +7,7 @@ using Intense.UI;
 using MagicOnion;
 using MagicOnion.Client;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using Zenject;
 
@@ -20,10 +21,7 @@ namespace Intense.Api
         [Inject] private readonly IApiSession apiSession;
 
         private GrpcChannel channel;
-        private IAuthService authService;
-        private IUserService userService;
-        private IScoreService scoreService;
-        private IChartService chartService;
+        private readonly Dictionary<Type, object> serviceDict = new();
 
         public string Token { set => apiSession.Token = value; }
 
@@ -38,25 +36,29 @@ namespace Intense.Api
                 },
                 DisposeHttpClient = true,
             });
-            authService = MagicOnionClient.Create<IAuthService>(channel);
-            userService = MagicOnionClient.Create<IUserService>(channel);
-            scoreService = MagicOnionClient.Create<IScoreService>(channel);
-            chartService = MagicOnionClient.Create<IChartService>(channel);
         }
 
         private void OnDestroy() => channel?.Dispose();
+
+        private TService GetService<TService>() where TService : class, IService<TService>
+        {
+            if (serviceDict.TryGetValue(typeof(TService), out var service)) return (TService)service;
+            var created = MagicOnionClient.Create<TService>(channel);
+            serviceDict[typeof(TService)] = created;
+            return created;
+        }
 
         public async UniTask<TResponse> RequestAsync<TResponse>(IApiRequest<TResponse> request) where TResponse : ResponseBase
         {
             return (TResponse)(ResponseBase)(request switch
             {
-                LoginRequest value => await SendAsync(() => authService.WithHeaders(CreateHeaders()).LoginAsync(value)),
-                RegisterRequest value => await SendAsync(() => authService.WithHeaders(CreateHeaders()).RegisterAsync(value)),
-                LogoutRequest value => await SendAsync(() => authService.WithHeaders(CreateHeaders()).LogoutAsync(value)),
-                UserDataRequest value => await SendAsync(() => userService.WithHeaders(CreateHeaders()).GetDataAsync(value)),
-                ScoreBeginRequest value => await SendAsync(() => scoreService.WithHeaders(CreateHeaders()).BeginAsync(value)),
-                ScoreSubmitRequest value => await SendAsync(() => scoreService.WithHeaders(CreateHeaders()).SubmitAsync(value)),
-                ChartRequest value => await SendAsync(() => chartService.WithHeaders(CreateHeaders()).GetAsync(value)),
+                LoginRequest value => await SendAsync(() => GetService<IAuthService>().WithHeaders(CreateHeaders()).LoginAsync(value)),
+                RegisterRequest value => await SendAsync(() => GetService<IAuthService>().WithHeaders(CreateHeaders()).RegisterAsync(value)),
+                LogoutRequest value => await SendAsync(() => GetService<IAuthService>().WithHeaders(CreateHeaders()).LogoutAsync(value)),
+                UserDataRequest value => await SendAsync(() => GetService<IUserService>().WithHeaders(CreateHeaders()).GetDataAsync(value)),
+                ScoreBeginRequest value => await SendAsync(() => GetService<IScoreService>().WithHeaders(CreateHeaders()).BeginAsync(value)),
+                ScoreSubmitRequest value => await SendAsync(() => GetService<IScoreService>().WithHeaders(CreateHeaders()).SubmitAsync(value)),
+                ChartRequest value => await SendAsync(() => GetService<IChartService>().WithHeaders(CreateHeaders()).GetAsync(value)),
                 _ => throw new ArgumentOutOfRangeException(nameof(request)),
             });
         }

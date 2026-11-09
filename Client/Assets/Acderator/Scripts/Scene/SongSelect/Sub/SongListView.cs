@@ -3,6 +3,7 @@ using EnhancedUI.EnhancedScroller;
 using Intense.Asset;
 using Intense.Internal;
 using Intense.Master;
+using System.Collections.Generic;
 using UnityEngine;
 using Zenject;
 
@@ -23,6 +24,7 @@ namespace SongSelect
 
         public int SelectedGroup => songSelectCellListController.SelectedGroup;
         public int SelectedDifficulty => songSelectCellListController.SelectedDifficulty;
+        public List<int> SongGroupList => songSelectCellListController.SongGroupList;
         public int SelectedCellListSid => songSelectCellListController.SelectedCellListSid;
         public string CurrentOrderText => songSelectSortController.Text;
 

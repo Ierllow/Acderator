@@ -1,7 +1,6 @@
 #nullable enable
 
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace Song
@@ -11,28 +10,41 @@ namespace Song
         public List<NoteData> NoteDataList { get; } = new();
         public HeaderData HeaderData { get; set; } = new();
 
-        public int NoteCount => NoteDataList.Sum(x => x.NoteType == NoteType.Long ? 2 : 1);
+        private int noteCount;
 
-        public void AddNoteData(float beatBegin, float beatEnd, int lane, NoteType noteType = NoteType.Single) => NoteDataList.Add(new()
+        public int NoteCount => noteCount;
+
+        public void AddNoteData(float beatBegin, float beatEnd, int lane, NoteType noteType = NoteType.Single)
         {
-            BeatBegin = beatBegin,
-            BeatEnd = beatEnd,
-            SecBegin = beatBegin / (HeaderData.Tempo / 60f),
-            SecEnd = beatEnd / (HeaderData.Tempo / 60f),
-            Lane = lane,
-            NoteType = noteType,
-        });
-        public void AddCurveNoteData(float beatBegin, float beatEnd, int lane, NoteType noteType, List<CurveSegment> curveSegments, float curveDuration, bool useMidPoint) => NoteDataList.Add(new()
+            var tempo = HeaderData.Tempo / 60f;
+            NoteDataList.Add(new()
+            {
+                BeatBegin = beatBegin,
+                BeatEnd = beatEnd,
+                SecBegin = beatBegin / tempo,
+                SecEnd = beatEnd / tempo,
+                Lane = lane,
+                NoteType = noteType,
+            });
+            noteCount += noteType == NoteType.Long ? 2 : 1;
+        }
+
+        public void AddCurveNoteData(float beatBegin, float beatEnd, int lane, NoteType noteType, List<CurveSegment> curveSegments, float curveDuration, bool useMidPoint)
         {
-            BeatBegin = beatBegin,
-            BeatEnd = beatEnd,
-            SecBegin = beatBegin / (HeaderData.Tempo / 60f),
-            SecEnd = beatEnd / (HeaderData.Tempo / 60f),
-            Lane = lane,
-            NoteType = noteType,
-            CurveSegmentList = curveSegments,
-            CurveDuration = curveDuration,
-            UseMidPoint = useMidPoint,
-        });
+            var tempo = HeaderData.Tempo / 60f;
+            NoteDataList.Add(new()
+            {
+                BeatBegin = beatBegin,
+                BeatEnd = beatEnd,
+                SecBegin = beatBegin / tempo,
+                SecEnd = beatEnd / tempo,
+                Lane = lane,
+                NoteType = noteType,
+                CurveSegmentList = curveSegments,
+                CurveDuration = curveDuration,
+                UseMidPoint = useMidPoint,
+            });
+            noteCount += noteType == NoteType.Long ? 2 : 1;
+        }
     }
 }

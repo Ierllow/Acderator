@@ -2,8 +2,6 @@
 
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace Song
@@ -21,21 +19,14 @@ namespace Song
             await noteLineRoot.transform.DOMoveZ(0f, 1f).WithCancellation(destroyCancellationToken);
         }
 
-        private List<(GameObject, int)>? laneLightTuple;
-        public void SetLaneLightActive(int lane, FingerType fingerType)
-        {
-            laneLightTuple ??= laneLights.Select((ll, index) => (ll, index)).ToList();
-            foreach (var (ll, index) in laneLightTuple)
-            {
-                if (index != lane) continue;
-                var value = fingerType == FingerType.Down;
-                ll.SetActive(value);
-            }
-        }
+        public void SetLaneLightActive(int lane, FingerType fingerType) => laneLights[lane].SetActive(fingerType == FingerType.Down);
 
         public void SetLaneLightActiveAll(bool value = false)
         {
-            foreach (var laneLight in laneLights.Where(x => !value ? x.activeSelf : !x.activeSelf)) laneLight.SetActive(value);
+            foreach (var laneLight in laneLights)
+            {
+                if (laneLight.activeSelf != value) laneLight.SetActive(value);
+            }
         }
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 
@@ -27,7 +28,7 @@ namespace Intense.Asset
             SceneType.SongSelect => songSelectLabels,
             SceneType.Song => songLabels,
             SceneType.Result => resultLabels,
-            _ => new AssetLabelReference[] { },
+            _ => Array.Empty<AssetLabelReference>(),
         };
     }
 }

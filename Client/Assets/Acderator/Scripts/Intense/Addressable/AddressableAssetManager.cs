@@ -150,17 +150,20 @@ namespace Intense.Asset
 
         private async UniTask<AddressableOperationResult> LoadAddressesAsync(IEnumerable<string> addressList, CancellationToken cancellationToken)
         {
-            foreach (var address in addressList)
+            var loadAddressList = addressList.ToList();
+            var loadHandleList = new List<AsyncOperationHandle<Object>>(loadAddressList.Count);
+            foreach (var address in loadAddressList) loadHandleList.Add(Addressables.LoadAssetAsync<Object>(address));
+
+            for (var i = 0; i < loadHandleList.Count; i++)
             {
-                var loadHandle = Addressables.LoadAssetAsync<Object>(address);
-                var result = await WaitForCompletionAsync(loadHandle, cancellationToken);
+                var result = await WaitForCompletionAsync(loadHandleList[i], cancellationToken);
                 if (result != AddressableOperationResult.Success)
                 {
-                    ReleaseIfValid(loadHandle);
+                    for (var j = i; j < loadHandleList.Count; j++) ReleaseIfValid(loadHandleList[j]);
                     return result;
                 }
 
-                addressableAssetCache.CacheAsset(address, loadHandle);
+                addressableAssetCache.CacheAsset(loadAddressList[i], loadHandleList[i]);
             }
             return AddressableOperationResult.Success;
         }

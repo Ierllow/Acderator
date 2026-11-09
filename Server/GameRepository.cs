@@ -9,6 +9,7 @@ public sealed class GameRepository
 {
     private readonly MySqlDataSource dataSource;
     private readonly ServerOptions options;
+    private int? cachedBaseScore;
 
     public GameRepository(MySqlDataSource dataSource, IOptions<ServerOptions> options)
     {
@@ -70,18 +71,15 @@ public sealed class GameRepository
     internal async Task<string?> AuthenticateAsync(string sessionHash)
     {
         await using var connection = await dataSource.OpenConnectionAsync();
-        await using var transaction = await connection.BeginTransactionAsync();
         if (await connection.ExecuteAsync(
             "UPDATE session SET last_activity = UTC_TIMESTAMP() WHERE session_id = @SessionId AND last_activity >= @Cutoff",
-            new { SessionId = sessionHash, Cutoff = DateTime.UtcNow.AddSeconds(-options.AuthSessionTtlSeconds) }, transaction) != 1)
+            new { SessionId = sessionHash, Cutoff = DateTime.UtcNow.AddSeconds(-options.AuthSessionTtlSeconds) }) != 1)
         {
             return null;
         }
-        var userId = await connection.QuerySingleOrDefaultAsync<string>(
+        return await connection.QuerySingleOrDefaultAsync<string>(
             "SELECT userid FROM session WHERE session_id = @SessionId LIMIT 1",
-            new { SessionId = sessionHash }, transaction);
-        await transaction.CommitAsync();
-        return userId;
+            new { SessionId = sessionHash });
     }
 
     internal async Task LogoutAsync(string sessionHash)
@@ -119,9 +117,9 @@ public sealed class GameRepository
     internal async Task<SubmitScoreResult> SubmitScoreAsync(string userId, string sessionHash, int score)
     {
         await using var connection = await dataSource.OpenConnectionAsync();
-        var baseScore = await connection.QuerySingleOrDefaultAsync<int?>("SELECT score FROM song_base_score_master LIMIT 1");
-        if (baseScore is null) return SubmitScoreResult.MissingBaseScore;
-        if (score < 0 || score > baseScore) return SubmitScoreResult.InvalidScore;
+        cachedBaseScore ??= await connection.QuerySingleOrDefaultAsync<int?>("SELECT score FROM song_base_score_master LIMIT 1");
+        if (cachedBaseScore is null) return SubmitScoreResult.MissingBaseScore;
+        if (score < 0 || score > cachedBaseScore) return SubmitScoreResult.InvalidScore;
 
         await using var transaction = await connection.BeginTransactionAsync();
         var scoreId = await connection.QuerySingleOrDefaultAsync<int?>(

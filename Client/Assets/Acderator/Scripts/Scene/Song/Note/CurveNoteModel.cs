@@ -19,6 +19,7 @@ namespace Song
         private readonly Vector2[] evaluationBuffer;
         private readonly float startSec;
         private readonly float duration;
+        private readonly Vector2 endPosition;
 
         public bool IsEmpty => segments.Count == 0;
         public bool UsesMidPoint { get; }
@@ -36,6 +37,7 @@ namespace Song
                 maxPointCount = Mathf.Max(maxPointCount, segment.Points.Count);
             }
             evaluationBuffer = maxPointCount > 0 ? new Vector2[maxPointCount] : Array.Empty<Vector2>();
+            endPosition = Evaluate(1f);
         }
 
         public CurveNoteLayout GetLayout(float currentSec)
@@ -45,7 +47,7 @@ namespace Song
             {
                 Start = Evaluate(progress),
                 Middle = Evaluate(Mathf.Lerp(progress, 1f, 0.5f)),
-                End = Evaluate(1f)
+                End = endPosition
             };
         }
 

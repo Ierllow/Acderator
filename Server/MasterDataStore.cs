@@ -12,6 +12,8 @@ public sealed class MasterDataStore
     private readonly ServerOptions options;
     private readonly ILogger<MasterDataStore> logger;
     private JsonDocument document = JsonDocument.Parse("{}");
+    private Dictionary<string, object> payload = new();
+    private string version = string.Empty;
 
     public MasterDataStore(MySqlDataSource dataSource, IHostEnvironment environment, IOptions<ServerOptions> options, ILogger<MasterDataStore> logger)
     {
@@ -21,14 +23,16 @@ public sealed class MasterDataStore
         this.logger = logger;
     }
 
-    internal Dictionary<string, object> Payload => (Dictionary<string, object>)ConvertElement(document.RootElement);
+    internal Dictionary<string, object> Payload => payload;
 
-    internal string Version => document.RootElement.TryGetProperty("version_master", out var version) ? version.GetString() ?? string.Empty : string.Empty;
+    internal string Version => version;
 
     internal async Task SynchronizeAsync()
     {
         document.Dispose();
         document = JsonDocument.Parse(await File.ReadAllTextAsync(Path.IsPathRooted(options.MasterDataPath) ? options.MasterDataPath : Path.Combine(environment.ContentRootPath, options.MasterDataPath)));
+        payload = (Dictionary<string, object>)ConvertElement(document.RootElement);
+        version = document.RootElement.TryGetProperty("version_master", out var versionElement) ? versionElement.GetString() ?? string.Empty : string.Empty;
 
         await using var connection = await dataSource.OpenConnectionAsync();
         await using var transaction = await connection.BeginTransactionAsync();

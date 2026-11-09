@@ -1,24 +1,30 @@
 using Acderator.Shared;
 using MagicOnion;
 using Microsoft.Extensions.Options;
+using System.Collections.Concurrent;
 using System.Text.Json;
 
 namespace Acderator.Server.Services;
 
 public sealed class ChartService : AcderatorServiceBase<IChartService>, IChartService
 {
-    private readonly IHostEnvironment environment;
+    private static readonly JsonSerializerOptions JsonOptions = new()
+    {
+        PropertyNameCaseInsensitive = true,
+        PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
+    };
+
     private readonly GameRepository repository;
     private readonly TokenService tokens;
-    private readonly ServerOptions options;
+    private readonly string chartDataDirectory;
+    private readonly ConcurrentDictionary<int, ChartResponse> chartCache = new();
 
     public ChartService(IHostEnvironment environment, GameRepository repository, TokenService tokens, IOptions<ServerOptions> options, ILogger<ChartService> logger)
         : base(options, logger)
     {
-        this.environment = environment;
         this.repository = repository;
         this.tokens = tokens;
-        this.options = options.Value;
+        chartDataDirectory = Path.IsPathRooted(options.Value.ChartDataDirectory) ? options.Value.ChartDataDirectory : Path.Combine(environment.ContentRootPath, options.Value.ChartDataDirectory);
     }
 
     public async UnaryResult<ChartResponse> GetAsync(ChartRequest request) => await ExecuteAsync(async () =>
@@ -26,14 +32,12 @@ public sealed class ChartService : AcderatorServiceBase<IChartService>, IChartSe
         var authentication = await Authentication.AuthenticateAsync(Header("authorization"), repository, tokens);
         if (authentication is null) return Failure<ChartResponse>(AppError.Unauthorized);
 
-        var path = Path.Combine(Path.IsPathRooted(options.ChartDataDirectory) ? options.ChartDataDirectory : Path.Combine(environment.ContentRootPath, options.ChartDataDirectory), $"{request.Sid}.json");
+        if (chartCache.TryGetValue(request.Sid, out var cached)) return cached;
+
+        var path = Path.Combine(chartDataDirectory, $"{request.Sid}.json");
         if (!File.Exists(path)) return Failure<ChartResponse>(AppError.NotFound);
-        var response = JsonSerializer.Deserialize<ChartResponse>(await File.ReadAllTextAsync(path), new JsonSerializerOptions
-        {
-            PropertyNameCaseInsensitive = true,
-            PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
-        });
+        var response = JsonSerializer.Deserialize<ChartResponse>(await File.ReadAllTextAsync(path), JsonOptions);
         if (response is null) return Failure<ChartResponse>(AppError.InvalidRequestFormat);
-        return response;
+        return chartCache[request.Sid] = response;
     });
 }

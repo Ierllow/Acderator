@@ -107,8 +107,12 @@ namespace Song
             if (!sceneContext.IsRestart)
             {
                 await songAssetLoader.LoadAssetsAsync(sceneManager.CurrentSceneType, destroyCancellationToken).AddWatcherTo(failFastExceptionWatcher);
+                await (LoadIntro(), sceneManager.FadeInAsync());
             }
-            await (LoadIntro(), sceneManager.FadeInAsync());
+            else
+            {
+                await LoadIntro();
+            }
             songLayerController.Show(sceneContext.IsAuto());
             await notesLineController.Show().AddWatcherTo(failFastExceptionWatcher);
             backTelopLayerController.SetBackgroundImage(songManagerResolver.Addressable.GetSprite(sceneContext.SongInfo.Bg.ToString()));

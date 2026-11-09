@@ -6,7 +6,7 @@ namespace Song
 {
     public enum FingerJudgeRequestType { Normal, Swipe, HoldCross }
 
-    public sealed class FingerJudgeRequest
+    public readonly struct FingerJudgeRequest
     {
         public FingerJudgeRequestType RequestType { get; }
         public FingerType FingerType { get; }

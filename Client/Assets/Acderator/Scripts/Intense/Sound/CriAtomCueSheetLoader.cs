@@ -12,16 +12,19 @@ namespace Intense
         [Inject] private readonly AddressableAssetManager addressableAssetManager;
 
         public UniTask<CriAtomCueSheet> GetOrAddCueSheetAsync(string name, TextAssetReference reference)
-            => GetOrAddCueSheetAsync(name, () => addressableAssetManager.LoadAssetAsync(reference));
+        {
+            var sheet = CriAtom.GetCueSheet(name);
+            return sheet != default ? UniTask.FromResult(sheet) : GetOrAddCueSheetAsync(name, () => addressableAssetManager.LoadAssetAsync(reference));
+        }
 
         public UniTask<CriAtomCueSheet> GetOrAddCueSheetAsync(string name, AddressableAssetAddress address)
-            => GetOrAddCueSheetAsync(name, () => addressableAssetManager.LoadAssetAsync<TextAsset>(address));
+        {
+            var sheet = CriAtom.GetCueSheet(name);
+            return sheet != default ? UniTask.FromResult(sheet) : GetOrAddCueSheetAsync(name, () => addressableAssetManager.LoadAssetAsync<TextAsset>(address));
+        }
 
         private async UniTask<CriAtomCueSheet> GetOrAddCueSheetAsync(string name, Func<UniTask<TextAsset>> loadAsset)
         {
-            var sheet = CriAtom.GetCueSheet(name);
-            if (sheet != default) return sheet;
-
             var asset = await loadAsset();
             if (asset == default)
             {

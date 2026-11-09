@@ -100,6 +100,7 @@ namespace Song
             if (lane < 0 || lane >= LaneCount) return false;
 
             var laneNoteList = aliveNotesByLaneDict[lane];
+            var tapTimingOffset = SongOption.TapTiming * 0.1f;
             var bestDiff = float.MaxValue;
             NoteBase? bestNote = null;
 
@@ -116,7 +117,7 @@ namespace Song
                     _ => true,
                 }) continue;
 
-                var diff = GetSearchDiffSec(candidateData, mode);
+                var diff = GetSearchDiffSec(candidateData, mode, tapTimingOffset);
                 if (diff >= bestDiff) continue;
 
                 bestDiff = diff;
@@ -127,11 +128,11 @@ namespace Song
             return note != null;
         }
 
-        private float GetSearchDiffSec(NoteData noteData, NoteSearchMode mode) => Math.Abs(mode switch
+        private float GetSearchDiffSec(NoteData noteData, NoteSearchMode mode, float tapTimingOffset) => Math.Abs(mode switch
         {
             NoteSearchMode.Up => GetNoteEndSec(noteData),
             _ => noteData.SecBegin,
-        } - CurrentSec + SongOption.TapTiming * 0.1f);
+        } - CurrentSec + tapTimingOffset);
 
         private float GetNoteEndSec(NoteData noteData) => noteData.NoteType switch
         {

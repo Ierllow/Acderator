@@ -2,7 +2,6 @@
 
 using Intense;
 using System.Collections.Generic;
-using System.Linq;
 using Zenject;
 
 namespace Song
@@ -29,16 +28,19 @@ namespace Song
         public int CurrentCombo => comboController.CurrentCombo.CurrentValue;
         public float CurrentHpPercent => hpBarController.CurrentHpPercent.CurrentValue;
 
+        private int noteCount;
+
         public void Init(int sid)
         {
-            scoreController.Init(sid, notesManager.LoadedChartInfo!.NoteCount);
+            noteCount = notesManager.LoadedChartInfo!.NoteCount;
+            scoreController.Init(sid, noteCount);
             hpBarController.Init(sid);
         }
 
         public void UpdateGameLogic(FingerInfo fingerInfo)
         {
             if (fingerInfo.NoteBase == null || fingerInfo.NoteData == null) return;
-            if (!notesManager.AliveNoteList.Any(x => x == fingerInfo.NoteBase)) return;
+            if (!notesManager.IsAlive(fingerInfo.NoteBase)) return;
 
             if (fingerInfo.IsMissed)
             {
@@ -56,7 +58,7 @@ namespace Song
                 if (fingerInfo.NoteData.NoteType == NoteType.Long && fingerInfo.FingerType == FingerType.Down) return;
                 notesManager.RemoveNote(fingerInfo.NoteBase);
             }
-            if (!notesManager.SongOption.IsAuto) hpBarController.UpdateHp(fingerInfo.JudgmentType, notesManager.LoadedChartInfo!.NoteCount);
+            if (!notesManager.SongOption.IsAuto) hpBarController.UpdateHp(fingerInfo.JudgmentType, noteCount);
         }
     }
 }

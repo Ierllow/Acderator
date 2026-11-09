@@ -4,7 +4,6 @@ using Intense;
 using R3;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using Zenject;
 
 namespace Song
@@ -37,9 +36,9 @@ namespace Song
 
         public void Judge(float currentSec)
         {
-            foreach (var judgeRequest in judgeRequestList.Where(x => x.IsCurrentFrame()))
+            for (var i = 0; i < judgeRequestList.Count; i++)
             {
-                EmitJudgeRequest(judgeRequest);
+                if (judgeRequestList[i].IsCurrentFrame()) EmitJudgeRequest(judgeRequestList[i]);
             }
             judgeRequestList.Clear();
             var notes = notesManager.AliveNoteList;
@@ -181,6 +180,14 @@ namespace Song
             return true;
         }
 
-        private List<int> GetTappingLanes() => notesManager.AliveNoteList.Where(note => note && note.IsActive && note.IsTapping).Select(x => notesManager.GetNoteData(x).Lane).ToList();
+        private List<int> GetTappingLanes()
+        {
+            var tappingLaneList = new List<int>();
+            foreach (var note in notesManager.AliveNoteList)
+            {
+                if (note && note.IsActive && note.IsTapping) tappingLaneList.Add(notesManager.GetNoteData(note).Lane);
+            }
+            return tappingLaneList;
+        }
     }
 }

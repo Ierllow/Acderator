@@ -4,7 +4,19 @@ using Zenject;
 
 namespace Song
 {
-    public record NotePositionUpdateContext(float PositionBeginY, float PositionEndY, float CurrentSec);
+    public readonly struct NotePositionUpdateContext
+    {
+        public float PositionBeginY { get; }
+        public float PositionEndY { get; }
+        public float CurrentSec { get; }
+
+        public NotePositionUpdateContext(float positionBeginY, float positionEndY, float currentSec)
+        {
+            PositionBeginY = positionBeginY;
+            PositionEndY = positionEndY;
+            CurrentSec = currentSec;
+        }
+    }
 
     public class NotePositionUpdater
     {

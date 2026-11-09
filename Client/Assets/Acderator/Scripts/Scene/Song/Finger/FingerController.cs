@@ -92,7 +92,7 @@ namespace Song
 
             if ((touchState.StartScreenPosition - screenPosition).sqrMagnitude > swipeThreshold * swipeThreshold)
             {
-                if (TryEnqueueFingerSwipe(pointerId)) return;
+                if (TryEnqueueFingerSwipe(pointerId, touchState)) return;
             }
 
             var lane = touchState.Lane;
@@ -100,10 +100,8 @@ namespace Song
             touchStateManager.Remove(pointerId);
         }
 
-        private bool TryEnqueueFingerSwipe(int pointerId)
+        private bool TryEnqueueFingerSwipe(int pointerId, TouchStateManager.TouchState touchState)
         {
-            if (!touchStateManager.TryGet(pointerId, out var touchState)) return false;
-
             judgeRequestController.Enqueue(FingerJudgeRequest.Swipe(pointerId, touchState.Lane));
             touchStateManager.Remove(pointerId);
             return true;

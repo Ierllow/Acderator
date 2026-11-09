@@ -17,6 +17,12 @@ namespace Song
         private float? badJudgmentZone;
         private float BadJudgmentZone => badJudgmentZone ??= masterDataManager.MemoryDatabase.SongJudgeZoneMasterTable.LastOrDefault(x => x.Type <= (int)JudgementType.Bad).Zone;
 
+        private SongJudgeZoneMaster[] judgeZoneMasters;
+        private SongJudgeZoneMaster[] JudgeZoneMasters => judgeZoneMasters ??= masterDataManager.MemoryDatabase.SongJudgeZoneMasterTable.All.ToArray();
+
+        private float? tapTimingOffset;
+        private float TapTimingOffset => tapTimingOffset ??= notesManager.SongOption.TapTiming * 0.1f;
+
         public bool TryJudge(NoteBase note, FingerType fingerType, bool allowMiss, out JudgementType judgementType)
         {
             judgementType = JudgementType.None;
@@ -32,8 +38,11 @@ namespace Song
 
         private JudgementType GetJudgmentType(float diffSec)
         {
-            var zone = masterDataManager.MemoryDatabase.SongJudgeZoneMasterTable.FirstOrDefault(x => diffSec <= x.Zone);
-            return zone == default ? JudgementType.None : (JudgementType)zone.Type;
+            foreach (var zone in JudgeZoneMasters)
+            {
+                if (diffSec <= zone.Zone) return (JudgementType)zone.Type;
+            }
+            return JudgementType.None;
         }
 
         private float GetNoteDiffSec(FingerType fingerType, NoteData noteData) => (noteData.NoteType, fingerType) switch
@@ -43,13 +52,13 @@ namespace Song
             _ => GetDiffSec(fingerType == FingerType.Down ? noteData.SecBegin : noteData.SecEnd),
         };
 
-        private float GetDiffSec(float noteSec) => Math.Abs(noteSec - notesManager.CurrentSec + notesManager.SongOption.TapTiming * 0.1f);
+        private float GetDiffSec(float noteSec) => Math.Abs(noteSec - notesManager.CurrentSec + TapTimingOffset);
 
         private float GetCurveNoteDiffSec(NoteData noteData)
         {
             var curveProgress = noteData.CurveDuration > 0 ? Mathf.Clamp01((notesManager.CurrentSec - noteData.SecBegin) / noteData.CurveDuration) : 1f;
             var curveTime = noteData.SecBegin + noteData.CurveDuration * curveProgress;
-            return Math.Abs(curveTime - notesManager.CurrentSec + notesManager.SongOption.TapTiming * 0.1f);
+            return Math.Abs(curveTime - notesManager.CurrentSec + TapTimingOffset);
         }
 
         public bool IsJustAutoTiming(NoteBase note, FingerType fingerType)

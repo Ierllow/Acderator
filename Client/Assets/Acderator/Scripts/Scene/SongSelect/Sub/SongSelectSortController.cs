@@ -20,12 +20,15 @@ namespace SongSelect
             [Text("ハイスコア")] HighScore,
         }
 
+        private static readonly OrderType[] OrderTypes = (OrderType[])Enum.GetValues(typeof(OrderType));
+        private static readonly Dictionary<OrderType, string> OrderTypeTextDict = OrderTypes.ToDictionary(x => x, x => typeof(OrderType).GetField(x.ToString())?.GetCustomAttribute<TextAttribute>()?.Text ?? x.ToString());
+
         [Inject] private readonly MasterDataManager masterDataManager;
         [Inject] private readonly ScoreManager scoreManager;
 
         public OrderType CurrentOrderType { get; private set; } = (OrderType)PlayerPrefsValues.OrderType;
 
-        public string Text => typeof(OrderType).GetField(CurrentOrderType.ToString())?.GetCustomAttribute<TextAttribute>()?.Text ?? CurrentOrderType.ToString();
+        public string Text => OrderTypeTextDict.TryGetValue(CurrentOrderType, out var text) ? text : CurrentOrderType.ToString();
 
         public List<int> GetOrderedList(int selectedDifficulty)
         {
@@ -40,9 +43,11 @@ namespace SongSelect
             };
         }
 
-        public void UpdateOrderType(OrderType orderType) => CurrentOrderType = orderType;
-
-        public void SetNextOrderType() => CurrentOrderType = ((OrderType[])Enum.GetValues(typeof(OrderType))).ElementAtOrDefault((int)CurrentOrderType + 1);
+        public void SetNextOrderType()
+        {
+            var index = (int)CurrentOrderType + 1;
+            CurrentOrderType = index < OrderTypes.Length ? OrderTypes[index] : default;
+        }
 
         public void SaveOrderType() => PlayerPrefsValues.Set(PlayerPrefsKey.OrderType, (int)CurrentOrderType);
     }

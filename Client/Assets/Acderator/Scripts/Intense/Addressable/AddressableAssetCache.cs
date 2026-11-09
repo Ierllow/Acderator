@@ -16,6 +16,7 @@ namespace Intense.Asset
         private readonly Dictionary<string, AsyncOperationHandle<Object>> loadedAssetHandleDict = new();
         private readonly Dictionary<string, AsyncOperationHandle<IList<Object>>> loadedLabelHandleDict = new();
         private readonly HashSet<SpriteAtlas> spriteAtlasSet = new();
+        private readonly Dictionary<string, Sprite> spriteDict = new();
 
         public IEnumerable<Object> LoadedAssets => loadedAssetHandleDict.Values.Select(handle => handle.Result).Concat(loadedLabelHandleDict.Values.SelectMany(handle => handle.Result));
 
@@ -51,18 +52,25 @@ namespace Intense.Asset
             addLoadAddressSet.Clear();
             loadedAssetHandleDict.Clear();
             loadedLabelHandleDict.Clear();
+            spriteDict.Clear();
             spriteAtlasSet.Clear();
             spriteAtlasSet.UnionWith(Resources.LoadAll<SpriteAtlas>(ResourcesAtlasPath));
         }
 
         public Sprite GetSprite(string spriteName)
         {
+            if (spriteDict.TryGetValue(spriteName, out var cached)) return cached;
+
             foreach (var atlas in spriteAtlasSet)
             {
                 if (atlas == null) continue;
 
                 var sprite = atlas.GetSprite(spriteName);
-                if (sprite != null) return sprite;
+                if (sprite != null)
+                {
+                    spriteDict[spriteName] = sprite;
+                    return sprite;
+                }
             }
             return null;
         }

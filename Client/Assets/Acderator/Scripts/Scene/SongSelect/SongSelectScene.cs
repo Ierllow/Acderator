@@ -9,7 +9,6 @@ using Intense.Data;
 using Intense.Master;
 using Intense.UI;
 using R3;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
@@ -71,8 +70,7 @@ namespace SongSelect
 
         private async UniTask LoadAssets()
         {
-            var groupList = masterDataManager.MemoryDatabase.SongMasterTable.Select(x => x.Group).ToList();
-            foreach (var address in sceneContext.DynamicAssetAddressList(groupList))
+            foreach (var address in sceneContext.DynamicAssetAddressList(songListView.SongGroupList))
             {
                 addressableAssetManager.AddLoad(address);
             }
