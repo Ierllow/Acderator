@@ -33,6 +33,10 @@ namespace SongSelect
             atlas.SetSprite(jacket);
             foreach (var (toggle, index) in toggles.Select((x, i) => (x, i)))
             {
+                toggle.gameObject.SetActive(index < songList.Count);
+                if (index >= songList.Count) continue;
+
+                toggle.name = songList[index].Difficulty.ToString();
                 toggle.SetToggleText(songList[index].Difficulty.ToString());
                 toggle.Toggle.isOn = toggle.name == selectedDifficulty.ToString();
             }
