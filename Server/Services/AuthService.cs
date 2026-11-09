@@ -58,7 +58,7 @@ public sealed class AuthService : AcderatorServiceBase<IAuthService>, IAuthServi
         if (await repository.UuidExistsAsync(request.Uuid)) return Failure<RegisterResponse>(AppError.Conflict);
 
         var userId = RandomNumberGenerator.GetInt32(100_000_000, 1_000_000_000);
-        var password = userId.ToString();
+        var password = Convert.ToBase64String(RandomNumberGenerator.GetBytes(18));
         var token = tokens.Generate();
         if (!await repository.CreateUserAndSessionAsync(userId, request.Uuid, passwords.Hash(password), tokens.Hash(token)))
         {
