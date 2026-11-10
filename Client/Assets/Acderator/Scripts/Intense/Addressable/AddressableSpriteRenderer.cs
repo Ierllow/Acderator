@@ -15,7 +15,7 @@ namespace Intense.Asset
         internal void Resolve(Func<string, Sprite> spriteResolver)
         {
             if (string.IsNullOrEmpty(spriteName)) return;
-            if (spriteRenderer == null) spriteRenderer = GetComponent<SpriteRenderer>();
+            spriteRenderer ??= GetComponent<SpriteRenderer>();
             var resolvedSprite = spriteResolver(spriteName);
             if (resolvedSprite != null) spriteRenderer.sprite = resolvedSprite;
         }
