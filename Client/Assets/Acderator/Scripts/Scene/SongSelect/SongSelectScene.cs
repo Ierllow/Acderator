@@ -10,6 +10,7 @@ using Intense.Master;
 using Intense.UI;
 using R3;
 using UnityEngine;
+using UnityEngine.U2D;
 using UnityEngine.UI;
 using Zenject;
 
@@ -33,6 +34,12 @@ namespace SongSelect
         [Inject] private readonly SongSelectSoundController soundController;
         [Inject] private readonly Song.TutorialSceneContextBuilder tutorialSceneContextBuilder;
 
+        private static readonly AddressableAssetAddress BackgroundAtlasAddress = new("songselect/bg");
+        private static readonly AddressableAssetAddress JacketAtlasAddress = new("song/jacket");
+
+        private SpriteAtlas backgroundAtlas;
+        private SpriteAtlas jacketAtlas;
+
         private void Start()
         {
             autoButton.SetToggleTextAsAsyncEnumerableForEachAsync(isOn => isOn ? "オートON" : "オートOFF");
@@ -52,8 +59,8 @@ namespace SongSelect
             await LoadAssets();
             songListView.Init();
             var selectedSong = masterDataManager.MemoryDatabase.SongMasterTable.FindByGroup(songListView.SelectedGroup);
-            songSelectDetail.SetData(songListView.SelectedGroup, songListView.SelectedDifficulty, addressableAssetManager.GetSprite(songListView.SelectedGroup.ToString()));
-            backgroundImage.SetSprite(addressableAssetManager.GetSprite(selectedSong.Bg.ToString()));
+            songSelectDetail.SetData(songListView.SelectedGroup, songListView.SelectedDifficulty, GetJacketSprite(songListView.SelectedGroup));
+            SetBackground(selectedSong.Bg);
             orderButton.SetButtonText(songListView.CurrentOrderText);
             soundController.PlayPreview(songListView.SelectedGroup, destroyCancellationToken);
             await UniTask.WhenAll(
@@ -74,8 +81,16 @@ namespace SongSelect
             {
                 addressableAssetManager.AddLoad(address);
             }
+            addressableAssetManager.AddLoad(BackgroundAtlasAddress);
+            addressableAssetManager.AddLoad(JacketAtlasAddress);
             await addressableAssetManager.LoadAssetsAsync(sceneManager.CurrentSceneType, destroyCancellationToken);
+            backgroundAtlas = await addressableAssetManager.LoadAssetAsync<SpriteAtlas>(BackgroundAtlasAddress);
+            jacketAtlas = await addressableAssetManager.LoadAssetAsync<SpriteAtlas>(JacketAtlasAddress);
         }
+
+        private void SetBackground(int bg) => backgroundImage.SetSprite(backgroundAtlas != null ? backgroundAtlas.GetSprite(bg.ToString()) : addressableAssetManager.GetSprite(bg.ToString()));
+
+        private Sprite GetJacketSprite(int group) => jacketAtlas != null ? jacketAtlas.GetSprite(group.ToString()) : addressableAssetManager.GetSprite(group.ToString());
 
         private async UniTask TapDecideButton()
         {
@@ -101,8 +116,8 @@ namespace SongSelect
 
         private void SelectedCellChanged(SongSelectCell cell)
         {
-            songSelectDetail.SetData(cell.Song.Group, songListView.SelectedDifficulty, addressableAssetManager.GetSprite(cell.Song.Group.ToString()));
-            backgroundImage.SetSprite(addressableAssetManager.GetSprite(cell.Song.Bg.ToString()));
+            songSelectDetail.SetData(cell.Song.Group, songListView.SelectedDifficulty, GetJacketSprite(cell.Song.Group));
+            SetBackground(cell.Song.Bg);
             soundController.PlayPreview(cell.Song.Group, destroyCancellationToken);
         }
 

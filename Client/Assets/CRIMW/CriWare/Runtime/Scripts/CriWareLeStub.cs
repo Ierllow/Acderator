@@ -24,8 +24,10 @@ public static class CriFsPlugin
 	public static void SetConfigParameters(
 		int num_loaders, int num_binders, int num_installers, int argInstallBufferSize, int max_path, bool minimize_file_descriptor_usage, bool dummy_flag)
 	{
+#if !CRIWARE_ENABLE_HEADLESS_MODE
 		CriFsPlugin.criFsUnity_SetConfigParameters(
 			num_loaders, num_binders, num_installers, max_path, minimize_file_descriptor_usage, dummy_flag);
+#endif
 
 		CriFsPlugin.isConfigured = true;
 	}
@@ -59,13 +61,19 @@ public static class CriFsPlugin
 		}
 
 		/* ライブラリの初期化 */
+#if !CRIWARE_ENABLE_HEADLESS_MODE
 		CriFsPlugin.criFsUnity_Initialize();
+#endif
 	}
 
 	public static bool IsLibraryInitialized()
 	{
+#if CRIWARE_ENABLE_HEADLESS_MODE
+		return false;
+#else
 		/* ライブラリが初期化済みかチェック */
 		return criFsUnity_IsInitialized();
+#endif
 	}
 
 	public static void FinalizeLibrary()
@@ -89,7 +97,9 @@ public static class CriFsPlugin
 		CriDisposableObjectManager.CallOnModuleFinalization(CriDisposableObjectManager.ModuleType.Fs);
 
 		/* ライブラリの終了 */
+#if !CRIWARE_ENABLE_HEADLESS_MODE
 		CriFsPlugin.criFsUnity_Finalize();
+#endif
 	}
 
 	#region DLL Import
@@ -107,8 +117,12 @@ public static class CriFsPlugin
 	[DllImport(CriWare.Common.pluginName, CallingConvention = CriWare.Common.pluginCallingConvention)]
 	private static extern void criFsUnity_Finalize();
 
+#if CRIWARE_ENABLE_HEADLESS_MODE
+	public static uint criFsUnity_GetAllocatedHeapSize() { return 0; }
+#else
 	[DllImport(CriWare.Common.pluginName, CallingConvention = CriWare.Common.pluginCallingConvention)]
 	public static extern uint criFsUnity_GetAllocatedHeapSize();
+#endif
 
 	#if !UNITY_EDITOR && UNITY_ANDROID
 	[DllImport(CriWare.Common.pluginName, CallingConvention = CriWare.Common.pluginCallingConvention)]

@@ -17,6 +17,7 @@ MonoBehaviour:
   - m_LabelString: song/rank
   - m_LabelString: songselect/banner
   - m_LabelString: songselect/prefab/item
+  - m_LabelString: songselect/bg
   songLabels:
   - m_LabelString: song/rank
   - m_LabelString: song/hud

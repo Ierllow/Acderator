@@ -9,6 +9,7 @@ using Intense.Master;
 using Intense.UI;
 using R3;
 using UnityEngine;
+using UnityEngine.U2D;
 using Zenject;
 
 namespace Result
@@ -29,6 +30,12 @@ namespace Result
         [Inject] private readonly SoundManager soundManager;
         [Inject] private readonly NetworkManager networkManager;
 
+        private static readonly AddressableAssetAddress BackgroundAtlasAddress = new("result/bg");
+        private static readonly AddressableAssetAddress JacketAtlasAddress = new("song/jacket");
+
+        private SpriteAtlas backgroundAtlas;
+        private SpriteAtlas jacketAtlas;
+
         private void Start()
         {
             retryButton.OnTapButtonAsObservable.SubscribeLockAwait(async (_, __) => await TapRetryButton()).RegisterTo(destroyCancellationToken);
@@ -37,15 +44,19 @@ namespace Result
 
         public override void OnCreateScene() => UniTask.Void(async () =>
         {
+            addressableAssetManager.AddLoad(BackgroundAtlasAddress);
+            addressableAssetManager.AddLoad(JacketAtlasAddress);
             await addressableAssetManager.LoadAssetsAsync(sceneManager.CurrentSceneType, destroyCancellationToken);
+            backgroundAtlas = await addressableAssetManager.LoadAssetAsync<SpriteAtlas>(BackgroundAtlasAddress);
+            jacketAtlas = await addressableAssetManager.LoadAssetAsync<SpriteAtlas>(JacketAtlasAddress);
             var song = masterDataManager.MemoryDatabase.SongMasterTable.FindBySid(sceneContext.ResultInfo.Sid);
             var rank = (int)ScoreUtils.ToRank(sceneContext.ResultInfo.CurrentScore);
             resultDetail.Setup(
                 song,
                 sceneContext.ResultInfo,
-                addressableAssetManager.GetSprite(song.Group.ToString()),
+                GetJacketSprite(song.Group),
                 addressableAssetManager.GetSprite(string.Format("icon_result_rank_{0}", rank)));
-            backgroundImage.SetSprite(addressableAssetManager.GetSprite(masterDataManager.MemoryDatabase.ResultMasterTable.First().Rid.ToString()));
+            backgroundImage.SetSprite(GetBackgroundSprite(masterDataManager.MemoryDatabase.ResultMasterTable.First().Rid));
             backgroundImage.color = ScoreUtils.IsClear(sceneContext.ResultInfo.CurrentScore) ? resultVisualConfig.ClearBackgroundColor : resultVisualConfig.FailedBackgroundColor;
             cautionTextRoot.SetActive(sceneContext.ResultInfo.IsAuto);
             retryButton.gameObject.SetActive(!sceneContext.ResultInfo.IsAuto);
@@ -53,6 +64,10 @@ namespace Result
             await sceneManager.FadeInAsync();
             soundManager.PlayBgm(ScoreUtils.IsClear(sceneContext.ResultInfo.CurrentScore) ? BgmType.GameResult : BgmType.GameResultFailed);
         });
+
+        private Sprite GetBackgroundSprite(int rid) => backgroundAtlas != null ? backgroundAtlas.GetSprite(rid.ToString()) : addressableAssetManager.GetSprite(rid.ToString());
+
+        private Sprite GetJacketSprite(int group) => jacketAtlas != null ? jacketAtlas.GetSprite(group.ToString()) : addressableAssetManager.GetSprite(group.ToString());
 
         private async UniTask TapRetryButton()
         {

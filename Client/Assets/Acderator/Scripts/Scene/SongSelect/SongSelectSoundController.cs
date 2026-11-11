@@ -16,11 +16,20 @@ namespace SongSelect
         [Inject] private readonly SongSoundSheetNameResolver soundSheetNameResolver;
         [Inject] private readonly SongVolumeController songVolumeController;
 
-        private readonly CriAtomSoundPlayer songPreviewExPlayer = new();
+        // Lazy: CriAtomSoundPlayer's constructor creates a native CRI player and
+        // throws where the CRI runtime is unavailable (e.g. Linux editor).
+        private CriAtomSoundPlayer songPreviewExPlayer;
         private CancellationTokenSource songPreviewCancellationTokenSource;
 
         public void PlayPreview(int group, CancellationToken token) => UniTask.Void(async () =>
         {
+#if UNITY_EDITOR
+            // CRI Ware has no Linux editor plugin, so CriAtom.instance stays null
+            // and any CriAtom call throws NullReferenceException. Skip the preview
+            // in the editor only; device behavior is unchanged.
+            await UniTask.CompletedTask;
+            return;
+#endif
             StopPreview();
 
             songPreviewCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(token);
@@ -30,6 +39,7 @@ namespace SongSelect
             var songSelectMaster = masterDataManager.MemoryDatabase.SongSelectMasterTable.FindByGroup(group);
             if (previewToken.IsCancellationRequested) return;
 
+            songPreviewExPlayer ??= new CriAtomSoundPlayer();
             songVolumeController.Register(songPreviewExPlayer);
             songPreviewExPlayer.AttachFader();
             songPreviewExPlayer.SetFadeInTime(3000);
@@ -56,6 +66,7 @@ namespace SongSelect
             songPreviewCancellationTokenSource?.Cancel();
             songPreviewCancellationTokenSource?.Dispose();
             songPreviewCancellationTokenSource = default;
+            if (songPreviewExPlayer == null) return;
             songPreviewExPlayer.Stop();
             songVolumeController.Unregister(songPreviewExPlayer);
         }

@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ddb444293c412634ca85ee452b6f4d07, type: 3}
   m_Name: networkConfig
   m_EditorClassIdentifier: Assembly-CSharp::NetworkConfig
-  apiServerUrl: 
+  apiServerUrl: http://localhost:3000
   assetServerUrl: 
   webViewServerUrl: 

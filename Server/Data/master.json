@@ -1,13 +1,1 @@
-{
-  "version_master": "",
-  "title_masters": [],
-  "song_select_masters":[],
-  "song_masters": [],
-  "score_rate_masters": [],
-  "base_score_masters": [],
-  "judge_zone_masters": [],
-  "base_hp_masters": [],
-  "hp_rate_masters": [],
-  "sound_sheet_masters": [],
-  "result_masters": []
-}
+{"version_master":"1","title_masters":[{"tid":1}],"song_select_masters":[{"group":1,"start_song_time":40000,"song_time":10}],"song_masters":[{"sid":1,"group":1,"difficulty":1,"name":"405nm","composer":"Ryu☆mix","bg":1,"start_offset":12.0},{"sid":2,"group":1,"difficulty":2,"name":"405nm","composer":"Ryu☆mix","bg":1,"start_offset":12.0},{"sid":3,"group":1,"difficulty":3,"name":"405nm","composer":"Ryu☆mix","bg":1,"start_offset":12.0}],"base_score_masters":[{"score":1000000}],"base_hp_masters":[{"hp":70}],"score_rate_masters":[{"r_type":1,"rate":1.0},{"r_type":2,"rate":0.7},{"r_type":3,"rate":0.4},{"r_type":4,"rate":0.1},{"r_type":5,"rate":0.0}],"judge_zone_masters":[{"j_type":1,"zone":0.05},{"j_type":2,"zone":0.1},{"j_type":3,"zone":0.2},{"j_type":4,"zone":0.3},{"j_type":5,"zone":0.0}],"hp_rate_masters":[{"j_type":1,"rate":2048},{"j_type":2,"rate":2048},{"j_type":3,"rate":1024},{"j_type":4,"rate":8192},{"j_type":5,"rate":8192}],"result_masters":[{"rid":1}],"sound_sheet_masters":[{"category":0,"id":2,"sheet_name":"bgm","cue_name":"result"},{"category":0,"id":3,"sheet_name":"bgm","cue_name":"result_failed"},{"category":1,"id":0,"sheet_name":"music","cue_name":""},{"category":3,"id":1,"sheet_name":"music_se","cue_name":"tap"},{"category":3,"id":2,"sheet_name":"music_se","cue_name":"flick"}]}

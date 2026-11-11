@@ -8,6 +8,9 @@ using MagicOnion;
 using MagicOnion.Client;
 using System;
 using System.Collections.Generic;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 using UnityEngine;
 using Zenject;
 
@@ -28,15 +31,41 @@ namespace Intense.Api
         private void Awake()
         {
             var address = networkConfigObject.ApiServerUrl.TrimEnd('/');
+            HttpMessageHandler handler = new YetAnotherHttpHandler
+            {
+                Http2Only = address.StartsWith("http://", StringComparison.OrdinalIgnoreCase),
+            };
+#if UNITY_EDITOR
+            handler = new TrailerMirrorHandler { InnerHandler = handler };
+#endif
             channel = GrpcChannel.ForAddress(address, new GrpcChannelOptions
             {
-                HttpHandler = new YetAnotherHttpHandler
-                {
-                    Http2Only = address.StartsWith("http://", StringComparison.OrdinalIgnoreCase),
-                },
+                HttpHandler = handler,
                 DisposeHttpClient = true,
             });
         }
+
+#if UNITY_EDITOR
+        // In the editor, Grpc.Net.Client (net462 build) looks for gRPC trailers in
+        // HttpRequestMessage.Properties["__ResponseTrailers"], while YetAnotherHttpHandler
+        // stores them in HttpResponseMessage.TrailingHeaders. Buffer each response so the
+        // trailers are final, then mirror them where Grpc reads them.
+        private sealed class TrailerMirrorHandler : DelegatingHandler
+        {
+            protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+            {
+                var response = await base.SendAsync(request, cancellationToken);
+                var body = await response.Content.ReadAsByteArrayAsync();
+                request.Properties["__ResponseTrailers"] = response.TrailingHeaders;
+                var content = response.Content;
+                var newContent = new ByteArrayContent(body);
+                newContent.Headers.ContentType = content.Headers.ContentType;
+                response.Content = newContent;
+                content.Dispose();
+                return response;
+            }
+        }
+#endif
 
         private void OnDestroy() => channel?.Dispose();
 

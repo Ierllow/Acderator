@@ -123,12 +123,15 @@ namespace Intense.Asset
             var labels = addressableAssetConfigObject.GetLabels(currentSceneType).Where(IsValidLabel).ToList();
             var downloadKeyList = addressList.Cast<object>().Concat(labels.Select(label => label.RuntimeKey)).ToList();
 
-            var (sizeResult, downloadSize) = await AwaitHandleAsync(Addressables.GetDownloadSizeAsync((IEnumerable)downloadKeyList), cancellationToken);
-            if (sizeResult != AddressableOperationResult.Success) return sizeResult;
-            if (downloadSize > 0 && !await addressableAssetPopupController.TryDownloadConfirmedAsync(downloadSize)) return AddressableOperationResult.Canceled;
+            if (downloadKeyList.Count > 0)
+            {
+                var (sizeResult, downloadSize) = await AwaitHandleAsync(Addressables.GetDownloadSizeAsync((IEnumerable)downloadKeyList), cancellationToken);
+                if (sizeResult != AddressableOperationResult.Success) return sizeResult;
+                if (downloadSize > 0 && !await addressableAssetPopupController.TryDownloadConfirmedAsync(downloadSize)) return AddressableOperationResult.Canceled;
 
-            var downloadResult = await DownloadDependenciesAsync(downloadKeyList, cancellationToken);
-            if (downloadResult != AddressableOperationResult.Success) return downloadResult;
+                var downloadResult = await DownloadDependenciesAsync(downloadKeyList, cancellationToken);
+                if (downloadResult != AddressableOperationResult.Success) return downloadResult;
+            }
 
             var addressResult = await LoadAddressesAsync(addressList, cancellationToken);
             return addressResult != AddressableOperationResult.Success ? addressResult : await LoadLabelsAsync(labels, cancellationToken);

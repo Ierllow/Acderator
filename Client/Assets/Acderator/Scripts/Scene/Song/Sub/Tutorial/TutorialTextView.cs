@@ -11,7 +11,7 @@ namespace Song
     {
         [SerializeField] private TextMeshProUGUI descriptionText = default!;
 
-        [Inject] private readonly TutorialMessageResolver tutorialMessageResolver = default!;
+        [InjectOptional] private readonly TutorialMessageResolver tutorialMessageResolver = default!;
 
         public void ShowIntro(TutorialMaster tutorial) => descriptionText.SetText(tutorial.Description);
 
