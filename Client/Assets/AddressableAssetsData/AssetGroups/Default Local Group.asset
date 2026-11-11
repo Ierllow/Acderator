@@ -27,24 +27,6 @@ MonoBehaviour:
     m_SerializedLabels:
     - song/prefab/note
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 4526205e4f66a204fb2220177e227d43
-    m_Address: charts/1
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - charts/1
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 474502fc774a4bc4fb3637e4e607d1e2
-    m_Address: song/jacket
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - song/jacket
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 563e78f4351b4aa478dfe8300018a64f
-    m_Address: sounds/song/song_1
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - sounds/song/song_1
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 5c91d06cd900e5019a1e8c93f363ffef
     m_Address: Assets/Acderator/Dummy/dummy.txt
     m_ReadOnly: 0
@@ -73,35 +55,11 @@ MonoBehaviour:
     m_SerializedLabels:
     - songselect/prefab/item
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 78c2c95c0e1496c4bb1fcd474d9f9a19
-    m_Address: master/master
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - master/master
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 7ae69c32298675c4a9fd7c9f057b0626
-    m_Address: song/particle/judgetext
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - song/particle/judgetext
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 84c3b95df199e4a11b374ff991d77f14
     m_Address: Assets/Acderator/Prefabs/Scene/Song/Notes/SingleNote.prefab
     m_ReadOnly: 0
     m_SerializedLabels:
     - song/prefab/note
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 8eff443bdec064f4ca8ff0634a47cd5b
-    m_Address: sounds/song/songse
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - sounds/song/songse
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 921a479ef4d6fb04ab4a1a997143c20b
-    m_Address: song/difficulty
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - song/difficulty
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 972f644c99a4ba0498b06a434f84d394
     m_Address: Assets/Acderator/Prefabs/Scene/Song/Notes/TapEffect.prefab
@@ -109,53 +67,17 @@ MonoBehaviour:
     m_SerializedLabels:
     - song/prefab/effect
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: a0a75ea3f97e67e4b96b2f12dd3bc075
-    m_Address: song/rank
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - song/rank
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: a8f1e72ad0d55434fbfe6011f5361151
-    m_Address: sounds/bgm/bgm
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - sounds/bgm/bgm
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: af3a4d320e4817a48851b316bbc1f054
-    m_Address: song/bg
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - song/bg
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: ccee2602023aa94429431317665fc6b9
-    m_Address: charts/3
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - charts/3
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: cd9e1b0593c7f4470b0d6e377f33b88f
     m_Address: Assets/Acderator/Prefabs/Scene/Song/Notes/LongNote.prefab
     m_ReadOnly: 0
     m_SerializedLabels:
     - song/prefab/note
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: cde7a598075b24248ac99d5307a30c9e
-    m_Address: songselect/bg
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - songselect/bg
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: e58f26967275ee7479213d80034432e2
     m_Address: Assets/Acderator/Prefabs/Scene/Song/TextJudge.prefab
     m_ReadOnly: 0
     m_SerializedLabels:
     - song/particle/judgetext
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: f20eef1d5f38f6f489b393675a6bed70
-    m_Address: result/bg
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - result/bg
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: f27c76e155416cd4bac97a3eb74e69b8
     m_Address: Assets/Acderator/Prefabs/Scene/Song/NoteLine.prefab
