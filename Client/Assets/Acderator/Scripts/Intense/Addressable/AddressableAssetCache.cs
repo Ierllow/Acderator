@@ -47,8 +47,8 @@ namespace Intense.Asset
 
         public void UnloadAll()
         {
-            foreach (var handle in loadedAssetHandleDict.Values.Where(handle => handle.IsValid())) Addressables.Release(handle);
-            foreach (var handle in loadedLabelHandleDict.Values.Where(handle => handle.IsValid())) Addressables.Release(handle);
+            foreach (var handle in loadedAssetHandleDict.Values) ReleaseIfValid(handle);
+            foreach (var handle in loadedLabelHandleDict.Values) ReleaseIfValid(handle);
             addLoadAddressSet.Clear();
             loadedAssetHandleDict.Clear();
             loadedLabelHandleDict.Clear();
@@ -78,6 +78,11 @@ namespace Intense.Asset
         public void RegisterSpriteAtlas(Object asset)
         {
             if (asset is SpriteAtlas atlas) spriteAtlasSet.Add(atlas);
+        }
+
+        private static void ReleaseIfValid(AsyncOperationHandle handle)
+        {
+            if (handle.IsValid()) Addressables.Release(handle);
         }
     }
 }

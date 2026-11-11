@@ -35,9 +35,9 @@ namespace Element.UI
             offsetSlider.value = PlayerPrefsValues.TapTiming;
             tapTimingNum.SetText(Math.Round(offsetSlider.value * 10).ToString());
             BgmSlider.value = PlayerPrefsValues.BgmVolume;
-            BgmNum.SetText(string.Format("{0}%", Math.Round(BgmSlider.value * 100)));
+            BgmNum.SetText(FormatPercent(BgmSlider.value));
             SeSlider.value = PlayerPrefsValues.SeVolume;
-            SeNum.SetText(string.Format("{0}%", Math.Round(SeSlider.value * 100)));
+            SeNum.SetText(FormatPercent(SeSlider.value));
         }
 
         public override void Open(ConfigPopupContext configPopupContext)
@@ -59,23 +59,37 @@ namespace Element.UI
                     tapTimingNum.SetText(Math.Round(offsetSlider.value * 10).ToString());
                     break;
                 case ConfigType.Bgm:
-                    PlayerPrefsValues.Set(PlayerPrefsKey.BgmVolume, BgmSlider.value);
-                    PlayerPrefsValues.Set(PlayerPrefsKey.BgmMute, BgmSlider.value == 0);
-                    PlayerPrefsValues.Set(PlayerPrefsKey.SongVolume, BgmSlider.value);
-                    PlayerPrefsValues.Set(PlayerPrefsKey.SongMute, BgmSlider.value == 0);
-                    bgmVolumeController.UpdateVolume(BgmSlider.value, BgmSlider.value == 0);
-                    songVolumeController.UpdateVolume(BgmSlider.value, BgmSlider.value == 0);
-                    BgmNum.SetText(string.Format("{0}%", Math.Round(BgmSlider.value * 100)));
+                    UpdateBgmVolume(BgmSlider.value);
                     break;
                 case ConfigType.Se:
-                    PlayerPrefsValues.Set(PlayerPrefsKey.SeVolume, SeSlider.value);
-                    PlayerPrefsValues.Set(PlayerPrefsKey.SeMute, SeSlider.value == 0);
-                    seVolumeController.UpdateVolume(SeSlider.value, SeSlider.value == 0);
-                    SeNum.SetText(string.Format("{0}%", Math.Round(SeSlider.value * 100)));
+                    UpdateSeVolume(SeSlider.value);
                     break;
                 default:
                     break;
             }
         }
+
+        private void UpdateBgmVolume(float volume)
+        {
+            var isMuted = volume == 0;
+            PlayerPrefsValues.Set(PlayerPrefsKey.BgmVolume, volume);
+            PlayerPrefsValues.Set(PlayerPrefsKey.BgmMute, isMuted);
+            PlayerPrefsValues.Set(PlayerPrefsKey.SongVolume, volume);
+            PlayerPrefsValues.Set(PlayerPrefsKey.SongMute, isMuted);
+            bgmVolumeController.UpdateVolume(volume, isMuted);
+            songVolumeController.UpdateVolume(volume, isMuted);
+            BgmNum.SetText(FormatPercent(volume));
+        }
+
+        private void UpdateSeVolume(float volume)
+        {
+            var isMuted = volume == 0;
+            PlayerPrefsValues.Set(PlayerPrefsKey.SeVolume, volume);
+            PlayerPrefsValues.Set(PlayerPrefsKey.SeMute, isMuted);
+            seVolumeController.UpdateVolume(volume, isMuted);
+            SeNum.SetText(FormatPercent(volume));
+        }
+
+        private static string FormatPercent(float value) => string.Format("{0}%", Math.Round(value * 100));
     }
 }

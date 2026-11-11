@@ -13,18 +13,7 @@ namespace Song
         [Inject] private readonly MasterDataManager masterDataManager = default!;
 
         public bool TryBuild(SongMaster selectedSong, string sessionId, [NotNullWhen(true)] out SongSceneContext? tutorialSceneContext)
-        {
-            var tutorial = FindTutorial(selectedSong);
-            var steps = GetTutorialSteps();
-            if (tutorial == default || steps.Count == 0)
-            {
-                tutorialSceneContext = null;
-                return false;
-            }
-
-            tutorialSceneContext = CreateTutorialSceneContext(tutorial, steps, selectedSong, sessionId);
-            return true;
-        }
+            => TryCreateTutorialSceneContext(FindTutorial(selectedSong), selectedSong, sessionId, out tutorialSceneContext);
 
         public bool TryGetFirstTutorialScoreId(out int scoreId)
         {
@@ -36,16 +25,7 @@ namespace Song
         public bool TryBuildFirstTutorial(string sessionId, [NotNullWhen(true)] out SongSceneContext? tutorialSceneContext)
         {
             var tutorialSong = FindFirstTutorialSong();
-            var tutorial = tutorialSong == default ? default : FindTutorial(tutorialSong);
-            var steps = GetTutorialSteps();
-            if (tutorialSong == default || tutorial == default || steps.Count == 0)
-            {
-                tutorialSceneContext = null;
-                return false;
-            }
-
-            tutorialSceneContext = CreateTutorialSceneContext(tutorial, steps, tutorialSong, sessionId);
-            return true;
+            return TryCreateTutorialSceneContext(tutorialSong == default ? default : FindTutorial(tutorialSong), tutorialSong, sessionId, out tutorialSceneContext);
         }
 
         private TutorialMaster? FindTutorial(SongMaster selectedSong) => masterDataManager.MemoryDatabase.TutorialMasterTable.Where(x => x.Sid == selectedSong.Sid || x.Sid == selectedSong.Group || x.Sid == 0).OrderBy(x => x.Order).FirstOrDefault();
@@ -58,6 +38,23 @@ namespace Song
             return tutorial == default ? null : masterDataManager.MemoryDatabase.SongMasterTable.FindBySid(tutorial.Sid);
         }
 
-        private SongSceneContext CreateTutorialSceneContext(TutorialMaster tutorial, List<TutorialStepMaster> steps, SongMaster song, string sessionId) => SongSceneContext.Create(new SongInfo(song), sessionId, new TutorialInfo(tutorial, steps.OrderBy(x => x.StepOrder).ToList()));
+        private bool TryCreateTutorialSceneContext(TutorialMaster? tutorial, SongMaster? song, string sessionId, [NotNullWhen(true)] out SongSceneContext? tutorialSceneContext)
+        {
+            if (tutorial == default || song == default)
+            {
+                tutorialSceneContext = null;
+                return false;
+            }
+
+            var steps = GetTutorialSteps();
+            if (steps.Count == 0)
+            {
+                tutorialSceneContext = null;
+                return false;
+            }
+
+            tutorialSceneContext = SongSceneContext.Create(new SongInfo(song), sessionId, new TutorialInfo(tutorial, steps));
+            return true;
+        }
     }
 }

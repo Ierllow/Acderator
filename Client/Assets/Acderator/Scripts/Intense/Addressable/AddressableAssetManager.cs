@@ -151,11 +151,10 @@ namespace Intense.Asset
             return result;
         }
 
-        private async UniTask<AddressableOperationResult> LoadAddressesAsync(IEnumerable<string> addressList, CancellationToken cancellationToken)
+        private async UniTask<AddressableOperationResult> LoadAddressesAsync(IReadOnlyList<string> addressList, CancellationToken cancellationToken)
         {
-            var loadAddressList = addressList.ToList();
-            var loadHandleList = new List<AsyncOperationHandle<Object>>(loadAddressList.Count);
-            foreach (var address in loadAddressList) loadHandleList.Add(Addressables.LoadAssetAsync<Object>(address));
+            var loadHandleList = new List<AsyncOperationHandle<Object>>(addressList.Count);
+            foreach (var address in addressList) loadHandleList.Add(Addressables.LoadAssetAsync<Object>(address));
 
             for (var i = 0; i < loadHandleList.Count; i++)
             {
@@ -166,7 +165,7 @@ namespace Intense.Asset
                     return result;
                 }
 
-                addressableAssetCache.CacheAsset(loadAddressList[i], loadHandleList[i]);
+                addressableAssetCache.CacheAsset(addressList[i], loadHandleList[i]);
             }
             return AddressableOperationResult.Success;
         }
@@ -222,9 +221,9 @@ namespace Intense.Asset
             }
         }
 
-        private bool IsValidLabel(AssetLabelReference label) => label?.RuntimeKeyIsValid() ?? false;
+        private static bool IsValidLabel(AssetLabelReference label) => label?.RuntimeKeyIsValid() ?? false;
 
-        private void ReleaseIfValid(AsyncOperationHandle handle)
+        private static void ReleaseIfValid(AsyncOperationHandle handle)
         {
             if (handle.IsValid()) Addressables.Release(handle);
         }
@@ -240,7 +239,7 @@ namespace Intense.Asset
         private async UniTask<AddressableOperationResult> WaitForCompletionAsync(AsyncOperationHandle handle, CancellationToken cancellationToken)
             => GetOperationResult(handle, await UniTask.WaitUntil(() => handle.IsDone, cancellationToken: cancellationToken).SuppressCancellationThrow());
 
-        private AddressableOperationResult GetOperationResult(AsyncOperationHandle operation, bool isCanceled) => (isCanceled, operation.Status) switch
+        private static AddressableOperationResult GetOperationResult(AsyncOperationHandle operation, bool isCanceled) => (isCanceled, operation.Status) switch
         {
             (true, _) => AddressableOperationResult.Canceled,
             (_, AsyncOperationStatus.Succeeded) => AddressableOperationResult.Success,
