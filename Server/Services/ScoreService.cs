@@ -4,18 +4,9 @@ using Microsoft.Extensions.Options;
 
 namespace Acderator.Server.Services;
 
-public sealed class ScoreService : AcderatorServiceBase<IScoreService>, IScoreService
+public sealed class ScoreService(GameRepository repository, TokenService tokens, IOptions<ServerOptions> options, ILogger<ScoreService> logger)
+    : AcderatorServiceBase<IScoreService>(options, logger), IScoreService
 {
-    private readonly GameRepository repository;
-    private readonly TokenService tokens;
-
-    public ScoreService(GameRepository repository, TokenService tokens, IOptions<ServerOptions> options, ILogger<ScoreService> logger)
-        : base(options, logger)
-    {
-        this.repository = repository;
-        this.tokens = tokens;
-    }
-
     public async UnaryResult<ScoreBeginResponse> BeginAsync(ScoreBeginRequest request) => await ExecuteAsync(async () =>
     {
         var authentication = await Authentication.AuthenticateAsync(Header("authorization"), repository, tokens);

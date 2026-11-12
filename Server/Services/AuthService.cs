@@ -6,23 +6,10 @@ using System.Text;
 
 namespace Acderator.Server.Services;
 
-public sealed class AuthService : AcderatorServiceBase<IAuthService>, IAuthService
+public sealed class AuthService(GameRepository repository, MasterDataStore masterData, PasswordService passwords, TokenService tokens, IOptions<ServerOptions> options, ILogger<AuthService> logger)
+    : AcderatorServiceBase<IAuthService>(options, logger), IAuthService
 {
-    private readonly GameRepository repository;
-    private readonly MasterDataStore masterData;
-    private readonly PasswordService passwords;
-    private readonly TokenService tokens;
-    private readonly ServerOptions options;
-
-    public AuthService(GameRepository repository, MasterDataStore masterData, PasswordService passwords, TokenService tokens, IOptions<ServerOptions> options, ILogger<AuthService> logger)
-        : base(options, logger)
-    {
-        this.repository = repository;
-        this.masterData = masterData;
-        this.passwords = passwords;
-        this.tokens = tokens;
-        this.options = options.Value;
-    }
+    private readonly ServerOptions serverOptions = options.Value;
 
     public async UnaryResult<LoginResponse> LoginAsync(LoginRequest request) => await ExecuteAsync(async () =>
     {
@@ -30,7 +17,7 @@ public sealed class AuthService : AcderatorServiceBase<IAuthService>, IAuthServi
         {
             return Failure<LoginResponse>(AppError.PreconditionFailed, masterData.Payload);
         }
-        if (string.IsNullOrEmpty(request.UserId) || request.UserId.Length > 255 || Encoding.UTF8.GetByteCount(request.Password) > options.MaxPasswordBytes)
+        if (string.IsNullOrEmpty(request.UserId) || request.UserId.Length > 255 || Encoding.UTF8.GetByteCount(request.Password) > serverOptions.MaxPasswordBytes)
         {
             return Failure<LoginResponse>(AppError.Unauthorized);
         }
@@ -51,7 +38,7 @@ public sealed class AuthService : AcderatorServiceBase<IAuthService>, IAuthServi
         {
             return Failure<RegisterResponse>(AppError.PreconditionFailed, masterData.Payload);
         }
-        if (string.IsNullOrWhiteSpace(request.Uuid) || Encoding.UTF8.GetByteCount(request.Uuid) > options.MaxUuidBytes)
+        if (string.IsNullOrWhiteSpace(request.Uuid) || Encoding.UTF8.GetByteCount(request.Uuid) > serverOptions.MaxUuidBytes)
         {
             return Failure<RegisterResponse>(AppError.BadRequest);
         }

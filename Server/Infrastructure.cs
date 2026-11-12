@@ -45,22 +45,15 @@ internal static class AppErrorMessages
     };
 }
 
-public abstract class AcderatorServiceBase<TService> : ServiceBase<TService>
+public abstract class AcderatorServiceBase<TService>(IOptions<ServerOptions> options, ILogger logger) : ServiceBase<TService>
     where TService : class, MagicOnion.IService<TService>
 {
-    private readonly IOptions<ServerOptions> options;
-    private readonly ILogger logger;
-
-    protected AcderatorServiceBase(IOptions<ServerOptions> options, ILogger logger)
-    {
-        this.options = options;
-        this.logger = logger;
-    }
+    private readonly ServerOptions serverOptions = options.Value;
 
     protected async Task<TResponse> ExecuteAsync<TResponse>(Func<Task<TResponse>> action)
         where TResponse : ResponseBase, new()
     {
-        if (options.Value.MaintenanceMode) return Failure<TResponse>(AppError.Maintenance);
+        if (serverOptions.MaintenanceMode) return Failure<TResponse>(AppError.Maintenance);
 
         try
         {
@@ -73,7 +66,14 @@ public abstract class AcderatorServiceBase<TService> : ServiceBase<TService>
         }
     }
 
-    protected string? Header(string key) => Context.CallContext.RequestHeaders.FirstOrDefault(entry => string.Equals(entry.Key, key, StringComparison.OrdinalIgnoreCase))?.Value;
+    protected string? Header(string key)
+    {
+        foreach (var entry in Context.CallContext.RequestHeaders)
+        {
+            if (string.Equals(entry.Key, key, StringComparison.OrdinalIgnoreCase)) return entry.Value;
+        }
+        return null;
+    }
 
     protected TResponse Failure<TResponse>(AppError error, Dictionary<string, object>? master = null)
         where TResponse : ResponseBase, new() => new()
@@ -89,11 +89,47 @@ public abstract class AcderatorServiceBase<TService> : ServiceBase<TService>
 
 public sealed class TokenService
 {
-    internal string Generate() => Convert.ToHexString(RandomNumberGenerator.GetBytes(32)).ToLowerInvariant();
+    internal string Generate()
+    {
+        Span<byte> token = stackalloc byte[32];
+        RandomNumberGenerator.Fill(token);
+        return ToLowerHex(token);
+    }
 
-    internal string Hash(string token) => Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(token))).ToLowerInvariant();
+    internal string Hash(ReadOnlySpan<char> token)
+    {
+        var byteCount = Encoding.UTF8.GetByteCount(token);
+        Span<byte> tokenBytes = byteCount <= 256 ? stackalloc byte[byteCount] : new byte[byteCount];
+        Encoding.UTF8.GetBytes(token, tokenBytes);
+        Span<byte> hash = stackalloc byte[32];
+        SHA256.HashData(tokenBytes, hash);
+        return ToLowerHex(hash);
+    }
 
-    internal bool IsValid(string? token) => token is { Length: 64 } && token.All(Uri.IsHexDigit);
+    internal bool IsValid(string? token) => token is not null && IsValid(token.AsSpan());
+
+    internal bool IsValid(ReadOnlySpan<char> token)
+    {
+        if (token.Length != 64) return false;
+        foreach (var character in token)
+        {
+            if (!Uri.IsHexDigit(character)) return false;
+        }
+        return true;
+    }
+
+    private string ToLowerHex(ReadOnlySpan<byte> bytes)
+    {
+        const string hex = "0123456789abcdef";
+        Span<char> characters = stackalloc char[bytes.Length * 2];
+        for (var index = 0; index < bytes.Length; index++)
+        {
+            var value = bytes[index];
+            characters[index * 2] = hex[value >> 4];
+            characters[index * 2 + 1] = hex[value & 0x0F];
+        }
+        return new string(characters);
+    }
 }
 
 public sealed class PasswordService
@@ -102,11 +138,20 @@ public sealed class PasswordService
 
     internal PasswordMatch Verify(string stored, string candidate)
     {
-        return stored switch
-        {
-            _ when stored.StartsWith("$argon2", StringComparison.Ordinal) => Argon2.Verify(stored, candidate) ? PasswordMatch.Current : PasswordMatch.Invalid,
-            _ => CryptographicOperations.FixedTimeEquals(Encoding.UTF8.GetBytes(stored), Encoding.UTF8.GetBytes(candidate)) ? PasswordMatch.Legacy : PasswordMatch.Invalid,
-        };
+        if (stored.StartsWith("$argon2", StringComparison.Ordinal)) return Argon2.Verify(stored, candidate) ? PasswordMatch.Current : PasswordMatch.Invalid;
+        return FixedTimeEquals(stored, candidate) ? PasswordMatch.Legacy : PasswordMatch.Invalid;
+    }
+
+    private bool FixedTimeEquals(string stored, string candidate)
+    {
+        var storedByteCount = Encoding.UTF8.GetByteCount(stored);
+        if (storedByteCount != Encoding.UTF8.GetByteCount(candidate)) return false;
+
+        Span<byte> storedBytes = storedByteCount <= 256 ? stackalloc byte[storedByteCount] : new byte[storedByteCount];
+        Span<byte> candidateBytes = storedByteCount <= 256 ? stackalloc byte[storedByteCount] : new byte[storedByteCount];
+        Encoding.UTF8.GetBytes(stored, storedBytes);
+        Encoding.UTF8.GetBytes(candidate, candidateBytes);
+        return CryptographicOperations.FixedTimeEquals(storedBytes, candidateBytes);
     }
 }
 

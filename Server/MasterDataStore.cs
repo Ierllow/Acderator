@@ -8,11 +8,7 @@ public sealed class MasterDataStore(IDbContextFactory<AcderatorDbContext> contex
 {
     private readonly JsonSerializerOptions jsonOptions = new() { PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower };
 
-    private readonly IDbContextFactory<AcderatorDbContext> contextFactory = contextFactory;
-    private readonly IHostEnvironment environment = environment;
-    private readonly ServerOptions options = options.Value;
-    private readonly ILogger<MasterDataStore> logger = logger;
-    private JsonDocument document = JsonDocument.Parse("{}");
+    private readonly ServerOptions serverOptions = options.Value;
     private Dictionary<string, object> payload = [];
     private string version = string.Empty;
 
@@ -22,41 +18,32 @@ public sealed class MasterDataStore(IDbContextFactory<AcderatorDbContext> contex
 
     internal async Task SynchronizeAsync()
     {
-        var configuredPath = options.MasterDataPath;
+        var configuredPath = serverOptions.MasterDataPath;
         var path = Path.IsPathRooted(configuredPath) ? configuredPath : Path.Combine(environment.ContentRootPath, configuredPath);
-        var nextDocument = JsonDocument.Parse(await File.ReadAllTextAsync(path));
+        await using var stream = File.OpenRead(path);
+        using var nextDocument = await JsonDocument.ParseAsync(stream);
         var root = nextDocument.RootElement;
         var nextPayload = (Dictionary<string, object>)ConvertElement(root);
         var hasVersion = root.TryGetProperty("version_master", out var versionElement);
         var nextVersion = hasVersion ? versionElement.GetString() ?? string.Empty : string.Empty;
 
-        try
-        {
-            await using var context = await contextFactory.CreateDbContextAsync();
-            await using var transaction = await context.Database.BeginTransactionAsync();
-            await DeleteMasterDataAsync(context);
-            context.MasterVersions.Add(new MasterVersionEntity { Version = nextVersion });
-            context.TitleMasters.AddRange(ReadEntities<TitleMasterEntity>(root, "title_masters"));
-            context.SongSelectMasters.AddRange(ReadEntities<SongSelectMasterEntity>(root, "song_select_masters"));
-            context.SongMasters.AddRange(ReadEntities<SongMasterEntity>(root, "song_masters"));
-            context.SongScoreRateMasters.AddRange(ReadEntities<SongScoreRateMasterEntity>(root, "score_rate_masters"));
-            context.SongBaseScoreMasters.AddRange(ReadEntities<SongBaseScoreMasterEntity>(root, "base_score_masters"));
-            context.SongJudgeZoneMasters.AddRange(ReadEntities<SongJudgeZoneMasterEntity>(root, "judge_zone_masters"));
-            context.SongBaseHpMasters.AddRange(ReadEntities<SongBaseHpMasterEntity>(root, "base_hp_masters"));
-            context.SongHpRateMasters.AddRange(ReadEntities<SongHpRateMasterEntity>(root, "hp_rate_masters"));
-            context.SoundSheetNameMasters.AddRange(ReadEntities<SoundSheetNameMasterEntity>(root, "sound_sheet_masters"));
-            context.ResultMasters.AddRange(ReadEntities<ResultMasterEntity>(root, "result_masters"));
-            await context.SaveChangesAsync();
-            await transaction.CommitAsync();
-        }
-        catch
-        {
-            nextDocument.Dispose();
-            throw;
-        }
+        await using var context = await contextFactory.CreateDbContextAsync();
+        await using var transaction = await context.Database.BeginTransactionAsync();
+        await DeleteMasterDataAsync(context);
+        context.MasterVersions.Add(new MasterVersionEntity { Version = nextVersion });
+        context.TitleMasters.AddRange(ReadEntities<TitleMasterEntity>(root, "title_masters"));
+        context.SongSelectMasters.AddRange(ReadEntities<SongSelectMasterEntity>(root, "song_select_masters"));
+        context.SongMasters.AddRange(ReadEntities<SongMasterEntity>(root, "song_masters"));
+        context.SongScoreRateMasters.AddRange(ReadEntities<SongScoreRateMasterEntity>(root, "score_rate_masters"));
+        context.SongBaseScoreMasters.AddRange(ReadEntities<SongBaseScoreMasterEntity>(root, "base_score_masters"));
+        context.SongJudgeZoneMasters.AddRange(ReadEntities<SongJudgeZoneMasterEntity>(root, "judge_zone_masters"));
+        context.SongBaseHpMasters.AddRange(ReadEntities<SongBaseHpMasterEntity>(root, "base_hp_masters"));
+        context.SongHpRateMasters.AddRange(ReadEntities<SongHpRateMasterEntity>(root, "hp_rate_masters"));
+        context.SoundSheetNameMasters.AddRange(ReadEntities<SoundSheetNameMasterEntity>(root, "sound_sheet_masters"));
+        context.ResultMasters.AddRange(ReadEntities<ResultMasterEntity>(root, "result_masters"));
+        await context.SaveChangesAsync();
+        await transaction.CommitAsync();
 
-        document.Dispose();
-        document = nextDocument;
         payload = nextPayload;
         version = nextVersion;
         logger.LogInformation("Synchronized master data version {Version}", Version);
@@ -87,8 +74,8 @@ public sealed class MasterDataStore(IDbContextFactory<AcderatorDbContext> contex
 
     private object ConvertElement(JsonElement element) => element.ValueKind switch
     {
-        JsonValueKind.Object => element.EnumerateObject().ToDictionary(x => x.Name, x => ConvertElement(x.Value)),
-        JsonValueKind.Array => element.EnumerateArray().Select(ConvertElement).ToList(),
+        JsonValueKind.Object => ConvertObject(element),
+        JsonValueKind.Array => ConvertArray(element),
         JsonValueKind.String => element.GetString() ?? string.Empty,
         JsonValueKind.Number when element.TryGetInt32(out var intValue) => intValue,
         JsonValueKind.Number when element.TryGetInt64(out var longValue) => longValue,
@@ -97,4 +84,18 @@ public sealed class MasterDataStore(IDbContextFactory<AcderatorDbContext> contex
         JsonValueKind.False => false,
         _ => string.Empty,
     };
+
+    private Dictionary<string, object> ConvertObject(JsonElement element)
+    {
+        var result = new Dictionary<string, object>();
+        foreach (var property in element.EnumerateObject()) result[property.Name] = ConvertElement(property.Value);
+        return result;
+    }
+
+    private List<object> ConvertArray(JsonElement element)
+    {
+        var result = new List<object>(element.GetArrayLength());
+        foreach (var item in element.EnumerateArray()) result.Add(ConvertElement(item));
+        return result;
+    }
 }

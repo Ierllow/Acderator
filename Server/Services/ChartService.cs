@@ -6,7 +6,8 @@ using System.Text.Json;
 
 namespace Acderator.Server.Services;
 
-public sealed class ChartService : AcderatorServiceBase<IChartService>, IChartService
+public sealed class ChartService(IHostEnvironment environment, GameRepository repository, TokenService tokens, IOptions<ServerOptions> options, ILogger<ChartService> logger)
+    : AcderatorServiceBase<IChartService>(options, logger), IChartService
 {
     private readonly JsonSerializerOptions jsonOptions = new()
     {
@@ -14,18 +15,10 @@ public sealed class ChartService : AcderatorServiceBase<IChartService>, IChartSe
         PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
     };
 
-    private readonly GameRepository repository;
-    private readonly TokenService tokens;
-    private readonly string chartDataDirectory;
+    private readonly string chartDataDirectory = Path.IsPathRooted(options.Value.ChartDataDirectory)
+        ? options.Value.ChartDataDirectory
+        : Path.Combine(environment.ContentRootPath, options.Value.ChartDataDirectory);
     private readonly ConcurrentDictionary<int, ChartResponse> chartCache = new();
-
-    public ChartService(IHostEnvironment environment, GameRepository repository, TokenService tokens, IOptions<ServerOptions> options, ILogger<ChartService> logger)
-        : base(options, logger)
-    {
-        this.repository = repository;
-        this.tokens = tokens;
-        chartDataDirectory = Path.IsPathRooted(options.Value.ChartDataDirectory) ? options.Value.ChartDataDirectory : Path.Combine(environment.ContentRootPath, options.Value.ChartDataDirectory);
-    }
 
     public async UnaryResult<ChartResponse> GetAsync(ChartRequest request) => await ExecuteAsync(async () =>
     {
@@ -36,7 +29,8 @@ public sealed class ChartService : AcderatorServiceBase<IChartService>, IChartSe
 
         var path = Path.Combine(chartDataDirectory, $"{request.Sid}.json");
         if (!File.Exists(path)) return Failure<ChartResponse>(AppError.NotFound);
-        var response = JsonSerializer.Deserialize<ChartResponse>(await File.ReadAllTextAsync(path), jsonOptions);
+        await using var stream = File.OpenRead(path);
+        var response = await JsonSerializer.DeserializeAsync<ChartResponse>(stream, jsonOptions);
         if (response is null) return Failure<ChartResponse>(AppError.InvalidRequestFormat);
         return chartCache[request.Sid] = response;
     });
