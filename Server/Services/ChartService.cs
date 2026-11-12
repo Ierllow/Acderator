@@ -8,7 +8,7 @@ namespace Acderator.Server.Services;
 
 public sealed class ChartService : AcderatorServiceBase<IChartService>, IChartService
 {
-    private static readonly JsonSerializerOptions JsonOptions = new()
+    private readonly JsonSerializerOptions jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true,
         PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
@@ -36,7 +36,7 @@ public sealed class ChartService : AcderatorServiceBase<IChartService>, IChartSe
 
         var path = Path.Combine(chartDataDirectory, $"{request.Sid}.json");
         if (!File.Exists(path)) return Failure<ChartResponse>(AppError.NotFound);
-        var response = JsonSerializer.Deserialize<ChartResponse>(await File.ReadAllTextAsync(path), JsonOptions);
+        var response = JsonSerializer.Deserialize<ChartResponse>(await File.ReadAllTextAsync(path), jsonOptions);
         if (response is null) return Failure<ChartResponse>(AppError.InvalidRequestFormat);
         return chartCache[request.Sid] = response;
     });

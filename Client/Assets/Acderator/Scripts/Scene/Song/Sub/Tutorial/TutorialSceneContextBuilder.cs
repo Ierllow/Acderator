@@ -28,7 +28,12 @@ namespace Song
             return TryCreateTutorialSceneContext(tutorialSong == default ? default : FindTutorial(tutorialSong), tutorialSong, sessionId, out tutorialSceneContext);
         }
 
-        private TutorialMaster? FindTutorial(SongMaster selectedSong) => masterDataManager.MemoryDatabase.TutorialMasterTable.Where(x => x.Sid == selectedSong.Sid || x.Sid == selectedSong.Group || x.Sid == 0).OrderBy(x => x.Order).FirstOrDefault();
+        private TutorialMaster? FindTutorial(SongMaster selectedSong)
+        {
+            var tutorials = masterDataManager.MemoryDatabase.TutorialMasterTable;
+            var matches = tutorials.Where(x => x.Sid == selectedSong.Sid || x.Sid == selectedSong.Group || x.Sid == 0);
+            return matches.OrderBy(x => x.Order).FirstOrDefault();
+        }
 
         private List<TutorialStepMaster> GetTutorialSteps() => masterDataManager.MemoryDatabase.TutorialStepMasterTable.OrderBy(x => x.StepOrder).ToList();
 

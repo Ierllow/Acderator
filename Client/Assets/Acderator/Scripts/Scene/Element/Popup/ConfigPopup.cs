@@ -90,6 +90,6 @@ namespace Element.UI
             SeNum.SetText(FormatPercent(volume));
         }
 
-        private static string FormatPercent(float value) => string.Format("{0}%", Math.Round(value * 100));
+        private string FormatPercent(float value) => string.Format("{0}%", Math.Round(value * 100));
     }
 }

@@ -29,7 +29,10 @@ namespace Intense
         public void AddLoaded(SceneType sceneType)
         {
             var loadedScene = UnityEngine.SceneManagement.SceneManager.GetSceneByName(sceneType.ToString());
-            var sceneBase = !loadedScene.IsValid() || !loadedScene.isLoaded ? default : loadedScene.GetRootGameObjects().SelectMany(root => root.GetComponentsInChildren<SceneBase>(true)).FirstOrDefault(sceneBase => GetSceneType(sceneBase) == sceneType);
+            if (!loadedScene.IsValid() || !loadedScene.isLoaded) return;
+
+            var sceneBases = loadedScene.GetRootGameObjects().SelectMany(root => root.GetComponentsInChildren<SceneBase>(true));
+            var sceneBase = sceneBases.FirstOrDefault(x => GetSceneType(x) == sceneType);
             if (sceneBase == null) return;
 
             var registeredSceneType = GetSceneType(sceneBase);

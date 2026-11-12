@@ -34,8 +34,8 @@ namespace SongSelect
         [Inject] private readonly SongSelectSoundController soundController;
         [Inject] private readonly Song.TutorialSceneContextBuilder tutorialSceneContextBuilder;
 
-        private static readonly AddressableAssetAddress BackgroundAtlasAddress = new("songselect/bg");
-        private static readonly AddressableAssetAddress JacketAtlasAddress = new("song/jacket");
+        private readonly AddressableAssetAddress backgroundAtlasAddress = new("songselect/bg");
+        private readonly AddressableAssetAddress jacketAtlasAddress = new("song/jacket");
 
         private SpriteAtlas backgroundAtlas;
         private SpriteAtlas jacketAtlas;
@@ -81,11 +81,11 @@ namespace SongSelect
             {
                 addressableAssetManager.AddLoad(address);
             }
-            addressableAssetManager.AddLoad(BackgroundAtlasAddress);
-            addressableAssetManager.AddLoad(JacketAtlasAddress);
+            addressableAssetManager.AddLoad(backgroundAtlasAddress);
+            addressableAssetManager.AddLoad(jacketAtlasAddress);
             await addressableAssetManager.LoadAssetsAsync(sceneManager.CurrentSceneType, destroyCancellationToken);
-            backgroundAtlas = await addressableAssetManager.LoadAssetAsync<SpriteAtlas>(BackgroundAtlasAddress);
-            jacketAtlas = await addressableAssetManager.LoadAssetAsync<SpriteAtlas>(JacketAtlasAddress);
+            backgroundAtlas = await addressableAssetManager.LoadAssetAsync<SpriteAtlas>(backgroundAtlasAddress);
+            jacketAtlas = await addressableAssetManager.LoadAssetAsync<SpriteAtlas>(jacketAtlasAddress);
         }
 
         private void SetBackground(int bg) => backgroundImage.SetSprite(backgroundAtlas != null ? backgroundAtlas.GetSprite(bg.ToString()) : addressableAssetManager.GetSprite(bg.ToString()));

@@ -16,7 +16,14 @@ namespace Song
         public SongState CurrentState { get; private set; }
 
         public IUniTaskAsyncEnumerable<SongState> EverySongStateChanged => UniTaskAsyncEnumerable.EveryValueChanged(this, x => x.CurrentState).Queue();
-        public IUniTaskAsyncEnumerable<AsyncUnit> EveryUpdateSongStateWhere => UniTaskAsyncEnumerable.EveryUpdate().Queue().TakeWhile(_ => CurrentState != SongState.End);
+        public IUniTaskAsyncEnumerable<AsyncUnit> EveryUpdateSongStateWhere
+        {
+            get
+            {
+                var updates = UniTaskAsyncEnumerable.EveryUpdate().Queue();
+                return updates.TakeWhile(_ => CurrentState != SongState.End);
+            }
+        }
 
         public Observable<float> SongLoopUpdateAsObservable => songLoopUpdateSubject;
         public Observable<float> SongLeadInCompletedAsObservable => songLoopUpdateSubject.Where(s => s >= 0).Take(1);

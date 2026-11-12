@@ -34,7 +34,7 @@ namespace Intense
             return await AddCueSheetAsync(name, asset);
         }
 
-        private static async UniTask<CriAtomCueSheet> AddCueSheetAsync(string name, TextAsset asset)
+        private async UniTask<CriAtomCueSheet> AddCueSheetAsync(string name, TextAsset asset)
         {
             var cueSheet = CriAtom.AddCueSheet(name, asset.bytes, "");
             await UniTask.WaitWhile(() => cueSheet.IsLoading);

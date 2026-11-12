@@ -30,8 +30,8 @@ namespace Result
         [Inject] private readonly SoundManager soundManager;
         [Inject] private readonly NetworkManager networkManager;
 
-        private static readonly AddressableAssetAddress BackgroundAtlasAddress = new("result/bg");
-        private static readonly AddressableAssetAddress JacketAtlasAddress = new("song/jacket");
+        private readonly AddressableAssetAddress backgroundAtlasAddress = new("result/bg");
+        private readonly AddressableAssetAddress jacketAtlasAddress = new("song/jacket");
 
         private SpriteAtlas backgroundAtlas;
         private SpriteAtlas jacketAtlas;
@@ -44,11 +44,11 @@ namespace Result
 
         public override void OnCreateScene() => UniTask.Void(async () =>
         {
-            addressableAssetManager.AddLoad(BackgroundAtlasAddress);
-            addressableAssetManager.AddLoad(JacketAtlasAddress);
+            addressableAssetManager.AddLoad(backgroundAtlasAddress);
+            addressableAssetManager.AddLoad(jacketAtlasAddress);
             await addressableAssetManager.LoadAssetsAsync(sceneManager.CurrentSceneType, destroyCancellationToken);
-            backgroundAtlas = await addressableAssetManager.LoadAssetAsync<SpriteAtlas>(BackgroundAtlasAddress);
-            jacketAtlas = await addressableAssetManager.LoadAssetAsync<SpriteAtlas>(JacketAtlasAddress);
+            backgroundAtlas = await addressableAssetManager.LoadAssetAsync<SpriteAtlas>(backgroundAtlasAddress);
+            jacketAtlas = await addressableAssetManager.LoadAssetAsync<SpriteAtlas>(jacketAtlasAddress);
             var song = masterDataManager.MemoryDatabase.SongMasterTable.FindBySid(sceneContext.ResultInfo.Sid);
             var rank = (int)ScoreUtils.ToRank(sceneContext.ResultInfo.CurrentScore);
             resultDetail.Setup(

@@ -39,16 +39,23 @@ namespace Song
 
         private void Start()
         {
+            var spawnedNotes = songControllerResolver.Spawner.NoteFactoryAsObservable.Select(x => (Note: songManagerResolver.Factory.SpawnNote(x), Factory: x));
+            var validSpawnedNotes = spawnedNotes.Where(x => x.Note != null);
+            var leadInCompleted = songControllerResolver.Loop.SongLeadInCompletedAsObservable.Where(_ => !sceneContext.IsTutorial());
+            var returnToSongSelect = songPopupLayerController.EverySceneTypeChanged.Where(x => x.IsSongSelect());
+            var pauseButtonTaps = songLayerController.OnTapPauseButtonAsObservable.TakeWhile(_ => !songControllerResolver.Loop.IsEnd());
+            var pausePopupResults = songPopupLayerController.ClosedPausePopupAsAsyncEnumerable.TakeWhile(_ => sceneContext.IsNormal());
+
             songControllerResolver.Loop.EveryUpdateSongStateWhere.Subscribe(_ => UpdateSongProgressNext()).RegisterTo(destroyCancellationToken);
             songControllerResolver.Loop.EverySongStateChanged.SubscribeAwait(ChangeStateNext).RegisterTo(destroyCancellationToken);
             songControllerResolver.Loop.SongLoopUpdateAsObservable.Subscribe(OnSongLoopNext).RegisterTo(destroyCancellationToken);
-            songControllerResolver.Spawner.NoteFactoryAsObservable.Select(x => (songManagerResolver.Factory.SpawnNote(x), x)).Where(x => x.Item1 != null).Subscribe(x => songManagerResolver.Notes.AddAliveNote(x.Item1!, x.x)).RegisterTo(destroyCancellationToken);
-            songControllerResolver.Loop.SongLeadInCompletedAsObservable.Where(_ => !sceneContext.IsTutorial()).Subscribe(_ => songControllerResolver.Loop.UpdateState(SongState.Playing)).RegisterTo(destroyCancellationToken);
+            validSpawnedNotes.Subscribe(x => songManagerResolver.Notes.AddAliveNote(x.Note!, x.Factory)).RegisterTo(destroyCancellationToken);
+            leadInCompleted.Subscribe(_ => songControllerResolver.Loop.UpdateState(SongState.Playing)).RegisterTo(destroyCancellationToken);
             songControllerResolver.FingerJudgeRequest.JudgmentAsObservable.Subscribe(FingerSubscribeNext).RegisterTo(destroyCancellationToken);
             songControllerResolver.Finger.EveryUseTouchChanged.Subscribe(notesLineController.SetLaneLightActiveAll).RegisterTo(destroyCancellationToken);
-            songPopupLayerController.ClosedPausePopupAsAsyncEnumerable.TakeWhile(_ => sceneContext.IsNormal()).SubscribeAwait(ClosedPausePopupSubscribeNext).RegisterTo(destroyCancellationToken);
-            songPopupLayerController.EverySceneTypeChanged.Where(s => s.IsSongSelect()).SubscribeAwait(async (_, _) => await sceneManager.ChangeSceneAsync(SceneType.SongSelect, new SongSelect.SongSelectSceneContext())).RegisterTo(destroyCancellationToken);
-            songLayerController.OnTapPauseButtonAsObservable.TakeWhile(_ => !songControllerResolver.Loop.IsEnd()).SubscribeAwait(async (_, __) => await OnTapPauseButton()).RegisterTo(destroyCancellationToken);
+            pausePopupResults.SubscribeAwait(ClosedPausePopupSubscribeNext).RegisterTo(destroyCancellationToken);
+            returnToSongSelect.SubscribeAwait(async (_, _) => await sceneManager.ChangeSceneAsync(SceneType.SongSelect, new SongSelect.SongSelectSceneContext())).RegisterTo(destroyCancellationToken);
+            pauseButtonTaps.SubscribeAwait(async (_, _) => await OnTapPauseButton()).RegisterTo(destroyCancellationToken);
             songManagerResolver.TutorialState?.TutorialEventAsObservable.Subscribe(TutorialEventSubscribeNext).RegisterTo(destroyCancellationToken);
             songControllerResolver.Tutorial?.TutorialIntroCompletedSubject.Subscribe(_ => songControllerResolver.Loop.UpdateState(SongState.Playing)).RegisterTo(destroyCancellationToken);
             songControllerResolver.Tutorial?.TutorialStepCompletedSubject.Subscribe(_ => TutorialStepCompletedSubscribeNext()).RegisterTo(destroyCancellationToken);

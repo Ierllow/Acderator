@@ -28,7 +28,7 @@ namespace Song
 
         private readonly Dictionary<int, ParticleObject> playingHoldParticleDict = new();
 
-        private static readonly string[] JudgeTextSpriteNames = { "judgetext_0", "judgetext_1", "judgetext_2", "judgetext_3", "judgetext_4", "judgetext_5" };
+        private readonly string[] judgeTextSpriteNames = { "judgetext_0", "judgetext_1", "judgetext_2", "judgetext_3", "judgetext_4", "judgetext_5" };
 
         private ObjectPool<ParticleObject> CreatePool(ParticleObject prefab) => new(
             createFunc: () => Instantiate(prefab, particlePoolTransform),
@@ -91,7 +91,7 @@ namespace Song
                 parentX,
                 childX,
                 judgementType,
-                addressableAssetManager.GetSprite(JudgeTextSpriteNames[(int)judgementType]));
+                addressableAssetManager.GetSprite(judgeTextSpriteNames[(int)judgementType]));
             await UniTask.WaitWhile(() => judgeParticle.IsPlaying, cancellationToken: destroyCancellationToken);
             judgeParticlePool.Release(judgeParticle);
         }

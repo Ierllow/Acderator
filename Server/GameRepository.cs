@@ -14,10 +14,7 @@ public sealed class GameRepository(IDbContextFactory<AcderatorDbContext> context
     internal async Task<UserRecord?> FindUserAsync(string userId)
     {
         await using var context = await contextFactory.CreateDbContextAsync();
-        return await context.Users.AsNoTracking()
-            .Where(x => x.UserId == userId)
-            .Select(x => new UserRecord(x.UserId, x.Password))
-            .SingleOrDefaultAsync();
+        return await context.Users.AsNoTracking().Where(x => x.UserId == userId).Select(x => new UserRecord(x.UserId, x.Password)).SingleOrDefaultAsync();
     }
 
     internal async Task<bool> UuidExistsAsync(string uuid)
@@ -31,8 +28,9 @@ public sealed class GameRepository(IDbContextFactory<AcderatorDbContext> context
         await using var context = await contextFactory.CreateDbContextAsync();
         await using var transaction = await context.Database.BeginTransactionAsync();
         var userIdText = userId.ToString();
+        var now = DateTime.UtcNow;
         context.Users.Add(new UserEntity { UserId = userIdText, Uuid = uuid, Password = passwordHash });
-        context.AuthSessions.Add(new AuthSessionEntity { SessionId = sessionHash, UserId = userIdText, LastActivity = DateTime.UtcNow });
+        AddAuthSession(context, userIdText, sessionHash, now);
         await PruneAuthSessionsAsync(context);
         try
         {
@@ -56,7 +54,7 @@ public sealed class GameRepository(IDbContextFactory<AcderatorDbContext> context
             user.Password = replacementPasswordHash;
         }
         await PruneAuthSessionsAsync(context);
-        context.AuthSessions.Add(new AuthSessionEntity { SessionId = sessionHash, UserId = userId, LastActivity = DateTime.UtcNow });
+        AddAuthSession(context, userId, sessionHash, DateTime.UtcNow);
         await context.SaveChangesAsync();
         await transaction.CommitAsync();
     }
@@ -64,10 +62,12 @@ public sealed class GameRepository(IDbContextFactory<AcderatorDbContext> context
     internal async Task<string?> AuthenticateAsync(string sessionHash)
     {
         await using var context = await contextFactory.CreateDbContextAsync();
-        var cutoff = DateTime.UtcNow.AddSeconds(-options.AuthSessionTtlSeconds);
-        var session = await context.AuthSessions.SingleOrDefaultAsync(x => x.SessionId == sessionHash && x.LastActivity >= cutoff);
+        var now = DateTime.UtcNow;
+        var cutoff = now.AddSeconds(-options.AuthSessionTtlSeconds);
+        var activeSession = context.AuthSessions.Where(x => x.SessionId == sessionHash && x.LastActivity >= cutoff);
+        var session = await activeSession.SingleOrDefaultAsync();
         if (session is null) return null;
-        session.LastActivity = DateTime.UtcNow;
+        session.LastActivity = now;
         await context.SaveChangesAsync();
         return session.UserId;
     }
@@ -81,11 +81,8 @@ public sealed class GameRepository(IDbContextFactory<AcderatorDbContext> context
     internal async Task<List<ScoreEntry>> GetScoresAsync(string userId)
     {
         await using var context = await contextFactory.CreateDbContextAsync();
-        return await context.Scores.AsNoTracking()
-            .Where(x => x.UserId == userId)
-            .OrderBy(x => x.ScoreId)
-            .Select(x => new ScoreEntry { ScoreId = x.ScoreId, Score = x.Value })
-            .ToListAsync();
+        var scores = context.Scores.AsNoTracking().Where(x => x.UserId == userId).OrderBy(x => x.ScoreId);
+        return await scores.Select(x => new ScoreEntry { ScoreId = x.ScoreId, Score = x.Value }).ToListAsync();
     }
 
     internal async Task<bool> BeginScoreAsync(string userId, int scoreId, string sessionHash)
@@ -94,7 +91,8 @@ public sealed class GameRepository(IDbContextFactory<AcderatorDbContext> context
         if (!await context.SongMasters.AnyAsync(x => x.Sid == scoreId)) return false;
 
         await using var transaction = await context.Database.BeginTransactionAsync();
-        var cutoff = DateTime.UtcNow.AddSeconds(-options.ScoreSessionTtlSeconds);
+        var now = DateTime.UtcNow;
+        var cutoff = now.AddSeconds(-options.ScoreSessionTtlSeconds);
         await context.ScoreSessions.Where(x => x.CreatedAt < cutoff).ExecuteDeleteAsync();
         await context.ScoreSessions.Where(x => x.UserId == userId && x.ScoreId == scoreId).ExecuteDeleteAsync();
         context.ScoreSessions.Add(new ScoreSessionEntity
@@ -102,7 +100,7 @@ public sealed class GameRepository(IDbContextFactory<AcderatorDbContext> context
             SessionId = sessionHash,
             ScoreId = scoreId,
             UserId = userId,
-            CreatedAt = DateTime.UtcNow,
+            CreatedAt = now,
         });
         await context.SaveChangesAsync();
         await transaction.CommitAsync();
@@ -118,11 +116,13 @@ public sealed class GameRepository(IDbContextFactory<AcderatorDbContext> context
 
         await using var transaction = await context.Database.BeginTransactionAsync(IsolationLevel.Serializable);
         var cutoff = DateTime.UtcNow.AddSeconds(-options.ScoreSessionTtlSeconds);
-        var scoreSession = await context.ScoreSessions.SingleOrDefaultAsync(x => x.SessionId == sessionHash && x.UserId == userId && x.CreatedAt >= cutoff);
+        var activeScoreSession = context.ScoreSessions.Where(x => x.SessionId == sessionHash && x.UserId == userId && x.CreatedAt >= cutoff);
+        var scoreSession = await activeScoreSession.SingleOrDefaultAsync();
         if (scoreSession is null) return SubmitScoreResult.SessionNotFound;
 
         context.ScoreSessions.Remove(scoreSession);
-        var savedScore = await context.Scores.SingleOrDefaultAsync(x => x.UserId == userId && x.ScoreId == scoreSession.ScoreId);
+        var savedScores = context.Scores.Where(x => x.UserId == userId && x.ScoreId == scoreSession.ScoreId);
+        var savedScore = await savedScores.SingleOrDefaultAsync();
         if (savedScore is null)
         {
             context.Scores.Add(new ScoreEntity { UserId = userId, ScoreId = scoreSession.ScoreId, Value = score });
@@ -142,7 +142,12 @@ public sealed class GameRepository(IDbContextFactory<AcderatorDbContext> context
         await context.AuthSessions.Where(x => x.LastActivity < cutoff).ExecuteDeleteAsync();
     }
 
-    private static bool IsDuplicateKey(DbUpdateException exception) => exception.GetBaseException() is MySqlException { Number: 1062 };
+    private void AddAuthSession(AcderatorDbContext context, string userId, string sessionHash, DateTime now)
+    {
+        context.AuthSessions.Add(new AuthSessionEntity { SessionId = sessionHash, UserId = userId, LastActivity = now });
+    }
+
+    private bool IsDuplicateKey(DbUpdateException exception) => exception.GetBaseException() is MySqlException { Number: 1062 };
 }
 
 internal sealed record UserRecord(string UserId, string Password);

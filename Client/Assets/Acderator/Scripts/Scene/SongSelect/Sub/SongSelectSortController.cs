@@ -20,35 +20,47 @@ namespace SongSelect
             [Text("ハイスコア")] HighScore,
         }
 
-        private static readonly OrderType[] OrderTypes = (OrderType[])Enum.GetValues(typeof(OrderType));
-        private static readonly Dictionary<OrderType, string> OrderTypeTextDict = OrderTypes.ToDictionary(x => x, x => typeof(OrderType).GetField(x.ToString())?.GetCustomAttribute<TextAttribute>()?.Text ?? x.ToString());
+        private readonly OrderType[] orderTypes;
+        private readonly Dictionary<OrderType, string> orderTypeTextDict;
 
         [Inject] private readonly MasterDataManager masterDataManager;
         [Inject] private readonly ScoreManager scoreManager;
 
         public OrderType CurrentOrderType { get; private set; } = (OrderType)PlayerPrefsValues.OrderType;
 
-        public string Text => OrderTypeTextDict.TryGetValue(CurrentOrderType, out var text) ? text : CurrentOrderType.ToString();
+        public string Text => orderTypeTextDict.TryGetValue(CurrentOrderType, out var text) ? text : CurrentOrderType.ToString();
+
+        public SongSelectSortController()
+        {
+            orderTypes = (OrderType[])Enum.GetValues(typeof(OrderType));
+            orderTypeTextDict = orderTypes.ToDictionary(x => x, GetOrderTypeText);
+        }
 
         public List<int> GetOrderedList(int selectedDifficulty)
         {
-            var songMasterTables = masterDataManager.MemoryDatabase.SongMasterTable;
-            return CurrentOrderType switch
+            var songs = masterDataManager.MemoryDatabase.SongMasterTable.All;
+            IEnumerable<SongMaster> orderedSongs = CurrentOrderType switch
             {
-                OrderType.Default => songMasterTables.Select(x => x.Group).Distinct().ToList(),
-                OrderType.Level => songMasterTables.OrderBy(x => x.Difficulty == selectedDifficulty).Select(x => x.Group).Distinct().ToList(),
-                OrderType.HighScore => songMasterTables.OrderBy(x => -scoreManager.GetScore(x.Sid)).Select(x => x.Group).Distinct().ToList(),
-                OrderType.Name => songMasterTables.OrderBy(x => x.Name).Select(x => x.Group).Distinct().ToList(),
-                _ => default
+                OrderType.Level => songs.OrderBy(x => x.Difficulty == selectedDifficulty),
+                OrderType.HighScore => songs.OrderBy(x => -scoreManager.GetScore(x.Sid)),
+                OrderType.Name => songs.OrderBy(x => x.Name),
+                _ => songs,
             };
+            return orderedSongs.Select(x => x.Group).Distinct().ToList();
         }
 
         public void SetNextOrderType()
         {
             var index = (int)CurrentOrderType + 1;
-            CurrentOrderType = index < OrderTypes.Length ? OrderTypes[index] : default;
+            CurrentOrderType = index < orderTypes.Length ? orderTypes[index] : default;
         }
 
         public void SaveOrderType() => PlayerPrefsValues.Set(PlayerPrefsKey.OrderType, (int)CurrentOrderType);
+
+        private string GetOrderTypeText(OrderType orderType)
+        {
+            var name = orderType.ToString();
+            return typeof(OrderType).GetField(name)?.GetCustomAttribute<TextAttribute>()?.Text ?? name;
+        }
     }
 }

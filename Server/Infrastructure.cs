@@ -73,8 +73,7 @@ public abstract class AcderatorServiceBase<TService> : ServiceBase<TService>
         }
     }
 
-    protected string? Header(string key) => Context.CallContext.RequestHeaders
-        .FirstOrDefault(entry => string.Equals(entry.Key, key, StringComparison.OrdinalIgnoreCase))?.Value;
+    protected string? Header(string key) => Context.CallContext.RequestHeaders.FirstOrDefault(entry => string.Equals(entry.Key, key, StringComparison.OrdinalIgnoreCase))?.Value;
 
     protected TResponse Failure<TResponse>(AppError error, Dictionary<string, object>? master = null)
         where TResponse : ResponseBase, new() => new()

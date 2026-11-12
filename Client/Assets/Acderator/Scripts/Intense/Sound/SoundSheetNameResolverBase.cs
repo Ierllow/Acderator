@@ -9,6 +9,10 @@ namespace Intense
 
         protected SoundSheetNameMaster FindByCategory(int category) => masterDataManager.MemoryDatabase.SoundSheetNameMasterTable.FindByCategory(category);
 
-        protected SoundSheetNameMaster FindByCategoryAndId(int category, int id) => masterDataManager.MemoryDatabase.SoundSheetNameMasterTable.First(x => x.Category == category && x.Id == id);
+        protected SoundSheetNameMaster FindByCategoryAndId(int category, int id)
+        {
+            var soundSheetNames = masterDataManager.MemoryDatabase.SoundSheetNameMasterTable;
+            return soundSheetNames.First(x => x.Category == category && x.Id == id);
+        }
     }
 }

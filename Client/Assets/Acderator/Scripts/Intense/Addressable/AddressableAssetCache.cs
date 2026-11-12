@@ -18,7 +18,15 @@ namespace Intense.Asset
         private readonly HashSet<SpriteAtlas> spriteAtlasSet = new();
         private readonly Dictionary<string, Sprite> spriteDict = new();
 
-        public IEnumerable<Object> LoadedAssets => loadedAssetHandleDict.Values.Select(handle => handle.Result).Concat(loadedLabelHandleDict.Values.SelectMany(handle => handle.Result));
+        public IEnumerable<Object> LoadedAssets
+        {
+            get
+            {
+                var loadedAssets = loadedAssetHandleDict.Values.Select(handle => handle.Result);
+                var loadedLabelAssets = loadedLabelHandleDict.Values.SelectMany(handle => handle.Result);
+                return loadedAssets.Concat(loadedLabelAssets);
+            }
+        }
 
         public void AddLoad(string address) => addLoadAddressSet.Add(address);
 
@@ -80,7 +88,7 @@ namespace Intense.Asset
             if (asset is SpriteAtlas atlas) spriteAtlasSet.Add(atlas);
         }
 
-        private static void ReleaseIfValid(AsyncOperationHandle handle)
+        private void ReleaseIfValid(AsyncOperationHandle handle)
         {
             if (handle.IsValid()) Addressables.Release(handle);
         }

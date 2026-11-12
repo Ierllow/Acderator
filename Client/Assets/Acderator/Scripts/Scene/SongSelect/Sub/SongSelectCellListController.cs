@@ -15,8 +15,8 @@ namespace SongSelect
         public int SelectedDifficulty { get; private set; } = PlayerPrefsValues.SelectedDifficulty;
         public List<int> SongGroupList => songGroupList ??= CreateSongGroupList();
 
-        public IUniTaskAsyncEnumerable<SongSelectCell> EverySelectedCellChangedAsAsyncEnumerable => UniTaskAsyncEnumerable.EveryValueChanged(this, x => x.selectedCell).Queue().Where(x => x != null);
-        public int SelectedCellListSid => selectedCellListSid ??= masterDataManager.MemoryDatabase.SongMasterTable.First(x => x.Group == SelectedGroup && x.Difficulty == SelectedDifficulty).Sid;
+        public IUniTaskAsyncEnumerable<SongSelectCell> EverySelectedCellChangedAsAsyncEnumerable => CreateSelectedCellChanges();
+        public int SelectedCellListSid => selectedCellListSid ??= FindSelectedSongSid();
 
         public int IndexOf => SongGroupList.IndexOf(SelectedGroup);
 
@@ -49,6 +49,18 @@ namespace SongSelect
         {
             PlayerPrefsValues.Set(PlayerPrefsKey.SelectedGroup, SelectedGroup);
             PlayerPrefsValues.Set(PlayerPrefsKey.SelectedDifficulty, SelectedDifficulty);
+        }
+
+        private IUniTaskAsyncEnumerable<SongSelectCell> CreateSelectedCellChanges()
+        {
+            var selectedCellChanges = UniTaskAsyncEnumerable.EveryValueChanged(this, x => x.selectedCell).Queue();
+            return selectedCellChanges.Where(x => x != null);
+        }
+
+        private int FindSelectedSongSid()
+        {
+            var songs = masterDataManager.MemoryDatabase.SongMasterTable;
+            return songs.First(x => x.Group == SelectedGroup && x.Difficulty == SelectedDifficulty).Sid;
         }
 
         private List<int> CreateSongGroupList() => masterDataManager.MemoryDatabase.SongMasterTable.Select(x => x.Group).Distinct().ToList();

@@ -27,7 +27,7 @@ public class PopupBaseEditor : Editor
         }
     }
 
-    private static void InvokeSetContentSize(PopupBase popupBase)
+    private void InvokeSetContentSize(PopupBase popupBase)
     {
         var type = popupBase.GetType();
         while (type != null)

@@ -221,9 +221,9 @@ namespace Intense.Asset
             }
         }
 
-        private static bool IsValidLabel(AssetLabelReference label) => label?.RuntimeKeyIsValid() ?? false;
+        private bool IsValidLabel(AssetLabelReference label) => label?.RuntimeKeyIsValid() ?? false;
 
-        private static void ReleaseIfValid(AsyncOperationHandle handle)
+        private void ReleaseIfValid(AsyncOperationHandle handle)
         {
             if (handle.IsValid()) Addressables.Release(handle);
         }
@@ -239,7 +239,7 @@ namespace Intense.Asset
         private async UniTask<AddressableOperationResult> WaitForCompletionAsync(AsyncOperationHandle handle, CancellationToken cancellationToken)
             => GetOperationResult(handle, await UniTask.WaitUntil(() => handle.IsDone, cancellationToken: cancellationToken).SuppressCancellationThrow());
 
-        private static AddressableOperationResult GetOperationResult(AsyncOperationHandle operation, bool isCanceled) => (isCanceled, operation.Status) switch
+        private AddressableOperationResult GetOperationResult(AsyncOperationHandle operation, bool isCanceled) => (isCanceled, operation.Status) switch
         {
             (true, _) => AddressableOperationResult.Canceled,
             (_, AsyncOperationStatus.Succeeded) => AddressableOperationResult.Success,

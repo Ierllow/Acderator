@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using UnityEngine;
 
-public class Screenshot
+public static class Screenshot
 {
     private static readonly string rootPath = Application.dataPath + "/..";
     private static readonly string path = rootPath + "/" + "ScreenShot" + "/";

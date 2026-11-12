@@ -2,7 +2,7 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
-public class EditorHierarchyViewEx
+public static class EditorHierarchyViewEx
 {
     private const int cWidth = 16;
 

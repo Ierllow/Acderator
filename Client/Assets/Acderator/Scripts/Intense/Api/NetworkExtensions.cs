@@ -23,11 +23,17 @@ namespace Intense.Api
         public static bool TryConvertDictionary(this object rawValue, out Dictionary<string, object> value) => (value = rawValue switch
         {
             Dictionary<string, object> stringDictionary => stringDictionary,
-            Dictionary<object, object> objectDictionary => objectDictionary.Where(x => !string.IsNullOrEmpty(x.Key?.ToString())).ToDictionary(x => x.Key.ToString(), x => x.Value),
+            Dictionary<object, object> objectDictionary => ToStringDictionary(objectDictionary),
             _ => default,
         }) != default;
 
         public static IEnumerable<object> GetList(this Dictionary<string, object> dictionary, string key) =>
             (dictionary?.TryGetValue(key, out var rawValue) ?? false) && rawValue is IEnumerable<object> enumerable ? enumerable : Enumerable.Empty<object>();
+
+        private static Dictionary<string, object> ToStringDictionary(Dictionary<object, object> dictionary)
+        {
+            var validEntries = dictionary.Where(x => !string.IsNullOrEmpty(x.Key?.ToString()));
+            return validEntries.ToDictionary(x => x.Key.ToString(), x => x.Value);
+        }
     }
 }

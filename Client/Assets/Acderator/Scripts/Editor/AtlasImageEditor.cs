@@ -113,7 +113,7 @@ public class AtlasImageEditor : ImageEditor
         });
     }
 
-    private static string[] GetSpriteNames(SpriteAtlas spriteAtlas)
+    private string[] GetSpriteNames(SpriteAtlas spriteAtlas)
     {
         var sprites = new Sprite[spriteAtlas.spriteCount];
         spriteAtlas.GetSprites(sprites);

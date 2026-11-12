@@ -6,7 +6,7 @@ namespace Acderator.Server;
 
 public sealed class MasterDataStore(IDbContextFactory<AcderatorDbContext> contextFactory, IHostEnvironment environment, IOptions<ServerOptions> options, ILogger<MasterDataStore> logger)
 {
-    private static readonly JsonSerializerOptions JsonOptions = new() { PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower };
+    private readonly JsonSerializerOptions jsonOptions = new() { PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower };
 
     private readonly IDbContextFactory<AcderatorDbContext> contextFactory = contextFactory;
     private readonly IHostEnvironment environment = environment;
@@ -22,11 +22,13 @@ public sealed class MasterDataStore(IDbContextFactory<AcderatorDbContext> contex
 
     internal async Task SynchronizeAsync()
     {
-        var path = Path.IsPathRooted(options.MasterDataPath) ? options.MasterDataPath : Path.Combine(environment.ContentRootPath, options.MasterDataPath);
+        var configuredPath = options.MasterDataPath;
+        var path = Path.IsPathRooted(configuredPath) ? configuredPath : Path.Combine(environment.ContentRootPath, configuredPath);
         var nextDocument = JsonDocument.Parse(await File.ReadAllTextAsync(path));
         var root = nextDocument.RootElement;
         var nextPayload = (Dictionary<string, object>)ConvertElement(root);
-        var nextVersion = root.TryGetProperty("version_master", out var versionElement) ? versionElement.GetString() ?? string.Empty : string.Empty;
+        var hasVersion = root.TryGetProperty("version_master", out var versionElement);
+        var nextVersion = hasVersion ? versionElement.GetString() ?? string.Empty : string.Empty;
 
         try
         {
@@ -60,10 +62,9 @@ public sealed class MasterDataStore(IDbContextFactory<AcderatorDbContext> contex
         logger.LogInformation("Synchronized master data version {Version}", Version);
     }
 
-    internal bool IsCurrentVersion(string? clientVersion) =>
-        string.Equals(clientVersion ?? string.Empty, Version, StringComparison.Ordinal);
+    internal bool IsCurrentVersion(string? clientVersion) => string.Equals(clientVersion ?? string.Empty, Version, StringComparison.Ordinal);
 
-    private static async Task DeleteMasterDataAsync(AcderatorDbContext context)
+    private async Task DeleteMasterDataAsync(AcderatorDbContext context)
     {
         await context.MasterVersions.ExecuteDeleteAsync();
         await context.TitleMasters.ExecuteDeleteAsync();
@@ -78,10 +79,13 @@ public sealed class MasterDataStore(IDbContextFactory<AcderatorDbContext> contex
         await context.ResultMasters.ExecuteDeleteAsync();
     }
 
-    private static List<TEntity> ReadEntities<TEntity>(JsonElement root, string propertyName) where TEntity : class =>
-        root.TryGetProperty(propertyName, out var array) ? array.Deserialize<List<TEntity>>(JsonOptions) ?? [] : [];
+    private List<TEntity> ReadEntities<TEntity>(JsonElement root, string propertyName) where TEntity : class
+    {
+        if (!root.TryGetProperty(propertyName, out var array)) return [];
+        return array.Deserialize<List<TEntity>>(jsonOptions) ?? [];
+    }
 
-    private static object ConvertElement(JsonElement element) => element.ValueKind switch
+    private object ConvertElement(JsonElement element) => element.ValueKind switch
     {
         JsonValueKind.Object => element.EnumerateObject().ToDictionary(x => x.Name, x => ConvertElement(x.Value)),
         JsonValueKind.Array => element.EnumerateArray().Select(ConvertElement).ToList(),
