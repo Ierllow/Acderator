@@ -1,6 +1,6 @@
 using Acderator.Server;
 using MagicOnion.Server;
-using MySqlConnector;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,8 +13,9 @@ builder.WebHost.ConfigureKestrel(options =>
 });
 
 builder.Services.Configure<ServerOptions>(builder.Configuration.GetSection("Acderator"));
-builder.Services.AddSingleton(new MySqlDataSource(
-    builder.Configuration["DATABASE_URL"] ?? throw new InvalidOperationException("DATABASE_URL must be set.")));
+var connectionString = builder.Configuration["DATABASE_URL"] ?? throw new InvalidOperationException("DATABASE_URL must be set.");
+builder.Services.AddPooledDbContextFactory<AcderatorDbContext>(options =>
+    options.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0))));
 builder.Services.AddSingleton<GameRepository>();
 builder.Services.AddSingleton<MasterDataStore>();
 builder.Services.AddSingleton<PasswordService>();

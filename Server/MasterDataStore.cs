@@ -1,27 +1,20 @@
-using Dapper;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using MySqlConnector;
 using System.Text.Json;
 
 namespace Acderator.Server;
 
-public sealed class MasterDataStore
+public sealed class MasterDataStore(IDbContextFactory<AcderatorDbContext> contextFactory, IHostEnvironment environment, IOptions<ServerOptions> options, ILogger<MasterDataStore> logger)
 {
-    private readonly MySqlDataSource dataSource;
-    private readonly IHostEnvironment environment;
-    private readonly ServerOptions options;
-    private readonly ILogger<MasterDataStore> logger;
-    private JsonDocument document = JsonDocument.Parse("{}");
-    private Dictionary<string, object> payload = new();
-    private string version = string.Empty;
+    private static readonly JsonSerializerOptions JsonOptions = new() { PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower };
 
-    public MasterDataStore(MySqlDataSource dataSource, IHostEnvironment environment, IOptions<ServerOptions> options, ILogger<MasterDataStore> logger)
-    {
-        this.dataSource = dataSource;
-        this.environment = environment;
-        this.options = options.Value;
-        this.logger = logger;
-    }
+    private readonly IDbContextFactory<AcderatorDbContext> contextFactory = contextFactory;
+    private readonly IHostEnvironment environment = environment;
+    private readonly ServerOptions options = options.Value;
+    private readonly ILogger<MasterDataStore> logger = logger;
+    private JsonDocument document = JsonDocument.Parse("{}");
+    private Dictionary<string, object> payload = [];
+    private string version = string.Empty;
 
     internal Dictionary<string, object> Payload => payload;
 
@@ -29,58 +22,66 @@ public sealed class MasterDataStore
 
     internal async Task SynchronizeAsync()
     {
-        document.Dispose();
-        document = JsonDocument.Parse(await File.ReadAllTextAsync(Path.IsPathRooted(options.MasterDataPath) ? options.MasterDataPath : Path.Combine(environment.ContentRootPath, options.MasterDataPath)));
-        payload = (Dictionary<string, object>)ConvertElement(document.RootElement);
-        version = document.RootElement.TryGetProperty("version_master", out var versionElement) ? versionElement.GetString() ?? string.Empty : string.Empty;
+        var path = Path.IsPathRooted(options.MasterDataPath) ? options.MasterDataPath : Path.Combine(environment.ContentRootPath, options.MasterDataPath);
+        var nextDocument = JsonDocument.Parse(await File.ReadAllTextAsync(path));
+        var root = nextDocument.RootElement;
+        var nextPayload = (Dictionary<string, object>)ConvertElement(root);
+        var nextVersion = root.TryGetProperty("version_master", out var versionElement) ? versionElement.GetString() ?? string.Empty : string.Empty;
 
-        await using var connection = await dataSource.OpenConnectionAsync();
-        await using var transaction = await connection.BeginTransactionAsync();
-        foreach (var table in new[]
+        try
         {
-            "master_version", "title_master", "song_select_master", "song_master",
-            "song_score_rate_master", "song_base_score_master", "song_judge_zone_master",
-            "song_base_hp_master", "song_hp_rate_master", "sound_sheet_name_master", "result_master",
-        })
+            await using var context = await contextFactory.CreateDbContextAsync();
+            await using var transaction = await context.Database.BeginTransactionAsync();
+            await DeleteMasterDataAsync(context);
+            context.MasterVersions.Add(new MasterVersionEntity { Version = nextVersion });
+            context.TitleMasters.AddRange(ReadEntities<TitleMasterEntity>(root, "title_masters"));
+            context.SongSelectMasters.AddRange(ReadEntities<SongSelectMasterEntity>(root, "song_select_masters"));
+            context.SongMasters.AddRange(ReadEntities<SongMasterEntity>(root, "song_masters"));
+            context.SongScoreRateMasters.AddRange(ReadEntities<SongScoreRateMasterEntity>(root, "score_rate_masters"));
+            context.SongBaseScoreMasters.AddRange(ReadEntities<SongBaseScoreMasterEntity>(root, "base_score_masters"));
+            context.SongJudgeZoneMasters.AddRange(ReadEntities<SongJudgeZoneMasterEntity>(root, "judge_zone_masters"));
+            context.SongBaseHpMasters.AddRange(ReadEntities<SongBaseHpMasterEntity>(root, "base_hp_masters"));
+            context.SongHpRateMasters.AddRange(ReadEntities<SongHpRateMasterEntity>(root, "hp_rate_masters"));
+            context.SoundSheetNameMasters.AddRange(ReadEntities<SoundSheetNameMasterEntity>(root, "sound_sheet_masters"));
+            context.ResultMasters.AddRange(ReadEntities<ResultMasterEntity>(root, "result_masters"));
+            await context.SaveChangesAsync();
+            await transaction.CommitAsync();
+        }
+        catch
         {
-            await connection.ExecuteAsync($"DELETE FROM {table}", transaction: transaction);
+            nextDocument.Dispose();
+            throw;
         }
 
-        await connection.ExecuteAsync("INSERT INTO master_version (version) VALUES (@Version)", new { Version }, transaction);
-        await InsertArray(connection, transaction, "title_masters", "INSERT INTO title_master (tid) VALUES (@tid)");
-        await InsertArray(connection, transaction, "song_select_masters", "INSERT INTO song_select_master (`group`, start_song_time, song_time) VALUES (@group, @start_song_time, @song_time)");
-        await InsertArray(connection, transaction, "song_masters", "INSERT INTO song_master (sid, `group`, difficulty, name, composer, start_offset, bg) VALUES (@sid, @group, @difficulty, @name, @composer, @start_offset, @bg)");
-        await InsertArray(connection, transaction, "score_rate_masters", "INSERT INTO song_score_rate_master (r_type, rate) VALUES (@r_type, @rate)");
-        await InsertArray(connection, transaction, "base_score_masters", "INSERT INTO song_base_score_master (score) VALUES (@score)");
-        await InsertArray(connection, transaction, "judge_zone_masters", "INSERT INTO song_judge_zone_master (j_type, zone) VALUES (@j_type, @zone)");
-        await InsertArray(connection, transaction, "base_hp_masters", "INSERT INTO song_base_hp_master (hp) VALUES (@hp)");
-        await InsertArray(connection, transaction, "hp_rate_masters", "INSERT INTO song_hp_rate_master (j_type, rate) VALUES (@j_type, @rate)");
-        await InsertArray(connection, transaction, "sound_sheet_masters", "INSERT INTO sound_sheet_name_master (category, id, sheet_name, cue_name) VALUES (@category, @id, @sheet_name, @cue_name)");
-        await InsertArray(connection, transaction, "result_masters", "INSERT INTO result_master (rid) VALUES (@rid)");
-        await transaction.CommitAsync();
+        document.Dispose();
+        document = nextDocument;
+        payload = nextPayload;
+        version = nextVersion;
         logger.LogInformation("Synchronized master data version {Version}", Version);
     }
 
     internal bool IsCurrentVersion(string? clientVersion) =>
         string.Equals(clientVersion ?? string.Empty, Version, StringComparison.Ordinal);
 
-    private async Task InsertArray(MySqlConnection connection, MySqlTransaction transaction, string propertyName, string sql)
+    private static async Task DeleteMasterDataAsync(AcderatorDbContext context)
     {
-        if (!document.RootElement.TryGetProperty(propertyName, out var array)) return;
-        foreach (var item in array.EnumerateArray())
-        {
-            await connection.ExecuteAsync(sql, ToParameters(item), transaction);
-        }
+        await context.MasterVersions.ExecuteDeleteAsync();
+        await context.TitleMasters.ExecuteDeleteAsync();
+        await context.SongSelectMasters.ExecuteDeleteAsync();
+        await context.SongMasters.ExecuteDeleteAsync();
+        await context.SongScoreRateMasters.ExecuteDeleteAsync();
+        await context.SongBaseScoreMasters.ExecuteDeleteAsync();
+        await context.SongJudgeZoneMasters.ExecuteDeleteAsync();
+        await context.SongBaseHpMasters.ExecuteDeleteAsync();
+        await context.SongHpRateMasters.ExecuteDeleteAsync();
+        await context.SoundSheetNameMasters.ExecuteDeleteAsync();
+        await context.ResultMasters.ExecuteDeleteAsync();
     }
 
-    private DynamicParameters ToParameters(JsonElement element)
-    {
-        var parameters = new DynamicParameters();
-        foreach (var property in element.EnumerateObject()) parameters.Add(property.Name, ConvertElement(property.Value));
-        return parameters;
-    }
+    private static List<TEntity> ReadEntities<TEntity>(JsonElement root, string propertyName) where TEntity : class =>
+        root.TryGetProperty(propertyName, out var array) ? array.Deserialize<List<TEntity>>(JsonOptions) ?? [] : [];
 
-    private object ConvertElement(JsonElement element) => element.ValueKind switch
+    private static object ConvertElement(JsonElement element) => element.ValueKind switch
     {
         JsonValueKind.Object => element.EnumerateObject().ToDictionary(x => x.Name, x => ConvertElement(x.Value)),
         JsonValueKind.Array => element.EnumerateArray().Select(ConvertElement).ToList(),

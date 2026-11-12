@@ -1,142 +1,148 @@
-using Dapper;
 using Acderator.Shared;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using MySqlConnector;
+using System.Data;
 
 namespace Acderator.Server;
 
-public sealed class GameRepository
+public sealed class GameRepository(IDbContextFactory<AcderatorDbContext> contextFactory, IOptions<ServerOptions> options)
 {
-    private readonly MySqlDataSource dataSource;
-    private readonly ServerOptions options;
-    private int? cachedBaseScore;
-
-    public GameRepository(MySqlDataSource dataSource, IOptions<ServerOptions> options)
-    {
-        this.dataSource = dataSource;
-        this.options = options.Value;
-    }
+    private readonly IDbContextFactory<AcderatorDbContext> contextFactory = contextFactory;
+    private readonly ServerOptions options = options.Value;
 
     internal async Task<UserRecord?> FindUserAsync(string userId)
     {
-        await using var connection = await dataSource.OpenConnectionAsync();
-        return await connection.QuerySingleOrDefaultAsync<UserRecord>(
-            "SELECT userid AS UserId, password AS Password FROM user WHERE userid = @UserId LIMIT 1",
-            new { UserId = userId });
+        await using var context = await contextFactory.CreateDbContextAsync();
+        return await context.Users.AsNoTracking()
+            .Where(x => x.UserId == userId)
+            .Select(x => new UserRecord(x.UserId, x.Password))
+            .SingleOrDefaultAsync();
     }
 
     internal async Task<bool> UuidExistsAsync(string uuid)
     {
-        await using var connection = await dataSource.OpenConnectionAsync();
-        return await connection.ExecuteScalarAsync<int>("SELECT EXISTS(SELECT 1 FROM user WHERE uuid = @Uuid)", new { Uuid = uuid }) == 1;
+        await using var context = await contextFactory.CreateDbContextAsync();
+        return await context.Users.AnyAsync(x => x.Uuid == uuid);
     }
 
     internal async Task<bool> CreateUserAndSessionAsync(int userId, string uuid, string passwordHash, string sessionHash)
     {
-        await using var connection = await dataSource.OpenConnectionAsync();
-        await using var transaction = await connection.BeginTransactionAsync();
+        await using var context = await contextFactory.CreateDbContextAsync();
+        await using var transaction = await context.Database.BeginTransactionAsync();
+        var userIdText = userId.ToString();
+        context.Users.Add(new UserEntity { UserId = userIdText, Uuid = uuid, Password = passwordHash });
+        context.AuthSessions.Add(new AuthSessionEntity { SessionId = sessionHash, UserId = userIdText, LastActivity = DateTime.UtcNow });
+        await PruneAuthSessionsAsync(context);
         try
         {
-            await connection.ExecuteAsync(
-                "INSERT INTO user (userid, uuid, password) VALUES (@UserId, @Uuid, @Password)",
-                new { UserId = userId.ToString(), Uuid = uuid, Password = passwordHash }, transaction);
+            await context.SaveChangesAsync();
+            await transaction.CommitAsync();
+            return true;
         }
-        catch (MySqlException exception) when (exception.Number == 1062)
+        catch (DbUpdateException exception) when (IsDuplicateKey(exception))
         {
             return false;
         }
-        await PruneAuthSessions(connection, transaction);
-        await connection.ExecuteAsync(
-            "INSERT INTO session (session_id, userid, last_activity) VALUES (@SessionId, @UserId, UTC_TIMESTAMP())",
-            new { SessionId = sessionHash, UserId = userId.ToString() }, transaction);
-        await transaction.CommitAsync();
-        return true;
     }
 
     internal async Task CreateLoginSessionAsync(string userId, string sessionHash, string? replacementPasswordHash)
     {
-        await using var connection = await dataSource.OpenConnectionAsync();
-        await using var transaction = await connection.BeginTransactionAsync();
+        await using var context = await contextFactory.CreateDbContextAsync();
+        await using var transaction = await context.Database.BeginTransactionAsync();
         if (replacementPasswordHash is not null)
         {
-            await connection.ExecuteAsync("UPDATE user SET password = @Password WHERE userid = @UserId", new { Password = replacementPasswordHash, UserId = userId }, transaction);
+            var user = await context.Users.SingleAsync(x => x.UserId == userId);
+            user.Password = replacementPasswordHash;
         }
-        await PruneAuthSessions(connection, transaction);
-        await connection.ExecuteAsync(
-            "INSERT INTO session (session_id, userid, last_activity) VALUES (@SessionId, @UserId, UTC_TIMESTAMP())",
-            new { SessionId = sessionHash, UserId = userId }, transaction);
+        await PruneAuthSessionsAsync(context);
+        context.AuthSessions.Add(new AuthSessionEntity { SessionId = sessionHash, UserId = userId, LastActivity = DateTime.UtcNow });
+        await context.SaveChangesAsync();
         await transaction.CommitAsync();
     }
 
     internal async Task<string?> AuthenticateAsync(string sessionHash)
     {
-        await using var connection = await dataSource.OpenConnectionAsync();
-        if (await connection.ExecuteAsync(
-            "UPDATE session SET last_activity = UTC_TIMESTAMP() WHERE session_id = @SessionId AND last_activity >= @Cutoff",
-            new { SessionId = sessionHash, Cutoff = DateTime.UtcNow.AddSeconds(-options.AuthSessionTtlSeconds) }) != 1)
-        {
-            return null;
-        }
-        return await connection.QuerySingleOrDefaultAsync<string>(
-            "SELECT userid FROM session WHERE session_id = @SessionId LIMIT 1",
-            new { SessionId = sessionHash });
+        await using var context = await contextFactory.CreateDbContextAsync();
+        var cutoff = DateTime.UtcNow.AddSeconds(-options.AuthSessionTtlSeconds);
+        var session = await context.AuthSessions.SingleOrDefaultAsync(x => x.SessionId == sessionHash && x.LastActivity >= cutoff);
+        if (session is null) return null;
+        session.LastActivity = DateTime.UtcNow;
+        await context.SaveChangesAsync();
+        return session.UserId;
     }
 
     internal async Task LogoutAsync(string sessionHash)
     {
-        await using var connection = await dataSource.OpenConnectionAsync();
-        await connection.ExecuteAsync("DELETE FROM session WHERE session_id = @SessionId", new { SessionId = sessionHash });
+        await using var context = await contextFactory.CreateDbContextAsync();
+        await context.AuthSessions.Where(x => x.SessionId == sessionHash).ExecuteDeleteAsync();
     }
 
     internal async Task<List<ScoreEntry>> GetScoresAsync(string userId)
     {
-        await using var connection = await dataSource.OpenConnectionAsync();
-        return (await connection.QueryAsync<ScoreEntry>(
-            "SELECT score_id AS ScoreId, score AS Score FROM score WHERE userid = @UserId ORDER BY score_id",
-            new { UserId = userId })).AsList();
+        await using var context = await contextFactory.CreateDbContextAsync();
+        return await context.Scores.AsNoTracking()
+            .Where(x => x.UserId == userId)
+            .OrderBy(x => x.ScoreId)
+            .Select(x => new ScoreEntry { ScoreId = x.ScoreId, Score = x.Value })
+            .ToListAsync();
     }
 
     internal async Task<bool> BeginScoreAsync(string userId, int scoreId, string sessionHash)
     {
-        await using var connection = await dataSource.OpenConnectionAsync();
-        if (await connection.ExecuteScalarAsync<int>("SELECT EXISTS(SELECT 1 FROM song_master WHERE sid = @ScoreId)", new { ScoreId = scoreId }) != 1)
-        {
-            return false;
-        }
+        await using var context = await contextFactory.CreateDbContextAsync();
+        if (!await context.SongMasters.AnyAsync(x => x.Sid == scoreId)) return false;
 
-        await using var transaction = await connection.BeginTransactionAsync();
-        await connection.ExecuteAsync("DELETE FROM score_session WHERE created_at < @Cutoff", new { Cutoff = DateTime.UtcNow.AddSeconds(-options.ScoreSessionTtlSeconds) }, transaction);
-        await connection.ExecuteAsync("DELETE FROM score_session WHERE userid = @UserId AND score_id = @ScoreId", new { UserId = userId, ScoreId = scoreId }, transaction);
-        await connection.ExecuteAsync(
-            "INSERT INTO score_session (session_id, score_id, userid, created_at) VALUES (@SessionId, @ScoreId, @UserId, UTC_TIMESTAMP())",
-            new { SessionId = sessionHash, ScoreId = scoreId, UserId = userId }, transaction);
+        await using var transaction = await context.Database.BeginTransactionAsync();
+        var cutoff = DateTime.UtcNow.AddSeconds(-options.ScoreSessionTtlSeconds);
+        await context.ScoreSessions.Where(x => x.CreatedAt < cutoff).ExecuteDeleteAsync();
+        await context.ScoreSessions.Where(x => x.UserId == userId && x.ScoreId == scoreId).ExecuteDeleteAsync();
+        context.ScoreSessions.Add(new ScoreSessionEntity
+        {
+            SessionId = sessionHash,
+            ScoreId = scoreId,
+            UserId = userId,
+            CreatedAt = DateTime.UtcNow,
+        });
+        await context.SaveChangesAsync();
         await transaction.CommitAsync();
         return true;
     }
 
     internal async Task<SubmitScoreResult> SubmitScoreAsync(string userId, string sessionHash, int score)
     {
-        await using var connection = await dataSource.OpenConnectionAsync();
-        cachedBaseScore ??= await connection.QuerySingleOrDefaultAsync<int?>("SELECT score FROM song_base_score_master LIMIT 1");
-        if (cachedBaseScore is null) return SubmitScoreResult.MissingBaseScore;
-        if (score < 0 || score > cachedBaseScore) return SubmitScoreResult.InvalidScore;
+        await using var context = await contextFactory.CreateDbContextAsync();
+        var baseScore = await context.SongBaseScoreMasters.AsNoTracking().Select(x => (int?)x.Score).FirstOrDefaultAsync();
+        if (baseScore is null) return SubmitScoreResult.MissingBaseScore;
+        if (score < 0 || score > baseScore) return SubmitScoreResult.InvalidScore;
 
-        await using var transaction = await connection.BeginTransactionAsync();
-        var scoreId = await connection.QuerySingleOrDefaultAsync<int?>(
-            "SELECT score_id FROM score_session WHERE session_id = @SessionId AND userid = @UserId AND created_at >= @Cutoff LIMIT 1 FOR UPDATE",
-            new { SessionId = sessionHash, UserId = userId, Cutoff = DateTime.UtcNow.AddSeconds(-options.ScoreSessionTtlSeconds) }, transaction);
-        if (scoreId is null) return SubmitScoreResult.SessionNotFound;
+        await using var transaction = await context.Database.BeginTransactionAsync(IsolationLevel.Serializable);
+        var cutoff = DateTime.UtcNow.AddSeconds(-options.ScoreSessionTtlSeconds);
+        var scoreSession = await context.ScoreSessions.SingleOrDefaultAsync(x => x.SessionId == sessionHash && x.UserId == userId && x.CreatedAt >= cutoff);
+        if (scoreSession is null) return SubmitScoreResult.SessionNotFound;
 
-        await connection.ExecuteAsync("DELETE FROM score_session WHERE session_id = @SessionId", new { SessionId = sessionHash }, transaction);
-        await connection.ExecuteAsync(
-            "INSERT INTO score (userid, score_id, score) VALUES (@UserId, @ScoreId, @Score) ON DUPLICATE KEY UPDATE score = GREATEST(score, VALUES(score))",
-            new { UserId = userId, ScoreId = scoreId.Value, Score = score }, transaction);
+        context.ScoreSessions.Remove(scoreSession);
+        var savedScore = await context.Scores.SingleOrDefaultAsync(x => x.UserId == userId && x.ScoreId == scoreSession.ScoreId);
+        if (savedScore is null)
+        {
+            context.Scores.Add(new ScoreEntity { UserId = userId, ScoreId = scoreSession.ScoreId, Value = score });
+        }
+        else if (score > savedScore.Value)
+        {
+            savedScore.Value = score;
+        }
+        await context.SaveChangesAsync();
         await transaction.CommitAsync();
         return SubmitScoreResult.Success;
     }
 
-    private async Task PruneAuthSessions(MySqlConnection connection, MySqlTransaction transaction) =>
-        await connection.ExecuteAsync("DELETE FROM session WHERE last_activity < @Cutoff", new { Cutoff = DateTime.UtcNow.AddSeconds(-options.AuthSessionTtlSeconds) }, transaction);
+    private async Task PruneAuthSessionsAsync(AcderatorDbContext context)
+    {
+        var cutoff = DateTime.UtcNow.AddSeconds(-options.AuthSessionTtlSeconds);
+        await context.AuthSessions.Where(x => x.LastActivity < cutoff).ExecuteDeleteAsync();
+    }
+
+    private static bool IsDuplicateKey(DbUpdateException exception) => exception.GetBaseException() is MySqlException { Number: 1062 };
 }
 
 internal sealed record UserRecord(string UserId, string Password);

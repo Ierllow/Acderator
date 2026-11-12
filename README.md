@@ -11,8 +11,6 @@ Shared/  Acderator.Shared RPC contracts used as a .NET library and Unity local p
 Tools/AddressablesBuilder/  Unity project for building remote Addressables content
 ```
 
-The previous Rust/Axum backend from `AcderatorServer` has been migrated into this repository. The server keeps the existing MySQL schema and MessagePack-based request/response models while exposing them as typed MagicOnion services.
-
 ## Getting Started
 
 ### Requirements
@@ -109,13 +107,12 @@ Open `Tools/AddressablesBuilder` with Unity 6000.3.0f1 to build remote Addressab
 ## Credits
 
 - [Ched](https://github.com/paralleltree/Ched)
-- [Dapper](https://github.com/DapperLib/Dapper)
 - [gRPC for .NET](https://github.com/grpc/grpc-dotnet)
 - [Isopoh.Cryptography.Argon2](https://github.com/mheyman/Isopoh.Cryptography.Argon2)
 - [MagicOnion](https://github.com/Cysharp/MagicOnion)
 - [MasterMemory](https://github.com/Cysharp/MasterMemory)
 - [MessagePack for C#](https://github.com/MessagePack-CSharp/MessagePack-CSharp)
-- [MySqlConnector](https://github.com/mysql-net/MySqlConnector)
+- [Pomelo Entity Framework Core MySQL](https://github.com/PomeloFoundation/Pomelo.EntityFrameworkCore.MySql)
 - [R3](https://github.com/Cysharp/R3)
 - [UIEffect](https://github.com/mob-sakai/UIEffect)
 - [UniTask](https://github.com/Cysharp/UniTask)
